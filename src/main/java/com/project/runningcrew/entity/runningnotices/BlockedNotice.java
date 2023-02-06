@@ -1,7 +1,7 @@
-package com.project.runningcrew.entity;
+package com.project.runningcrew.entity.runningnotices;
 
+import com.project.runningcrew.entity.BaseEntity;
 import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,22 +11,22 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RunningMember extends BaseEntity {
+public class BlockedNotice extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "running_member_id")
+    @Column(name = "blocked_notice_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "running_notice_id", nullable = false)
     private RunningNotice runningNotice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public RunningMember(RunningNotice runningNotice, Member member) {
+    public BlockedNotice(RunningNotice runningNotice, Member member) {
         this.runningNotice = runningNotice;
         this.member = member;
     }

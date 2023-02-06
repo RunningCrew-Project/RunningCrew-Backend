@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @Getter
@@ -20,15 +21,16 @@ public class Comment extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @NotBlank
-    @Column(nullable = false)
+    @NotBlank(message = "댓글 내용은 필수값입니다.")
+    @Size(min = 1, max = 200, message = "댓글 내용은 1 자 이상 200 자 이하입니다.")
+    @Column(nullable = false, length = 200)
     private String detail;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
     public Comment(Member member, String detail, Board board) {

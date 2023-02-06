@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,11 +22,11 @@ public class CrewRunningRecord extends RunningRecord{
     @JoinColumn(name = "running_notice_id")
     private RunningNotice runningNotice;
 
-    public CrewRunningRecord(double runningDistance, int runningTime, int runningFace, int calories, String running_detail,
-                             Member member, RunningNotice runningNotice) {
-        super(runningDistance, runningTime, runningFace, calories, running_detail);
+    public CrewRunningRecord(LocalDateTime startDateTime, double runningDistance, int runningTime,
+                             int runningFace, int calories, String running_detail, Member member,
+                             RunningNotice runningNotice) {
+        super(startDateTime, runningDistance, runningTime, runningFace, calories, running_detail);
         this.member = member;
         this.runningNotice = runningNotice;
     }
-
 }

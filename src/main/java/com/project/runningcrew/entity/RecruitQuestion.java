@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
 
 @Entity
 @Getter
@@ -19,14 +18,15 @@ public class RecruitQuestion extends BaseEntity{
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "crew_id")
+    @JoinColumn(name = "crew_id", nullable = false)
     private Crew crew;
 
     @NotBlank
-    @Column(nullable = false)
+    @Size(min = 1, max = 200, message = "크루 가입 질문은 1 자 이상 200 자 이하입니다.")
+    @Column(nullable = false, length = 200)
     private String question;
 
-    @Positive
+    @PositiveOrZero(message = "순서는 0 이상입니다.")
     @Column(nullable = false)
     private int offset;
 

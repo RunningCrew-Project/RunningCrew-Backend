@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @Getter
@@ -20,8 +21,9 @@ public abstract class Image extends BaseEntity {
     @Column(name = "image_id")
     private Long id;
 
-    @NotBlank
-    @Column(nullable = false)
+    @NotBlank(message = "이미지 이름은 필수값입니다.")
+    @Size(min = 1, max = 200, message = "이미지 이름은 1 자 이상 200 자 이하입니다.")
+    @Column(nullable = false, length = 200)
     private String fileName;
 
     public Image(String fileName) {

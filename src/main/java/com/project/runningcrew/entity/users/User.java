@@ -8,10 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,51 +24,58 @@ public class User extends BaseEntity {
     private Long id;
 
     @Email
-    @NotBlank
+    @NotBlank(message = "유저 이메일은 필수값입니다.")
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{4,16}$",
-            message = "비밀번호는 4글자 이상 16글자 이하의 영문, 숫자, 특수문자의 조합이여야 합니다.")
-    @NotNull
-    private String password;
-
-    @NotBlank
+    @NotBlank(message = "이름은 필수값입니다.")
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "닉네임은 필수값입니다.")
     @Column(unique = true, nullable = false)
     private String nickname;
 
+    @NotBlank(message = "이미지는 필수값입니다.")
     @Column(nullable = false)
     private String imgUrl;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoginType login_type;
 
+    @NotBlank(message = "핸드폰 번호는 필수값입니다.")
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private String location;
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{4,16}$",
+            message = "비밀번호는 4글자 이상 16글자 이하의 영문, 숫자, 특수문자의 조합이여야 합니다.")
+    @NotNull
+    private String password = "";
 
+    @NotNull
+    @Column(nullable = false)
+    private String location = "";
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Sex sex;
+    private Sex sex = Sex.MAN;
 
     @Column(nullable = false)
-    private LocalDate birthday;
+    private LocalDate birthday = LocalDate.of(1990, 1, 1);
 
+    @PositiveOrZero(message = "키는 0 이상입니다.")
     @Column(nullable = false)
-    private int height;
+    private int height = 0;
 
+    @PositiveOrZero(message = "몸무게는 0 이상입니다.")
     @Column(nullable = false)
-    private int weight;
+    private int weight = 0;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Member> members = new ArrayList<>();
-
 
     @Builder
     public User(String email, String password, String name, String nickname, String imgUrl,

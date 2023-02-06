@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @Getter
@@ -21,19 +22,22 @@ public class Crew extends BaseEntity {
     @Column(name = "crew_id")
     private Long id;
 
-    @NotBlank
-    @Column(unique = true, nullable = false)
+    @NotBlank(message = "크루 이름은 필수값입니다.")
+    @Size(min = 1, max = 100, message = "크루 이름은 1 자 이상 100 자 이하입니다.")
+    @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-    @NotBlank
-    @Column(nullable = false)
+    @NotBlank(message = "활동 지역은 필수값입니다.")
+    @Size(min = 1, max = 100, message = "활동 지역은 1 자 이상 100 자 이하입니다.")
+    @Column(nullable = false, length = 100)
     private String location;
 
-    @NotBlank
-    @Column(nullable = false)
+    @NotBlank(message = "크루 소개는 필수값입니다.")
+    @Size(min = 1, max = 500, message = "크루 소개는 1 자 이상 500 자 이하입니다.")
+    @Column(nullable = false, length = 500)
     private String introduction;
 
-    @NotBlank
+    @NotBlank(message = "이미지 경로는 필수값입니다.")
     @Column(nullable = false)
     private String crewImgUrl;
 
