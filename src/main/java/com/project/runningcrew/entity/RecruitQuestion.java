@@ -29,12 +29,12 @@ public class RecruitQuestion extends BaseEntity{
 
     @PositiveOrZero(message = "순서는 0 이상입니다.")
     @Column(nullable = false)
-    private int offset;
+    private int questionOffset;
 
-    public RecruitQuestion(Crew crew, String question, int offset) {
+    public RecruitQuestion(Crew crew, String question, int questionOffset) {
         this.crew = crew;
         this.question = question;
-        this.offset = offset;
+        this.questionOffset = questionOffset;
     }
 
 }

@@ -27,16 +27,16 @@ public class Gps extends BaseEntity{
 
     @PositiveOrZero(message = "순서는 0 이상입니다.")
     @Column(nullable = false)
-    private int offset;
+    private int gpsOffset;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "running_record_id", nullable = false)
     private RunningRecord runningRecord;
 
-    public Gps(Double latitude, Double longitude, int offset, RunningRecord runningRecord) {
+    public Gps(Double latitude, Double longitude, int gpsOffset, RunningRecord runningRecord) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.offset = offset;
+        this.gpsOffset = gpsOffset;
 
         if (runningRecord != null) {
             setRunningRecord(runningRecord);
