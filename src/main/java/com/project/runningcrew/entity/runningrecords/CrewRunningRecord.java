@@ -2,6 +2,7 @@ package com.project.runningcrew.entity.runningrecords;
 
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.members.Member;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,7 @@ public class CrewRunningRecord extends RunningRecord{
     @JoinColumn(name = "running_notice_id")
     private RunningNotice runningNotice;
 
+    @Builder
     public CrewRunningRecord(LocalDateTime startDateTime, double runningDistance, int runningTime,
                              int runningFace, int calories, String running_detail, Member member,
                              RunningNotice runningNotice) {
