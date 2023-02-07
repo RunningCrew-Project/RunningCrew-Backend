@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Getter
+@Table(name = "comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntity {
 

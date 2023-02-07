@@ -10,6 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Table(name = "running_members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RunningMember extends BaseEntity {
 

@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Getter
+@Table(name = "images")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "image_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

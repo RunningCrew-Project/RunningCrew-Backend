@@ -2,6 +2,7 @@ package com.project.runningcrew.entity.runningnotices;
 
 import com.project.runningcrew.entity.BaseEntity;
 import com.project.runningcrew.entity.members.Member;
+import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Table(name = "running_notices")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RunningNotice extends BaseEntity {
 
@@ -55,10 +57,14 @@ public class RunningNotice extends BaseEntity {
     @Column(nullable = false, length = 30)
     private RunningStatus status;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "running_record_id")
+    private RunningRecord preRunningRecord;
+
     @Builder
     public RunningNotice(String title, String detail, Member member, NoticeType noticeType,
-                         LocalDateTime runningDateTime, int runningPersonnel, RunningStatus status) {
-
+                         LocalDateTime runningDateTime, int runningPersonnel, RunningStatus status,
+                         RunningRecord preRunningRecord) {
         this.title = title;
         this.detail = detail;
         this.member = member;
@@ -66,7 +72,7 @@ public class RunningNotice extends BaseEntity {
         this.runningDateTime = runningDateTime;
         this.runningPersonnel = runningPersonnel;
         this.status = status;
-
+        this.preRunningRecord = preRunningRecord;
     }
 
     public void updateTitle(String title) {
@@ -87,6 +93,10 @@ public class RunningNotice extends BaseEntity {
 
     public void updateStatus(RunningStatus status) {
         this.status = status;
+    }
+
+    public void updatePreRunningRecord(RunningRecord preRunningRecord) {
+        this.preRunningRecord = preRunningRecord;
     }
 
 }
