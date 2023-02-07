@@ -9,6 +9,7 @@ import javax.validation.constraints.*;
 
 @Entity
 @Getter
+@Table(name = "recruit_questions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecruitQuestion extends BaseEntity{
 

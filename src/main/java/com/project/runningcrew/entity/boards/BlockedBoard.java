@@ -10,6 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Table(name = "blocked_boards")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BlockedBoard extends BaseEntity {
 

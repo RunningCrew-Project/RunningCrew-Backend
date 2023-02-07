@@ -10,6 +10,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 @Entity
 @Getter
+@Table(name = "gps")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Gps extends BaseEntity{
 

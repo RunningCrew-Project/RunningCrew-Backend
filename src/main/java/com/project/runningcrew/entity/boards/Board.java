@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Getter
+@Table(name = "boards")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "board_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

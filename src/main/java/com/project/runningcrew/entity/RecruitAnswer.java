@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Getter
+@Table(name = "recruit_answers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecruitAnswer extends BaseEntity{
 
