@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
 @Getter
+@Table(name = "crews")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseEntity {
 

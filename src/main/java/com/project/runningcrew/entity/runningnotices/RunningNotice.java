@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Table(name = "running_notices")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RunningNotice extends BaseEntity {
 

@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Table(name = "running_records")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "running_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

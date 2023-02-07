@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 @Entity
 @Getter
+@Table(name = "recruit_answers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecruitAnswer extends BaseEntity{
 
@@ -32,10 +34,15 @@ public class RecruitAnswer extends BaseEntity{
     @Column(nullable = false, length = 200)
     private String answer;
 
-    public RecruitAnswer(User user, Crew crew, String answer) {
+    @PositiveOrZero(message = "순서는 0 이상입니다.")
+    @Column(nullable = false)
+    private int answerOffset;
+
+    public RecruitAnswer(User user, Crew crew, String answer, int answerOffset) {
         this.user = user;
         this.crew = crew;
         this.answer = answer;
+        this.answerOffset = answerOffset;
     }
 
 }

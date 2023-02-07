@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Getter
+@Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
