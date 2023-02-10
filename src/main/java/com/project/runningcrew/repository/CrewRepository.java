@@ -28,8 +28,8 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
             "or c.location like %:keyword%")
     Slice<Crew> findByNameOrIntroductionOrLocation(Pageable pageable, @Param("keyword") String keyword);
 
-    @Query(value = "select * from crews where crews.location like %:location%" +
-            " order by random() limit :maxSize;", nativeQuery = true)
+    @Query(value = "select * from crews where crews.location = :location" +
+            " order by random() limit :maxSize", nativeQuery = true)
     List<Crew> findRandomByLocation(@Param("location") String location, @Param("maxSize") int maxSize);
 
 }
