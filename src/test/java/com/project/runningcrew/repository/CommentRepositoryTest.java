@@ -11,7 +11,6 @@ import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.boards.BoardRepository;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,42 +41,42 @@ class CommentRepositoryTest {
     @Test
     void saveTest() throws Exception {
         //given
-        User user1 = User.builder()
-                .email("email@email.com")
-                .password("password123!")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.now())
-                .height(100)
-                .weight(100)
-                .build();
+        User user = userRepository.save(
+                User.builder()
+                        .email("email@email.com")
+                        .password("password123!")
+                        .name("name")
+                        .nickname("nickname")
+                        .imgUrl("imgUrl")
+                        .login_type(LoginType.EMAIL)
+                        .phoneNumber("phoneNumber")
+                        .location("location")
+                        .sex(Sex.MAN)
+                        .birthday(LocalDate.now())
+                        .height(100)
+                        .weight(100)
+                        .build()
+        );
 
-        Crew crew1 = Crew.builder()
-                .name("name")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImgUrl")
-                .build();
-
-        Member member1 = new Member(user1, crew1, MemberRole.ROLE_NORMAL);
+        Crew crew = crewRepository.save(
+                Crew.builder()
+                        .name("name")
+                        .location("location")
+                        .introduction("introduction")
+                        .crewImgUrl("crewImgUrl")
+                        .build()
+        );
 
         String title = "title";
         String detail = "detail";
-        Board board1 = new FreeBoard(member1, title, detail);
-        userRepository.save(user1);
-        crewRepository.save(crew1);
-        memberRepository.save(member1);
-        boardRepository.save(board1);
+
+        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
+        FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
-        Comment comment1 = new Comment(member1, detail, board1);
-        Comment savedComment = commentRepository.save(comment1);
+        Comment comment = new Comment(member, detail, board);
+        Comment savedComment = commentRepository.save(comment);
         //then
-        Assertions.assertThat(savedComment).isEqualTo(comment1);
+        Assertions.assertThat(savedComment).isEqualTo(comment);
     }
 
 
@@ -85,40 +84,39 @@ class CommentRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
-        User user1 = User.builder()
-                .email("email@email.com")
-                .password("password123!")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.now())
-                .height(100)
-                .weight(100)
-                .build();
+        User user = userRepository.save(
+                User.builder()
+                        .email("email@email.com")
+                        .password("password123!")
+                        .name("name")
+                        .nickname("nickname")
+                        .imgUrl("imgUrl")
+                        .login_type(LoginType.EMAIL)
+                        .phoneNumber("phoneNumber")
+                        .location("location")
+                        .sex(Sex.MAN)
+                        .birthday(LocalDate.now())
+                        .height(100)
+                        .weight(100)
+                        .build()
+        );
 
-        Crew crew1 = Crew.builder()
-                .name("name")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImgUrl")
-                .build();
-
-        Member member1 = new Member(user1, crew1, MemberRole.ROLE_NORMAL);
+        Crew crew = crewRepository.save(
+                Crew.builder()
+                        .name("name")
+                        .location("location")
+                        .introduction("introduction")
+                        .crewImgUrl("crewImgUrl")
+                        .build()
+        );
 
         String title = "title";
         String detail = "detail";
-        Board board1 = new FreeBoard(member1, title, detail);
-        userRepository.save(user1);
-        crewRepository.save(crew1);
-        memberRepository.save(member1);
-        boardRepository.save(board1);
+
+        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
+        FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
-        Comment comment1 = new Comment(member1, detail, board1);
-        Comment savedComment = commentRepository.save(comment1);
+        Comment savedComment = commentRepository.save(new Comment(member, detail, board));
         Long savedCommentId = savedComment.getId();
         Optional<Comment> findCommentOpt = commentRepository.findById(savedCommentId);
         //then
@@ -128,42 +126,41 @@ class CommentRepositoryTest {
 
     @DisplayName("Comment delete 테스트")
     @Test
-    void nameTest() throws Exception {
+    void deleteTest() throws Exception {
         //given
-        User user1 = User.builder()
-                .email("email@email.com")
-                .password("password123!")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.now())
-                .height(100)
-                .weight(100)
-                .build();
+        User user = userRepository.save(
+                User.builder()
+                        .email("email@email.com")
+                        .password("password123!")
+                        .name("name")
+                        .nickname("nickname")
+                        .imgUrl("imgUrl")
+                        .login_type(LoginType.EMAIL)
+                        .phoneNumber("phoneNumber")
+                        .location("location")
+                        .sex(Sex.MAN)
+                        .birthday(LocalDate.now())
+                        .height(100)
+                        .weight(100)
+                        .build()
+        );
 
-        Crew crew1 = Crew.builder()
-                .name("name")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImgUrl")
-                .build();
-
-        Member member1 = new Member(user1, crew1, MemberRole.ROLE_NORMAL);
+        Crew crew = crewRepository.save(
+                Crew.builder()
+                        .name("name")
+                        .location("location")
+                        .introduction("introduction")
+                        .crewImgUrl("crewImgUrl")
+                        .build()
+        );
 
         String title = "title";
         String detail = "detail";
-        Board board1 = new FreeBoard(member1, title, detail);
-        userRepository.save(user1);
-        crewRepository.save(crew1);
-        memberRepository.save(member1);
-        boardRepository.save(board1);
+
+        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
+        FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
-        Comment comment1 = new Comment(member1, detail, board1);
-        Comment savedComment = commentRepository.save(comment1);
+        Comment savedComment = commentRepository.save(new Comment(member, detail, board));
         Long savedCommentId = savedComment.getId();
         commentRepository.delete(savedComment);
         //then
@@ -176,41 +173,42 @@ class CommentRepositoryTest {
     @Test
     void findAllByBoardIdTest() throws Exception {
         //given
-        User user1 = User.builder()
-                .email("email@email.com")
-                .password("password123!")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.now())
-                .height(100)
-                .weight(100)
-                .build();
+        User user = userRepository.save(
+                User.builder()
+                        .email("email@email.com")
+                        .password("password123!")
+                        .name("name")
+                        .nickname("nickname")
+                        .imgUrl("imgUrl")
+                        .login_type(LoginType.EMAIL)
+                        .phoneNumber("phoneNumber")
+                        .location("location")
+                        .sex(Sex.MAN)
+                        .birthday(LocalDate.now())
+                        .height(100)
+                        .weight(100)
+                        .build()
+        );
 
-        Crew crew1 = Crew.builder()
-                .name("name")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImgUrl")
-                .build();
+        Crew crew = crewRepository.save(
+                Crew.builder()
+                        .name("name")
+                        .location("location")
+                        .introduction("introduction")
+                        .crewImgUrl("crewImgUrl")
+                        .build()
+        );
 
-        Member member1 = new Member(user1, crew1, MemberRole.ROLE_NORMAL);
-        userRepository.save(user1);
-        crewRepository.save(crew1);
-        memberRepository.save(member1);
+        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
 
         String title = "title";
         String detail = "detail";
-        FreeBoard boardA = boardRepository.save(new FreeBoard(member1, title, detail));
-        FreeBoard boardB = boardRepository.save(new FreeBoard(member1, title, detail));
-        commentRepository.save(new Comment(member1, detail, boardA)); //A 저장
-        commentRepository.save(new Comment(member1 ,detail, boardA)); //A 저장
-        commentRepository.save(new Comment(member1, detail, boardB)); //B 저장
+        FreeBoard boardA = boardRepository.save(new FreeBoard(member, title, detail));
+        FreeBoard boardB = boardRepository.save(new FreeBoard(member, title, detail));
         //when
+        commentRepository.save(new Comment(member, detail, boardA)); //A 저장
+        commentRepository.save(new Comment(member ,detail, boardA)); //A 저장
+        commentRepository.save(new Comment(member, detail, boardB)); //B 저장
         Long boardAId = boardA.getId();
         List<Comment> findCommentList = commentRepository.findAllByBoardId(boardAId);
         //then
@@ -223,34 +221,35 @@ class CommentRepositoryTest {
     @Test
     void findAllByMemberIdTest() throws Exception {
         //given
-        User user1 = User.builder()
-                .email("email@email.com")
-                .password("password123!")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.now())
-                .height(100)
-                .weight(100)
-                .build();
+        User user = userRepository.save(
+                User.builder()
+                        .email("email@email.com")
+                        .password("password123!")
+                        .name("name")
+                        .nickname("nickname")
+                        .imgUrl("imgUrl")
+                        .login_type(LoginType.EMAIL)
+                        .phoneNumber("phoneNumber")
+                        .location("location")
+                        .sex(Sex.MAN)
+                        .birthday(LocalDate.now())
+                        .height(100)
+                        .weight(100)
+                        .build()
+        );
 
-        Crew crew1 = Crew.builder()
-                .name("name")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImgUrl")
-                .build();
+        Crew crew = crewRepository.save(
+                Crew.builder()
+                        .name("name")
+                        .location("location")
+                        .introduction("introduction")
+                        .crewImgUrl("crewImgUrl")
+                        .build()
+        );
 
-        userRepository.save(user1);
-        crewRepository.save(crew1);
-
-        Member testBoardCreateMember = memberRepository.save(new Member(user1, crew1, MemberRole.ROLE_NORMAL)); // 테스트 게시물 작성 멤버
-        Member memberA = memberRepository.save(new Member(user1, crew1, MemberRole.ROLE_NORMAL)); //A 멤버
-        Member memberB = memberRepository.save(new Member(user1, crew1, MemberRole.ROLE_NORMAL)); //B 멤버
+        Member testBoardCreateMember = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL)); // 테스트 게시물 작성 멤버
+        Member memberA = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL)); //A 멤버
+        Member memberB = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL)); //B 멤버
 
         String title = "title";
         String detail = "detail";
