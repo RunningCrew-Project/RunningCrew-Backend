@@ -25,24 +25,24 @@ class UserRepositoryTest {
     @Test
     public void saveTest() throws Exception {
         //given
-        User user1 = User.builder()
+        User user = User.builder()
                 .email("email@email.com")
                 .password("password123!")
-                .name("name1")
-                .nickname("nickname1")
-                .imgUrl("imgUrl1")
+                .name("name")
+                .nickname("nickname")
+                .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber1")
-                .location("location1")
+                .phoneNumber("phoneNumber")
+                .location("location")
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
                 .weight(100)
                 .build();
         //when
-        User savedUser = userRepository.save(user1);
+        User savedUser = userRepository.save(user);
         //then
-        Assertions.assertThat(savedUser).isEqualTo(savedUser);
+        Assertions.assertThat(user).isEqualTo(savedUser);
 
     }
 
@@ -51,22 +51,22 @@ class UserRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
-        User user1 = User.builder()
-                .email("email@email.com")
-                .password("password123!")
-                .name("name1")
-                .nickname("nickname1")
-                .imgUrl("imgUrl1")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber1")
-                .location("location1")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.now())
-                .height(100)
-                .weight(100)
-                .build();
-
-        User savedUser = userRepository.save(user1);
+        User savedUser = userRepository.save(
+                User.builder()
+                        .email("email@email.com")
+                        .password("password123!")
+                        .name("name")
+                        .nickname("nickname")
+                        .imgUrl("imgUrl")
+                        .login_type(LoginType.EMAIL)
+                        .phoneNumber("phoneNumber")
+                        .location("location")
+                        .sex(Sex.MAN)
+                        .birthday(LocalDate.now())
+                        .height(100)
+                        .weight(100)
+                        .build()
+        );
         //when
         Optional<User> findUserOpt = userRepository.findById(savedUser.getId());
         //then
@@ -79,22 +79,22 @@ class UserRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
-        User user1 = User.builder()
-                .email("email@email.com")
-                .password("password123!")
-                .name("name1")
-                .nickname("nickname1")
-                .imgUrl("imgUrl1")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber1")
-                .location("location1")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.now())
-                .height(100)
-                .weight(100)
-                .build();
-
-        User savedUser = userRepository.save(user1);
+        User savedUser = userRepository.save(
+                User.builder()
+                        .email("email@email.com")
+                        .password("password123!")
+                        .name("name")
+                        .nickname("nickname")
+                        .imgUrl("imgUrl")
+                        .login_type(LoginType.EMAIL)
+                        .phoneNumber("phoneNumber")
+                        .location("location")
+                        .sex(Sex.MAN)
+                        .birthday(LocalDate.now())
+                        .height(100)
+                        .weight(100)
+                        .build()
+        );
         Long savedUserId = savedUser.getId();
         //when
         userRepository.delete(savedUser);
