@@ -69,7 +69,6 @@ class CommentRepositoryTest {
 
         String title = "title";
         String detail = "detail";
-
         Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
         FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
@@ -112,13 +111,11 @@ class CommentRepositoryTest {
 
         String title = "title";
         String detail = "detail";
-
         Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
         FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
         Comment savedComment = commentRepository.save(new Comment(member, detail, board));
-        Long savedCommentId = savedComment.getId();
-        Optional<Comment> findCommentOpt = commentRepository.findById(savedCommentId);
+        Optional<Comment> findCommentOpt = commentRepository.findById(savedComment.getId());
         //then
         Assertions.assertThat(findCommentOpt).isNotEmpty();
         Assertions.assertThat(findCommentOpt).hasValue(savedComment);
@@ -156,15 +153,13 @@ class CommentRepositoryTest {
 
         String title = "title";
         String detail = "detail";
-
         Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
         FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
         Comment savedComment = commentRepository.save(new Comment(member, detail, board));
-        Long savedCommentId = savedComment.getId();
         commentRepository.delete(savedComment);
         //then
-        Optional<Comment> findCommentOpt = commentRepository.findById(savedCommentId);
+        Optional<Comment> findCommentOpt = commentRepository.findById(savedComment.getId());
         Assertions.assertThat(findCommentOpt).isEmpty();
     }
 
@@ -209,8 +204,7 @@ class CommentRepositoryTest {
         commentRepository.save(new Comment(member, detail, boardA)); //A 저장
         commentRepository.save(new Comment(member ,detail, boardA)); //A 저장
         commentRepository.save(new Comment(member, detail, boardB)); //B 저장
-        Long boardAId = boardA.getId();
-        List<Comment> findCommentList = commentRepository.findAllByBoardId(boardAId);
+        List<Comment> findCommentList = commentRepository.findAllByBoardId(boardA.getId());
         //then
         Assertions.assertThat(findCommentList.size()).isEqualTo(2);
     }
@@ -259,9 +253,7 @@ class CommentRepositoryTest {
         commentRepository.save(new Comment(memberA, detail, testBoard)); // A 멤버 댓글
         commentRepository.save(new Comment(memberA, detail, testBoard)); // A 멤버 댓글
         commentRepository.save(new Comment(memberB, detail, testBoard)); // B 멤버 댓글
-
-        Long memberAId = memberA.getId();
-        List<Comment> findCommentList = commentRepository.findAllByMemberId(memberAId);
+        List<Comment> findCommentList = commentRepository.findAllByMemberId(memberA.getId());
         //then
         Assertions.assertThat(findCommentList.size()).isEqualTo(2);
     }
