@@ -21,6 +21,8 @@ class RecruitQuestionRepositoryTest {
     @Autowired CrewRepository crewRepository;
     @Autowired RecruitQuestionRepository recruitQuestionRepository;
 
+
+
     @DisplayName("RecruitQuestion save 테스트")
     @Test
     void saveTest() throws Exception {
@@ -41,6 +43,8 @@ class RecruitQuestionRepositoryTest {
         //then
         Assertions.assertThat(recruitQuestion).isEqualTo(savedRecruitQuestion);
     }
+
+
 
     @DisplayName("RecruitQuestion findById 테스트")
     @Test
@@ -64,6 +68,8 @@ class RecruitQuestionRepositoryTest {
         Assertions.assertThat(findRecruitQuestionOpt).hasValue(savedRecruitQuestion);
     }
 
+
+
     @DisplayName("RecruitQuestion delete 테스트")
     @Test
     void deleteTest() throws Exception {
@@ -85,6 +91,8 @@ class RecruitQuestionRepositoryTest {
         Optional<RecruitQuestion> findRecruitQuestionOpt = recruitQuestionRepository.findById(savedRecruitQuestion.getId());
         Assertions.assertThat(findRecruitQuestionOpt).isEmpty();
     }
+
+
 
     @DisplayName("특정 crewId 를 가진 RecruitQuestion 출력 테스트")
     @Test
