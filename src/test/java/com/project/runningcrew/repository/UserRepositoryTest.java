@@ -95,11 +95,10 @@ class UserRepositoryTest {
                         .weight(100)
                         .build()
         );
-        Long savedUserId = savedUser.getId();
         //when
         userRepository.delete(savedUser);
         //then
-        Optional<User> findMemberOpt = userRepository.findById(savedUserId);
+        Optional<User> findMemberOpt = userRepository.findById(savedUser.getId());
         Assertions.assertThat(findMemberOpt).isEmpty();
     }
 
