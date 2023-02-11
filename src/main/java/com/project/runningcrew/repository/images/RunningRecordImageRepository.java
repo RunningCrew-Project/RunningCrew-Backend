@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface RunningRecordImageRepository extends JpaRepository<RunningRecordImage, Long> {
 
-    List<RunningRecordImageRepository> findAllByRunningRecord(RunningRecord runningRecord);
+    List<RunningRecordImage> findAllByRunningRecord(RunningRecord runningRecord);
 
 }
