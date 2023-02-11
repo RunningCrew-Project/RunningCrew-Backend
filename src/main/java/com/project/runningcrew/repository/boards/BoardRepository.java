@@ -24,7 +24,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
      * @return list of Board
      * 특정 단어 search 를 제목 or 내용에 포함하는 게시물을 모두 반환한다.
      */
-    @Query("select b from Board b where b.title like %:search% and b.detail like %:search%")
+    @Query("select b from Board b where b.title like %:search% or b.detail like %:search%")
     List<Board> findAllByTitleAndDetail(@Param("search") String search);
 
 
