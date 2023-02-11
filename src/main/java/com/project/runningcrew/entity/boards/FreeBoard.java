@@ -1,6 +1,7 @@
 package com.project.runningcrew.entity.boards;
 
 import com.project.runningcrew.entity.members.Member;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,7 @@ import javax.persistence.Entity;
 @Entity
 @Getter
 @DiscriminatorValue("free")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FreeBoard extends Board{
 
     public FreeBoard(Member member, String title, String content) {
