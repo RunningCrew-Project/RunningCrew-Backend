@@ -6,8 +6,6 @@ import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.LoginType;
 import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.CrewRepository;
-import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.repository.UserRepository;
 import com.project.runningcrew.repository.runningrecords.PersonalRunningRecordRepository;
 import org.junit.jupiter.api.Test;
@@ -32,12 +30,6 @@ class RunningRecordImageRepositoryTest {
 
     @Autowired
     UserRepository userRepository;
-
-    @Autowired
-    CrewRepository crewRepository;
-
-    @Autowired
-    MemberRepository memberRepository;
 
     @Autowired
     PersonalRunningRecordRepository personalRunningRecordRepository;
