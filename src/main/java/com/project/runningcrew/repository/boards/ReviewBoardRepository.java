@@ -17,6 +17,6 @@ public interface ReviewBoardRepository extends JpaRepository<ReviewBoard, Long> 
      * 리뷰게시판 전체 게시물 출력에 paging 을 적용한다. default size = 15
      */
     @Query("select rb from ReviewBoard rb")
-    Slice<FreeBoard> findReviewBoardAll(Pageable pageable);
+    Slice<ReviewBoard> findReviewBoardAll(Pageable pageable);
 
 }
