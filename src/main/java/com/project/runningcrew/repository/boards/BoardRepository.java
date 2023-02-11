@@ -1,6 +1,7 @@
 package com.project.runningcrew.repository.boards;
 
 import com.project.runningcrew.entity.boards.Board;
+import com.project.runningcrew.entity.members.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,12 +12,11 @@ import java.util.List;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     /**
-     * @param memberId
+     * @param member
      * @return list of Board
      * 특정 member 가 작성한 모든 게시물을 반환한다.
      */
-    @Query("select b from Board b where b.member.id = :memberId")
-    List<Board> findAllByMemberId(@Param("memberId") Long memberId);
+    List<Board> findAllByMember(Member member);
 
 
     /**
