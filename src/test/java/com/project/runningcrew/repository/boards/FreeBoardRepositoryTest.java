@@ -38,36 +38,36 @@ class FreeBoardRepositoryTest {
 
 
     public User testUser(int num) {
-            User user = User.builder()
-                    .email("email@email.com" + num)
-                    .password("password123!" + num)
-                    .name("name"+ num)
-                    .nickname("nickname"+ num)
-                    .imgUrl("imgUrl"+ num)
-                    .login_type(LoginType.EMAIL)
-                    .phoneNumber("phoneNumber"+ num)
-                    .location("location"+ num)
-                    .sex(Sex.MAN)
-                    .birthday(LocalDate.now())
-                    .height(100)
-                    .weight(100)
-                    .build();
-            return userRepository.save(user);
-        }
+        User user = User.builder()
+                .email("email@email.com" + num)
+                .password("password123!" + num)
+                .name("name"+ num)
+                .nickname("nickname"+ num)
+                .imgUrl("imgUrl"+ num)
+                .login_type(LoginType.EMAIL)
+                .phoneNumber("phoneNumber"+ num)
+                .location("location"+ num)
+                .sex(Sex.MAN)
+                .birthday(LocalDate.now())
+                .height(100)
+                .weight(100)
+                .build();
+        return userRepository.save(user);
+    }
 
-        public Crew testCrew(int num) {
-            Crew crew = Crew.builder()
-                    .name("name"+ num)
-                    .location("location"+ num)
-                    .introduction("introduction"+ num)
-                    .crewImgUrl("crewImgUrl"+ num)
-                    .build();
-            return crewRepository.save(crew);
-        }
+    public Crew testCrew(int num) {
+        Crew crew = Crew.builder()
+                .name("name"+ num)
+                .location("location"+ num)
+                .introduction("introduction"+ num)
+                .crewImgUrl("crewImgUrl"+ num)
+                .build();
+        return crewRepository.save(crew);
+    }
 
-        public Member testMember(int num) {
-            Member member = new Member(testUser(num), testCrew(num), MemberRole.ROLE_NORMAL);
-            return memberRepository.save(member);
+    public Member testMember(int num) {
+        Member member = new Member(testUser(num), testCrew(num), MemberRole.ROLE_NORMAL);
+        return memberRepository.save(member);
     }
 
 
