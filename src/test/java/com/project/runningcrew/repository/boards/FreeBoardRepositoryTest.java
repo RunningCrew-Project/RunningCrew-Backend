@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@Rollback(value = false)
 class FreeBoardRepositoryTest {
 
     @Autowired FreeBoardRepository freeBoardRepository;
@@ -37,40 +38,53 @@ class FreeBoardRepositoryTest {
     @Autowired MemberRepository memberRepository;
 
 
-    @DisplayName("FreeBoard save 테스트")
-    @Test
-    void saveTest() throws Exception {
-        //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
+    public User testUser(int num) {
+        User user = User.builder()
+                        .email("email@email.com" + num)
+                        .password("password123!" + num)
+                        .name("name"+ num)
+                        .nickname("nickname"+ num)
+                        .imgUrl("imgUrl"+ num)
                         .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
+                        .phoneNumber("phoneNumber"+ num)
+                        .location("location"+ num)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)
                         .weight(100)
-                        .build()
-        );
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        //when
+                        .build();
+        return userRepository.save(user);
+    }
+
+    public Crew testCrew(int num) {
+        Crew crew = Crew.builder()
+                        .name("name"+ num)
+                        .location("location"+ num)
+                        .introduction("introduction"+ num)
+                        .crewImgUrl("crewImgUrl"+ num)
+                        .build();
+        return crewRepository.save(crew);
+    }
+
+    public Member testMember(int num) {
+        Member member = new Member(testUser(num), testCrew(num), MemberRole.ROLE_NORMAL);
+        return memberRepository.save(member);
+    }
+
+
+
+    @DisplayName("FreeBoard save 테스트")
+    @Test
+    void saveTest() throws Exception {
+        //given
+        int num = 1;
         String title = "title";
         String content = "content";
-        FreeBoard freeBoard = new FreeBoard(member, title, content);
+        FreeBoard freeBoard = new FreeBoard(testMember(num), title, content);
+
+        //when
         FreeBoard savedFreeBoard = freeBoardRepository.save(freeBoard);
+
         //then
         Assertions.assertThat(savedFreeBoard).isEqualTo(freeBoard);
     }
@@ -81,36 +95,14 @@ class FreeBoardRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        //when
+        int num = 1;
         String title = "title";
         String content = "content";
-        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(member, title, content));
+        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(testMember(num), title, content));
+
+        //when
         Optional<FreeBoard> findFreeBoardOpt = freeBoardRepository.findById(savedFreeBoard.getId());
+
         //then
         Assertions.assertThat(findFreeBoardOpt).isNotEmpty();
         Assertions.assertThat(findFreeBoardOpt).hasValue(savedFreeBoard);
@@ -122,37 +114,15 @@ class FreeBoardRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        //when
+        int num = 1;
         String title = "title";
         String content = "content";
-        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(member, title, content));
+        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(testMember(num), title, content));
+
+        //when
         freeBoardRepository.delete(savedFreeBoard);
         Optional<FreeBoard> findFreeBoardOpt = freeBoardRepository.findById(savedFreeBoard.getId());
+
         //then
         Assertions.assertThat(findFreeBoardOpt).isEmpty();
     }
@@ -163,41 +133,18 @@ class FreeBoardRepositoryTest {
     @Test
     void findFreeBoardAllTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        //when
         for (int i = 0; i < 100; i++) {
             freeBoardRepository.save(
-                    new FreeBoard(member, "title" + Integer.toString(i), "content" + Integer.toString(i))
+                    new FreeBoard(testMember(i), "title" + i, "content" + i)
                     // FreeBoard 100개 save
             );
         }
         PageRequest pageRequest = PageRequest.of(0, 15); // Page size = 15
+
+        //when
         Slice<FreeBoard> slice = freeBoardRepository.findFreeBoardAll(pageRequest);
         List<FreeBoard> content = slice.getContent();
+
         //then
         Assertions.assertThat(content.size()).isEqualTo(15);
         Assertions.assertThat(slice.getNumber()).isEqualTo(0);
