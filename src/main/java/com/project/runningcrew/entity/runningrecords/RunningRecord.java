@@ -2,6 +2,7 @@ package com.project.runningcrew.entity.runningrecords;
 
 import com.project.runningcrew.entity.BaseEntity;
 import com.project.runningcrew.entity.Gps;
+import com.project.runningcrew.entity.users.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,17 +50,22 @@ public abstract class RunningRecord extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String running_detail;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @OneToMany(mappedBy = "runningRecord", cascade = CascadeType.ALL)
     private List<Gps> gpsList = new ArrayList<>();
 
     public RunningRecord(LocalDateTime startDateTime, double runningDistance, int runningTime,
-                         int runningFace, int calories, String running_detail) {
+                         int runningFace, int calories, String running_detail, User user) {
         this.startDateTime = startDateTime;
         this.runningDistance = runningDistance;
         this.runningTime = runningTime;
         this.runningFace = runningFace;
         this.calories = calories;
         this.running_detail = running_detail;
+        this.user = user;
     }
 
 }

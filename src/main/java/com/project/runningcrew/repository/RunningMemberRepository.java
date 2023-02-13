@@ -11,10 +11,25 @@ import java.util.List;
 @Repository
 public interface RunningMemberRepository extends JpaRepository<RunningMember, Long> {
 
+    /**
+     * member 를 포함하는 모든 RunningMember 반환
+     * @param member
+     * @return member 를 포함된 모든 RunningMember 의 list
+     */
     List<RunningMember> findAllByMember(Member member);
 
+    /**
+     * runningNotice 를 포함하는 모든 RunningMember 의 개수 반환
+     * @param runningNotice
+     * @return runningNotice 를 포함하는 모든 RunningMember 의 개수
+     */
     Long countAllByRunningNotice(RunningNotice runningNotice);
 
+    /**
+     * runningNotice 를 포함하는 모든 RunningMember 반환
+     * @param runningNotice
+     * @return runningNotice 를 포함하는 모든 RunningMember 의 list
+     */
     List<RunningMember> findAllByRunningNotice(RunningNotice runningNotice);
 
 }

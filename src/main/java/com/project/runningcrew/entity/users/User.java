@@ -2,10 +2,7 @@ package com.project.runningcrew.entity.users;
 
 import com.project.runningcrew.entity.BaseEntity;
 import com.project.runningcrew.entity.members.Member;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -15,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter(AccessLevel.PROTECTED)
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
@@ -53,30 +51,46 @@ public class User extends BaseEntity {
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{4,16}$",
             message = "비밀번호는 4글자 이상 16글자 이하의 영문, 숫자, 특수문자의 조합이여야 합니다.")
     @NotNull
-    private String password = "";
+    private String password;
 
     @NotNull
     @Column(nullable = false)
-    private String location = "";
+    private String location;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Sex sex = Sex.MAN;
+    private Sex sex;
 
     @Column(nullable = false)
-    private LocalDate birthday = LocalDate.of(1990, 1, 1);
+    private LocalDate birthday;
 
     @PositiveOrZero(message = "키는 0 이상입니다.")
     @Column(nullable = false)
-    private int height = 0;
+    private int height;
 
     @PositiveOrZero(message = "몸무게는 0 이상입니다.")
     @Column(nullable = false)
-    private int weight = 0;
+    private int weight;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Member> members = new ArrayList<>();
+
+    public static User createBasicUser(String email, String name, String nickname, String imgUrl,
+                                  LoginType login_type, String phoneNumber) {
+        return User.builder().email(email)
+                .name(name)
+                .nickname(nickname)
+                .imgUrl(imgUrl)
+                .login_type(login_type)
+                .phoneNumber(phoneNumber)
+                .location("")
+                .sex(Sex.MAN)
+                .birthday(LocalDate.of(1990,1,1))
+                .height(170)
+                .weight(70)
+                .build();
+    }
 
     @Builder
     public User(String email, String password, String name, String nickname, String imgUrl,

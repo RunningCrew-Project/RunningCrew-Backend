@@ -3,24 +3,15 @@ package com.project.runningcrew.repository.images;
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.images.RunningNoticeImage;
 import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.entity.runningnotices.RunningStatus;
-import com.project.runningcrew.entity.users.LoginType;
-import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.CrewRepository;
-import com.project.runningcrew.repository.MemberRepository;
-import com.project.runningcrew.repository.RunningNoticeRepository;
-import com.project.runningcrew.repository.UserRepository;
+import com.project.runningcrew.repository.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,65 +26,17 @@ class RunningNoticeImageRepositoryTest {
     RunningNoticeImageRepository runningNoticeImageRepository;
 
     @Autowired
-    UserRepository userRepository;
+    TestEntityFactory testEntityFactory;
 
-    @Autowired
-    CrewRepository crewRepository;
-
-    @Autowired
-    MemberRepository memberRepository;
-
-    @Autowired
-    RunningNoticeRepository runningNoticeRepository;
-
-
-    public User testUser() {
-        User user = User.builder().email("email@naver.com")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("010-0000-0000")
-                .password("123a!")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.of(1990, 1, 1))
-                .height(170)
-                .weight(70)
-                .build();
-        return userRepository.save(user);
-    }
-
-    public Crew testCrew() {
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-        return crewRepository.save(crew);
-    }
-
-    public Member testMember() {
-        Member member = new Member(testUser(), testCrew(), MemberRole.ROLE_NORMAL);
-        return memberRepository.save(member);
-    }
-
-    public RunningNotice testRunningNotice() {
-        RunningNotice runningNotice = RunningNotice.builder().title("title")
-                .detail("detail")
-                .member(testMember())
-                .noticeType(NoticeType.REGULAR)
-                .runningDateTime(LocalDateTime.of(2023,02,11,15,0))
-                .runningPersonnel(4)
-                .status(RunningStatus.WAIT)
-                .build();
-        return runningNoticeRepository.save(runningNotice);
-    }
-
+    @DisplayName("RunningNoticeImage save 테스트")
     @Test
     public void saveTest() {
         //given
-        RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", testRunningNotice());
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
 
         ///when
         RunningNoticeImage savedImage = runningNoticeImageRepository.save(runningNoticeImage);
@@ -102,10 +45,15 @@ class RunningNoticeImageRepositoryTest {
         assertThat(savedImage).isEqualTo(runningNoticeImage);
     }
 
+    @DisplayName("RunningNoticeImage findById 테스트")
     @Test
-    public void findById() {
+    public void findByIdTest() {
         //given
-        RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", testRunningNotice());
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
         runningNoticeImageRepository.save(runningNoticeImage);
 
         ///when
@@ -116,10 +64,15 @@ class RunningNoticeImageRepositoryTest {
         assertThat(optRunningNoticeImage).hasValue(runningNoticeImage);
     }
 
+    @DisplayName("RunningNoticeImage delete 테스트")
     @Test
-    public void delete() {
+    public void deleteTest() {
         //given
-        RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", testRunningNotice());
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
         runningNoticeImageRepository.save(runningNoticeImage);
 
         ///when
@@ -130,10 +83,14 @@ class RunningNoticeImageRepositoryTest {
         assertThat(optRunningNoticeImage).isEmpty();
     }
 
+    @DisplayName("RunningNoticeImage findAllByRunningNotic 테스트")
     @Test
-    void findAllByRunningNotice() {
+    void findAllByRunningNoticeTest() {
         //given
-        RunningNotice runningNotice = testRunningNotice();
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         for (int i = 0; i < 10; i++) {
             RunningNoticeImage runningNoticeImage = new RunningNoticeImage("boardImage" + i, runningNotice);
             runningNoticeImageRepository.save(runningNoticeImage);
