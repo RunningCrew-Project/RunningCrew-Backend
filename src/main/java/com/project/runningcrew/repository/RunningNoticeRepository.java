@@ -21,22 +21,22 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
 
 
     /**
-     * 하루 간격의 날짜를 변수로 받아 그 날의 런닝 공지를 모두 반환한다.
+     * 특정 Crew 의 하루 간격의 날짜를 변수로 받아 그 날의 런닝 공지를 모두 반환한다.
      * @param start
      * @param end
      * @return list of RunningNotice
      */
-    @Query("select rn from RunningNotice rn where rn.runningDateTime >= :start and rn.runningDateTime < :end")
-    List<RunningNotice> findAllByRunningDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    @Query("select rn from RunningNotice rn where rn.member.crew = :crew and rn.runningDateTime >= :start and rn.runningDateTime < :end")
+    List<RunningNotice> findAllByCrewAndRunningDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("crew") Crew crew);
 
 
     /**
-     * 특정 단어 keyword 를 제목 or 내용에 포함하는 런닝 공지를 모두 반환한다.
+     * 특정 Crew 의  keyword 를 제목 or 내용에 포함하는 런닝 공지를 모두 반환한다.
      * @param keyword
      * @return list of RunningNotice
      */
-    @Query("select rn from RunningNotice rn where rn.title like %:keyword% or rn.detail like %:keyword%")
-    List<RunningNotice> findAllByTitleOrDetail(@Param("keyword") String keyword);
+    @Query("select rn from RunningNotice rn where rn.member.crew = :crew and (rn.title like %:keyword% or rn.detail like %:keyword%)")
+    List<RunningNotice> findAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew);
 
 
     /**
@@ -55,8 +55,8 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
      * -> 추후 필요시 수정
      *
      */
-    @Query("select rn from RunningNotice rn where rn.status = :status order by  rn.runningDateTime")
-    List<RunningNotice> findAllByRunningStatus(@Param("status") RunningStatus status);
+    @Query("select rn from RunningNotice rn where rn.member.crew = :crew and rn.status = :status order by  rn.runningDateTime")
+    List<RunningNotice> findAllByCrewAndStatus(@Param("status") RunningStatus status, @Param("crew") Crew crew);
 
 
 
@@ -67,7 +67,7 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
      * @return Slice of RunningNotice
      */
     @Query("select rn from RunningNotice rn where rn.noticeType = :noticeType and rn.member.crew = :crew")
-    Slice<RunningNotice> findAllByNoticeType (@Param("noticeType") NoticeType noticeType, @Param("crew") Crew crew, Pageable pageable );
+    Slice<RunningNotice> findAllByCrewAndNoticeType (@Param("noticeType") NoticeType noticeType, @Param("crew") Crew crew, Pageable pageable );
 
 
 }
