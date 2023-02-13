@@ -10,6 +10,11 @@ import java.util.List;
 @Repository
 public interface RunningNoticeImageRepository extends JpaRepository<RunningNoticeImage, Long> {
 
+    /**
+     * runningNotice에 포함된 모든 RunningNoticeImage 반환
+     * @param runningNotice
+     * @return runningNotice 에 포함된 모든 RunningNoticeImage 의 list
+     */
     List<RunningNoticeImage> findAllByRunningNotice(RunningNotice runningNotice);
 
 }
