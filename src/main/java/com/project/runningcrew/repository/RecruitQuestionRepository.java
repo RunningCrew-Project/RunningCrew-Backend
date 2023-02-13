@@ -16,6 +16,6 @@ public interface RecruitQuestionRepository extends JpaRepository<RecruitQuestion
      * 특정 Crew 의 가입 질문을 offset 순으로 정렬하여 반환한다.
      */
     @Query("select rq from RecruitQuestion rq where rq.crew = :crew order by rq.questionOffset")
-    List<RecruitQuestion> findAllByCrewId(@Param("crew") Crew crew);
+    List<RecruitQuestion> findAllByCrew(@Param("crew") Crew crew);
 
 }

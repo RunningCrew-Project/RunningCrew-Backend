@@ -143,7 +143,7 @@ class RecruitAnswerRepositoryTest {
         }
 
         //when
-        List<RecruitAnswer> findRecruitAnswerList = recruitAnswerRepository.findAllByUserId(user);
+        List<RecruitAnswer> findRecruitAnswerList = recruitAnswerRepository.findAllByUser(user);
 
         //then
         for(int i = 0; i <= 10; i++) {
