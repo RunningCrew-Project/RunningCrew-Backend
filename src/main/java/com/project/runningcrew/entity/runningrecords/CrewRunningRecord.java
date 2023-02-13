@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class CrewRunningRecord extends RunningRecord {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "crew_id")
     private Crew crew;
 
     @OneToOne(fetch = FetchType.LAZY)

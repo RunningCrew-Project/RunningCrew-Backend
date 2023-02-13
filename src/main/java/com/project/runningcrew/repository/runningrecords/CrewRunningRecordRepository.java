@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface CrewRunningRecordRepository extends JpaRepository<CrewRunningRecord, Long> {
 
-    List<CrewRunningRecord> findAllByMember(Member member);
-
 }

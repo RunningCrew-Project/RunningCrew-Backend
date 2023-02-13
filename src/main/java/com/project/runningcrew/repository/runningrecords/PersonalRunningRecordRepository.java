@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface PersonalRunningRecordRepository extends JpaRepository<PersonalRunningRecord, Long> {
 
-    List<PersonalRunningRecord> findAllByUser(User user);
-
 }
