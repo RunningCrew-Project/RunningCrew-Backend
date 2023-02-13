@@ -1,7 +1,7 @@
 package com.project.runningcrew.repository.boards;
 
 import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.boards.FreeBoard;
+import com.project.runningcrew.entity.boards.NoticeBoard;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.LoginType;
@@ -15,27 +15,22 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class FreeBoardRepositoryTest {
+class NoticeBoardRepositoryTest {
 
-    @Autowired FreeBoardRepository freeBoardRepository;
+
     @Autowired UserRepository userRepository;
     @Autowired CrewRepository crewRepository;
     @Autowired MemberRepository memberRepository;
-
+    @Autowired NoticeBoardRepository noticeBoardRepository;
 
     public User testUser(int num) {
         User user = User.builder()
@@ -72,86 +67,60 @@ class FreeBoardRepositoryTest {
 
 
 
-    @DisplayName("FreeBoard save 테스트")
+    @DisplayName("NoticeBoard save 테스트")
     @Test
     void saveTest() throws Exception {
         //given
-        int num = 1;
+        Member member = testMember(1);
         String title = "title";
         String content = "content";
-        FreeBoard freeBoard = new FreeBoard(testMember(num), title, content);
+        NoticeBoard noticeBoard = new NoticeBoard(member, title, content);
 
         //when
-        FreeBoard savedFreeBoard = freeBoardRepository.save(freeBoard);
+        NoticeBoard savedNoticeBoard = noticeBoardRepository.save(noticeBoard);
 
         //then
-        Assertions.assertThat(savedFreeBoard).isEqualTo(freeBoard);
+        Assertions.assertThat(savedNoticeBoard).isEqualTo(noticeBoard);
     }
 
 
 
-    @DisplayName("FreeBoard findById 테스트")
+    @DisplayName("NoticeBoard findById 테스트")
     @Test
     void findByIdTest() throws Exception {
         //given
-        int num = 1;
+        Member member = testMember(1);
         String title = "title";
         String content = "content";
-        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(testMember(num), title, content));
+        NoticeBoard noticeBoard = new NoticeBoard(member, title, content);
+        NoticeBoard savedNoticeBoard = noticeBoardRepository.save(noticeBoard);
 
         //when
-        Optional<FreeBoard> findFreeBoardOpt = freeBoardRepository.findById(savedFreeBoard.getId());
+        Optional<NoticeBoard> findNoticeBoardOpt = noticeBoardRepository.findById(savedNoticeBoard.getId());
 
         //then
-        Assertions.assertThat(findFreeBoardOpt).isNotEmpty();
-        Assertions.assertThat(findFreeBoardOpt).hasValue(savedFreeBoard);
+        Assertions.assertThat(findNoticeBoardOpt).isNotEmpty();
+        Assertions.assertThat(findNoticeBoardOpt).hasValue(savedNoticeBoard);
     }
 
 
 
-    @DisplayName("FreeBoard delete 테스트")
+    @DisplayName("NoticeBoard delete 테스트")
     @Test
     void deleteTest() throws Exception {
         //given
-        int num = 1;
+        Member member = testMember(1);
         String title = "title";
         String content = "content";
-        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(testMember(num), title, content));
+        NoticeBoard noticeBoard = new NoticeBoard(member, title, content);
+        NoticeBoard savedNoticeBoard = noticeBoardRepository.save(noticeBoard);
 
         //when
-        freeBoardRepository.delete(savedFreeBoard);
-        Optional<FreeBoard> findFreeBoardOpt = freeBoardRepository.findById(savedFreeBoard.getId());
+        noticeBoardRepository.delete(savedNoticeBoard);
+        Optional<NoticeBoard> findNoticeBoardOpt = noticeBoardRepository.findById(savedNoticeBoard.getId());
 
         //then
-        Assertions.assertThat(findFreeBoardOpt).isEmpty();
-    }
-
-
-
-    @DisplayName("FreeBoard 페이징 테스트")
-    @Test
-    void findFreeBoardAllTest() throws Exception {
-        //given
-        Member member = testMember(1);
-
-        for (int i = 0; i < 100; i++) {
-            freeBoardRepository.save(
-                    new FreeBoard(member, "title" + i, "content" + i)
-                    // FreeBoard 100개 save
-            );
-        }
-        PageRequest pageRequest = PageRequest.of(0, 15); // Page size = 15
-
-        //when
-        Slice<FreeBoard> slice = freeBoardRepository.findFreeBoardAll(pageRequest);
-        List<FreeBoard> content = slice.getContent();
-
-        //then
-        Assertions.assertThat(content.size()).isEqualTo(15);
-        Assertions.assertThat(slice.getNumber()).isEqualTo(0);
-        Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(15);
-        Assertions.assertThat(slice.isFirst()).isTrue();
-        Assertions.assertThat(slice.hasNext()).isTrue();
+        Assertions.assertThat(findNoticeBoardOpt).isEmpty();
     }
 
 

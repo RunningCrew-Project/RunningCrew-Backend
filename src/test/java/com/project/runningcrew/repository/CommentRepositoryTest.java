@@ -37,43 +37,55 @@ class CommentRepositoryTest {
     @Autowired BoardRepository boardRepository;
     @Autowired CommentRepository commentRepository;
 
+
+    public User testUser() {
+        User user = User.builder()
+                .email("email@email.com")
+                .password("password123!")
+                .name("name")
+                .nickname("nickname")
+                .imgUrl("imgUrl")
+                .login_type(LoginType.EMAIL)
+                .phoneNumber("phoneNumber")
+                .location("location")
+                .sex(Sex.MAN)
+                .birthday(LocalDate.now())
+                .height(100)
+                .weight(100)
+                .build();
+        return userRepository.save(user);
+    }
+
+    public Crew testCrew() {
+        Crew crew = Crew.builder()
+                .name("name")
+                .location("location")
+                .introduction("introduction")
+                .crewImgUrl("crewImgUrl")
+                .build();
+        return crewRepository.save(crew);
+    }
+
+    public Member testMember() {
+        Member member = new Member(testUser(), testCrew(), MemberRole.ROLE_NORMAL);
+        return memberRepository.save(member);
+    }
+
+    public FreeBoard testFreeBoard() {
+        FreeBoard freeBoard = new FreeBoard(testMember(), "title", "detail");
+        return boardRepository.save(freeBoard);
+    }
+
+
     @DisplayName("Comment save 테스트")
     @Test
     void saveTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
+        Comment comment = new Comment(testMember(), "detail", testFreeBoard());
 
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-
-        String title = "title";
-        String detail = "detail";
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
-        Comment comment = new Comment(member, detail, board);
         Comment savedComment = commentRepository.save(comment);
+
         //then
         Assertions.assertThat(savedComment).isEqualTo(comment);
     }
@@ -83,39 +95,11 @@ class CommentRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
+        Comment savedComment = commentRepository.save(new Comment(testMember(), "detail", testFreeBoard()));
 
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-
-        String title = "title";
-        String detail = "detail";
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
-        Comment savedComment = commentRepository.save(new Comment(member, detail, board));
         Optional<Comment> findCommentOpt = commentRepository.findById(savedComment.getId());
+
         //then
         Assertions.assertThat(findCommentOpt).isNotEmpty();
         Assertions.assertThat(findCommentOpt).hasValue(savedComment);
@@ -125,39 +109,11 @@ class CommentRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
+        Comment savedComment = commentRepository.save(new Comment(testMember(), "detail", testFreeBoard()));
 
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-
-        String title = "title";
-        String detail = "detail";
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        FreeBoard board = boardRepository.save(new FreeBoard(member, title, detail));
         //when
-        Comment savedComment = commentRepository.save(new Comment(member, detail, board));
         commentRepository.delete(savedComment);
+
         //then
         Optional<Comment> findCommentOpt = commentRepository.findById(savedComment.getId());
         Assertions.assertThat(findCommentOpt).isEmpty();
@@ -166,23 +122,23 @@ class CommentRepositoryTest {
 
     @DisplayName("특정 BoardId 를 가진 Comment 출력 테스트")
     @Test
-    void findAllByBoardIdTest() throws Exception {
+    void findAllByBoardTest() throws Exception {
         //given
         User user = userRepository.save(
                 User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
+                .email("email@email.com")
+                .password("password123!")
+                .name("name")
+                .nickname("nickname")
+                .imgUrl("imgUrl")
+                .login_type(LoginType.EMAIL)
+                .phoneNumber("phoneNumber")
+                .location("location")
+                .sex(Sex.MAN)
+                .birthday(LocalDate.now())
+                .height(100)
+                .weight(100)
+                .build()
         );
 
         Crew crew = crewRepository.save(
@@ -194,17 +150,22 @@ class CommentRepositoryTest {
                         .build()
         );
 
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
+        Member member = memberRepository.save(
+                new Member(user, crew, MemberRole.ROLE_NORMAL)
+        );
+
 
         String title = "title";
         String detail = "detail";
         FreeBoard boardA = boardRepository.save(new FreeBoard(member, title, detail));
         FreeBoard boardB = boardRepository.save(new FreeBoard(member, title, detail));
-        //when
         commentRepository.save(new Comment(member, detail, boardA)); //A 저장
         commentRepository.save(new Comment(member ,detail, boardA)); //A 저장
         commentRepository.save(new Comment(member, detail, boardB)); //B 저장
-        List<Comment> findCommentList = commentRepository.findAllByBoardId(boardA.getId());
+
+        //when
+        List<Comment> findCommentList = commentRepository.findAllByBoard(boardA);
+
         //then
         Assertions.assertThat(findCommentList.size()).isEqualTo(2);
     }
@@ -249,11 +210,13 @@ class CommentRepositoryTest {
         String detail = "detail";
         FreeBoard testBoard = boardRepository.save(new FreeBoard(testBoardCreateMember, title, detail)); // 테스트 게시물
 
-        //when
         commentRepository.save(new Comment(memberA, detail, testBoard)); // A 멤버 댓글
         commentRepository.save(new Comment(memberA, detail, testBoard)); // A 멤버 댓글
         commentRepository.save(new Comment(memberB, detail, testBoard)); // B 멤버 댓글
-        List<Comment> findCommentList = commentRepository.findAllByMemberId(memberA.getId());
+
+        //when
+        List<Comment> findCommentList = commentRepository.findAllByMember(memberA);
+
         //then
         Assertions.assertThat(findCommentList.size()).isEqualTo(2);
     }
