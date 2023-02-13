@@ -3,17 +3,13 @@ package com.project.runningcrew.repository;
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.users.LoginType;
-import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,41 +24,14 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
 
     @Autowired
-    UserRepository userRepository;
+    TestEntityFactory testEntityFactory;
 
-    @Autowired
-    CrewRepository crewRepository;
-
-    @BeforeEach
-    public void saveTestUserAndCrew() {
-
-    }
-
+    @DisplayName("Member save 테스트")
     @Test
-    public void save() {
+    public void saveTest() {
         //given
-        User user = User.builder().email("email@naver.com")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("010-0000-0000")
-                .password("123a!")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.of(1990, 1, 1))
-                .height(170)
-                .weight(70)
-                .build();
-
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-
-        userRepository.save(user);
-        crewRepository.save(crew);
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
         Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
 
         ///when
@@ -73,31 +42,12 @@ class MemberRepositoryTest {
 
     }
 
+    @DisplayName("Member findById 테스트")
     @Test
-    public void findById() {
+    public void findByIdTest() {
         //given
-        User user = User.builder().email("email@naver.com")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("010-0000-0000")
-                .password("123a!")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.of(1990, 1, 1))
-                .height(170)
-                .weight(70)
-                .build();
-
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-
-        userRepository.save(user);
-        crewRepository.save(crew);
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
         Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         memberRepository.save(member);
 
@@ -109,31 +59,12 @@ class MemberRepositoryTest {
         assertThat(optMember).hasValue(member);
     }
 
+    @DisplayName("Member delete 테스트")
     @Test
-    public void delete() {
+    public void deleteTest() {
         //given
-        User user = User.builder().email("email@naver.com")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("010-0000-0000")
-                .password("123a!")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.of(1990, 1, 1))
-                .height(170)
-                .weight(70)
-                .build();
-
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-
-        userRepository.save(user);
-        crewRepository.save(crew);
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
         Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         Member savedMember = memberRepository.save(member);
 
@@ -145,34 +76,14 @@ class MemberRepositoryTest {
         assertThat(optMember).isEmpty();
     }
 
+    @DisplayName("Member findAllByUser 테스트")
     @Test
     void findAllByUserTest() {
         //given
-        User user = User.builder().email("email@naver.com")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("010-0000-0000")
-                .password("123a!")
-                .location("location")
-                .password("123a!")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.of(1990, 1, 1))
-                .height(170)
-                .weight(70)
-                .build();
-        userRepository.save(user);
+        User user = testEntityFactory.getUser(0);
 
         for (int i = 0; i < 10; i++) {
-            Crew crew = Crew.builder().name("crew" + i)
-                    .location("location" + i)
-                    .introduction("introduction" + i)
-                    .crewImgUrl("crewImageUrl" + i)
-                    .build();
-            crewRepository.save(crew);
-
+            Crew crew = testEntityFactory.getCrew(i);
             Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
             memberRepository.save(member);
         }
@@ -187,32 +98,14 @@ class MemberRepositoryTest {
         }
     }
 
+    @DisplayName("Member countAllByCrew 테스트")
     @Test
     void countAllByCrewTest() {
         //given
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-        crewRepository.save(crew);
+        Crew crew = testEntityFactory.getCrew(0);
 
         for (int i = 0; i < 10; i++) {
-            User user = User.builder().email("email" + i + "@naver.com")
-                    .name("name" + i)
-                    .nickname("nickname" + i)
-                    .imgUrl("imgUrl" + i)
-                    .login_type(LoginType.EMAIL)
-                    .phoneNumber("010-0000-0000")
-                    .password("123a!")
-                    .location("location" + i)
-                    .sex(Sex.MAN)
-                    .birthday(LocalDate.of(1990, 1, 1))
-                    .height(170)
-                    .weight(70)
-                    .build();
-            userRepository.save(user);
-
+            User user = testEntityFactory.getUser(i);
             Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
             memberRepository.save(member);
         }
@@ -224,32 +117,15 @@ class MemberRepositoryTest {
         assertThat(count).isSameAs(10L);
     }
 
+    @DisplayName("Member findAllByCrew 테스트")
     @Test
     void findAllByCrewTest() {
         //given
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-        crewRepository.save(crew);
+        Crew crew = testEntityFactory.getCrew(0);
+
 
         for (int i = 0; i < 10; i++) {
-            User user = User.builder().email("email" + i + "@naver.com")
-                    .name("name" + i)
-                    .nickname("nickname" + i)
-                    .imgUrl("imgUrl" + i)
-                    .login_type(LoginType.EMAIL)
-                    .phoneNumber("010-0000-0000")
-                    .password("123a!")
-                    .location("location" + i)
-                    .sex(Sex.MAN)
-                    .birthday(LocalDate.of(1990, 1, 1))
-                    .height(170)
-                    .weight(70)
-                    .build();
-            userRepository.save(user);
-
+            User user = testEntityFactory.getUser(i);
             Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
             memberRepository.save(member);
         }
@@ -264,31 +140,14 @@ class MemberRepositoryTest {
         }
     }
 
+    @DisplayName("Member findAllByCrewAndRole 테스트")
     @Test
     void findAllByCrewAndRoleTest() {
         //given
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-        crewRepository.save(crew);
+        Crew crew = testEntityFactory.getCrew(0);
 
         for (int i = 0; i < 10; i++) {
-            User user = User.builder().email("email" + i + "@naver.com")
-                    .name("name" + i)
-                    .nickname("nickname" + i)
-                    .imgUrl("imgUrl" + i)
-                    .login_type(LoginType.EMAIL)
-                    .phoneNumber("010-0000-0000")
-                    .password("123a!")
-                    .location("location" + i)
-                    .sex(Sex.MAN)
-                    .birthday(LocalDate.of(1990, 1, 1))
-                    .height(170)
-                    .weight(70)
-                    .build();
-            userRepository.save(user);
+            User user = testEntityFactory.getUser(i);
 
             Member member;
             if (i == 0) {

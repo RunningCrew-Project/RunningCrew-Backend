@@ -1,25 +1,17 @@
 package com.project.runningcrew.repository.images;
 
 import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.boards.Board;
 import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.images.BoardImage;
 import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.users.LoginType;
-import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.CrewRepository;
-import com.project.runningcrew.repository.MemberRepository;
-import com.project.runningcrew.repository.UserRepository;
-import com.project.runningcrew.repository.boards.BoardRepository;
-import org.assertj.core.api.Assertions;
+import com.project.runningcrew.repository.TestEntityFactory;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,57 +26,17 @@ class BoardImageRepositoryTest {
     BoardImageRepository boardImageRepository;
 
     @Autowired
-    MemberRepository memberRepository;
+    TestEntityFactory testEntityFactory;
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    CrewRepository crewRepository;
-
-    @Autowired
-    BoardRepository boardRepository;
-
-    public User testUser() {
-        User user = User.builder().email("email@naver.com")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("010-0000-0000")
-                .password("123a!")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.of(1990, 1, 1))
-                .height(170)
-                .weight(70)
-                .build();
-        return userRepository.save(user);
-    }
-
-    public Crew testCrew() {
-        Crew crew = Crew.builder().name("crew")
-                .location("location")
-                .introduction("introduction")
-                .crewImgUrl("crewImageUrl")
-                .build();
-        return crewRepository.save(crew);
-    }
-
-    public Member testMember() {
-        Member member = new Member(testUser(), testCrew(), MemberRole.ROLE_NORMAL);
-        return memberRepository.save(member);
-    }
-
-    public Board testBoard() {
-        Board board = new FreeBoard(testMember(), "title", "detail");
-        return boardRepository.save(board);
-    }
-
+    @DisplayName("BoardImage save 테스트")
     @Test
     public void saveTest() {
         //given
-        BoardImage boardImage = new BoardImage("boardImage", testBoard());
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
+        BoardImage boardImage = new BoardImage("boardImage", freeBoard);
 
         ///when
         BoardImage savedImage = boardImageRepository.save(boardImage);
@@ -93,10 +45,15 @@ class BoardImageRepositoryTest {
         assertThat(savedImage).isEqualTo(boardImage);
     }
 
+    @DisplayName("BoardImage findById 테스트")
     @Test
     public void findById() {
         //given
-        BoardImage boardImage = new BoardImage("boardImage", testBoard());
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
+        BoardImage boardImage = new BoardImage("boardImage", freeBoard);
         boardImageRepository.save(boardImage);
 
         ///when
@@ -107,10 +64,15 @@ class BoardImageRepositoryTest {
         assertThat(optBoardImage).hasValue(boardImage);
     }
 
+    @DisplayName("BoardImage delete 테스트")
     @Test
     public void delete() {
         //given
-        BoardImage boardImage = new BoardImage("boardImage", testBoard());
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
+        BoardImage boardImage = new BoardImage("boardImage", freeBoard);
         boardImageRepository.save(boardImage);
 
         ///when
@@ -121,22 +83,27 @@ class BoardImageRepositoryTest {
         assertThat(optBoardImage).isEmpty();
     }
 
+    @DisplayName("BoardImage findAllByBoard 테스트")
     @Test
     void findAllByBoardTest() {
         //given
-        Board board = testBoard();
+        User user = testEntityFactory.getUser(0);
+        Crew crew = testEntityFactory.getCrew(0);
+        Member member = testEntityFactory.getMember(user, crew);
+        FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
+
         for (int i = 0; i < 10; i++) {
-            BoardImage boardImage = new BoardImage("boardImage" + i, board);
+            BoardImage boardImage = new BoardImage("boardImage" + i, freeBoard);
             boardImageRepository.save(boardImage);
         }
 
         //when
-        List<BoardImage> boardImages = boardImageRepository.findAllByBoard(board);
+        List<BoardImage> boardImages = boardImageRepository.findAllByBoard(freeBoard);
 
         //then
         assertThat(boardImages.size()).isSameAs(10);
         for (BoardImage boardImage : boardImages) {
-            assertThat(boardImage.getBoard()).isEqualTo(board);
+            assertThat(boardImage.getBoard()).isEqualTo(freeBoard);
         }
     }
 
