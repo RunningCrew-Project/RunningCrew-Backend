@@ -338,7 +338,7 @@ class RunningNoticeRepositoryTest {
         LocalDateTime tomorrow = LocalDateTime.of(2023, 2,12, 0, 0);
 
         Member member = testMember(1);
-        RunningNotice runningNoticeA = runningNoticeRepository.save(
+        RunningNotice runningNotice1 = runningNoticeRepository.save(
                 RunningNotice.builder().title("title")
                         .detail("detail")
                         .member(member)
@@ -349,7 +349,7 @@ class RunningNoticeRepositoryTest {
                         .build()
         ); // 23/02/11, 00시 01분
 
-        RunningNotice runningNoticeA2 = runningNoticeRepository.save(
+        RunningNotice runningNotice2 = runningNoticeRepository.save(
                 RunningNotice.builder().title("title")
                         .detail("detail")
                         .member(member)
@@ -360,7 +360,7 @@ class RunningNoticeRepositoryTest {
                         .build()
         ); // 23/02/11, 23시 59분
 
-        RunningNotice runningNoticeB = runningNoticeRepository.save(
+        RunningNotice runningNotice3 = runningNoticeRepository.save(
                 RunningNotice.builder().title("title")
                         .detail("detail")
                         .member(member)
@@ -376,6 +376,58 @@ class RunningNoticeRepositoryTest {
 
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
+    }
+
+
+
+    @DisplayName("특정 status 의 RunningNotice 를 RunningDate 순으로 출력 테스트")
+    @Test
+    void findAllByRunningStatusTest() throws Exception {
+        //given
+        Member member = testMember(1);
+        RunningNotice runningNotice1 = runningNoticeRepository.save(
+                RunningNotice.builder().title("title")
+                        .detail("detail")
+                        .member(member)
+                        .noticeType(NoticeType.REGULAR)
+                        .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 0))
+                        .runningPersonnel(4)
+                        .status(RunningStatus.WAIT)
+                        .build()
+        ); // 23/02/12, 00시 00분
+
+        RunningNotice runningNotice2 = runningNoticeRepository.save(
+                RunningNotice.builder().title("title")
+                        .detail("detail")
+                        .member(member)
+                        .noticeType(NoticeType.INSTANT)
+                        .runningDateTime(LocalDateTime.of(2023, 2, 11, 23, 59))
+                        .runningPersonnel(4)
+                        .status(RunningStatus.WAIT)
+                        .build()
+        ); // 23/02/11, 23시 59분
+
+        RunningNotice runningNotice3 = runningNoticeRepository.save(
+                RunningNotice.builder().title("title")
+                        .detail("detail")
+                        .member(member)
+                        .noticeType(NoticeType.INSTANT)
+                        .runningDateTime(LocalDateTime.of(2023, 2, 11, 0, 1))
+                        .runningPersonnel(4)
+                        .status(RunningStatus.WAIT)
+                        .build()
+        ); // 23/02/11, 00시 01분
+
+        //when
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByRunningStatus(RunningStatus.WAIT);
+
+        //then
+        Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(3);
+        Assertions.assertThat(findRunningNoticeList.get(0)).isEqualTo(runningNotice3);
+        Assertions.assertThat(findRunningNoticeList.get(1)).isEqualTo(runningNotice2);
+        Assertions.assertThat(findRunningNoticeList.get(2)).isEqualTo(runningNotice1);
+        // 정렬 확인
+
     }
 
 }

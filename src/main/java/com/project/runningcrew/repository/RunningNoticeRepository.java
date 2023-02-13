@@ -3,6 +3,7 @@ package com.project.runningcrew.repository;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
+import com.project.runningcrew.entity.runningnotices.RunningStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -43,6 +44,15 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
      * @return list of RunningNotice
      */
     List<RunningNotice> findAllByMember(Member member);
+
+
+    /**
+     * 특정 RunningStatus 의 RunningNotice 를 RunningDateTime 순으로 정렬하여 출력한다.
+     * @param status
+     * @return list of RunningNotice
+     */
+    @Query("select rn from RunningNotice rn where rn.status = :status order by  rn.runningDateTime")
+    List<RunningNotice> findAllByRunningStatus(@Param("status") RunningStatus status);
 
 
 
