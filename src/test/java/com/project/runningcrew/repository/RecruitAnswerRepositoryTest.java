@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -108,7 +109,7 @@ class RecruitAnswerRepositoryTest {
 
     @DisplayName("특정 UserId 를 가진 RecruitAnswer offset 정렬후 출력 테스트")
     @Test
-    void findAllByUserIdTest() throws Exception {
+    void findAllByUserAndCrewTest() throws Exception {
         //given
         User user = userRepository.save(
                 User.builder()
@@ -143,13 +144,34 @@ class RecruitAnswerRepositoryTest {
         }
 
         //when
-        List<RecruitAnswer> findRecruitAnswerList = recruitAnswerRepository.findAllByUser(user);
+        List<RecruitAnswer> findRecruitAnswerList = recruitAnswerRepository.findAllByUserAndCrew(user, crew);
 
         //then
         for(int i = 0; i <= 10; i++) {
             Assertions.assertThat(findRecruitAnswerList.get(i).getAnswerOffset()).isEqualTo(i);
             // [0, 10] 정렬 여부 확인
         }
+    }
+
+
+
+    @DisplayName("특정 Crew 의 RecruitAnswer 를 작성한 User 반환 테스트")
+    @Test
+    @Rollback(value = false)
+    void findUserByRecruitAnswerTest() throws Exception {
+        //given
+        User user = testUser();
+        Crew crew = testCrew();
+        recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 1));
+        recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 2));
+        recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 3));
+
+        //when
+        List<User> findUserList = recruitAnswerRepository.findUserByRecruitAnswer(crew);
+
+        //then
+        Assertions.assertThat(findUserList.size()).isEqualTo(1);
+        Assertions.assertThat(findUserList.get(0)).isEqualTo(user);
     }
 
 

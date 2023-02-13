@@ -218,7 +218,7 @@ class RunningNoticeRepositoryTest {
 
     @DisplayName("각 NoticeType 에 해당하는 RunningNotice 페이징 출력 테스트")
     @Test
-    void findAllByNoticeTypeTest() throws Exception {
+    void findAllByCrewAndNoticeTypeTest() throws Exception {
         //given
         Member member = testMember(1);
 
@@ -257,10 +257,10 @@ class RunningNoticeRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 15); // size = 15
 
         //when
-        Slice<RunningNotice> findRunningNoticeSliceA = runningNoticeRepository.findAllByNoticeType(NoticeType.REGULAR, pageRequest);
+        Slice<RunningNotice> findRunningNoticeSliceA = runningNoticeRepository.findAllByCrewAndNoticeType(NoticeType.REGULAR, member.getCrew(), pageRequest);
         List<RunningNotice> contentA = findRunningNoticeSliceA.getContent();
 
-        Slice<RunningNotice> findRunningNoticeSliceB = runningNoticeRepository.findAllByNoticeType(NoticeType.INSTANT, pageRequest);
+        Slice<RunningNotice> findRunningNoticeSliceB = runningNoticeRepository.findAllByCrewAndNoticeType(NoticeType.INSTANT, member.getCrew(), pageRequest);
         List<RunningNotice> contentB = findRunningNoticeSliceB.getContent();
 
         //then
@@ -285,7 +285,7 @@ class RunningNoticeRepositoryTest {
 
     @DisplayName("특정 키워드 포함 RunningNotice 출력 테스트")
     @Test
-    void findAllByTitleOrDetailTest() throws Exception {
+    void findAllByCrewAndKeyWordTest() throws Exception {
         //given
         String keyword = "key";
         Member member = testMember(1);
@@ -323,7 +323,7 @@ class RunningNoticeRepositoryTest {
         ); // 미포함
 
         //when
-        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByTitleOrDetail(keyword);
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByCrewAndKeyWord(keyword, member.getCrew());
 
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
@@ -333,7 +333,7 @@ class RunningNoticeRepositoryTest {
 
     @DisplayName("특정 날에 시작하는 런닝의 RunningNotice 출력 테스트")
     @Test
-    void findAllByRunningDateTest() throws Exception {
+    void findAllByCrewAndRunningDateTest() throws Exception {
         //given
 
         LocalDateTime today = LocalDateTime.of(2023, 2, 11, 0, 0);
@@ -367,14 +367,14 @@ class RunningNoticeRepositoryTest {
                         .detail("detail")
                         .member(member)
                         .noticeType(NoticeType.INSTANT)
-                        .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 1))
+                        .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 0))
                         .runningPersonnel(4)
                         .status(RunningStatus.WAIT)
                         .build()
         ); // 23/02/12, 00시 01분
 
         //when
-        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByRunningDate(today, tomorrow);
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByCrewAndRunningDate(today, tomorrow, member.getCrew());
 
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
@@ -382,9 +382,9 @@ class RunningNoticeRepositoryTest {
 
 
 
-    @DisplayName("특정 status 의 RunningNotice 를 RunningDate 순으로 출력 테스트")
+    @DisplayName("특정 Crew 의 RunningNotice 를 status 에 따라 RunningDate 순으로 출력 테스트")
     @Test
-    void findAllByRunningStatusTest() throws Exception {
+    void findAllByCrewAndStatusTest() throws Exception {
         //given
         Member member = testMember(1);
         RunningNotice runningNotice1 = runningNoticeRepository.save(
@@ -421,7 +421,7 @@ class RunningNoticeRepositoryTest {
         ); // 23/02/11, 00시 01분
 
         //when
-        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByRunningStatus(RunningStatus.WAIT);
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByCrewAndStatus(RunningStatus.WAIT, member.getCrew());
 
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(3);
