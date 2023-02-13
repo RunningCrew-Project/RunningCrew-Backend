@@ -2,6 +2,8 @@ package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.RecruitAnswer;
+import com.project.runningcrew.entity.members.Member;
+import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.LoginType;
 import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
@@ -26,40 +28,48 @@ class RecruitAnswerRepositoryTest {
     @Autowired private CrewRepository crewRepository;
     @Autowired private RecruitAnswerRepository recruitAnswerRepository;
 
+
+    public User testUser() {
+        User user = User.builder()
+                .email("email@email.com")
+                .password("password123!")
+                .name("name")
+                .nickname("nickname")
+                .imgUrl("imgUrl")
+                .login_type(LoginType.EMAIL)
+                .phoneNumber("phoneNumber")
+                .location("location")
+                .sex(Sex.MAN)
+                .birthday(LocalDate.now())
+                .height(100)
+                .weight(100)
+                .build();
+        return userRepository.save(user);
+    }
+
+    public Crew testCrew() {
+        Crew crew = Crew.builder()
+                .name("name")
+                .location("location")
+                .introduction("introduction")
+                .crewImgUrl("crewImgUrl")
+                .build();
+        return crewRepository.save(crew);
+    }
+
+
+
     @DisplayName("RecruitAnswer save 테스트")
     @Test
     void saveTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
-
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-        //when
         String answer = "answer";
         int offset = 123;
-        RecruitAnswer recruitAnswer = new RecruitAnswer(user, crew, answer, offset);
+        RecruitAnswer recruitAnswer = new RecruitAnswer(testUser(), testCrew(), answer, offset);
+
+        //when
         RecruitAnswer findRecruitAnswer = recruitAnswerRepository.save(recruitAnswer);
+
         //then
         Assertions.assertThat(recruitAnswer).isEqualTo(findRecruitAnswer);
     }
@@ -68,37 +78,14 @@ class RecruitAnswerRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
-
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-        //when
         String answer = "answer";
         int offset = 123;
-        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(user, crew, answer, offset));
-        //then
+        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(testUser(), testCrew(), answer, offset));
+
+        //when
         Optional<RecruitAnswer> findRecruitAnswerOpt = recruitAnswerRepository.findById(savedRecruitAnswer.getId());
+
+        //then
         Assertions.assertThat(findRecruitAnswerOpt).isNotEmpty();
         Assertions.assertThat(findRecruitAnswerOpt).hasValue(savedRecruitAnswer);
     }
@@ -107,36 +94,13 @@ class RecruitAnswerRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
-
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-        //when
         String answer = "answer";
         int offset = 123;
-        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(user, crew, answer, offset));
+        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(testUser(), testCrew(), answer, offset));
+
+        //when
         recruitAnswerRepository.delete(savedRecruitAnswer);
+
         //then
         Optional<RecruitAnswer> findRecruitAnswerOpt = recruitAnswerRepository.findById(savedRecruitAnswer.getId());
         Assertions.assertThat(findRecruitAnswerOpt).isEmpty();
@@ -171,13 +135,16 @@ class RecruitAnswerRepositoryTest {
                         .crewImgUrl("crewImgUrl")
                         .build()
         );
-        //when
+
         String answer = "answer";
         for (int i = 10; i >= 0; i--) { // 10 -> 0
             recruitAnswerRepository.save(new RecruitAnswer(user, crew, answer, i));
             // offset save [10, 0]
         }
-        List<RecruitAnswer> findRecruitAnswerList = recruitAnswerRepository.findAllByUserId(user.getId());
+
+        //when
+        List<RecruitAnswer> findRecruitAnswerList = recruitAnswerRepository.findAllByUser(user);
+
         //then
         for(int i = 0; i <= 10; i++) {
             Assertions.assertThat(findRecruitAnswerList.get(i).getAnswerOffset()).isEqualTo(i);

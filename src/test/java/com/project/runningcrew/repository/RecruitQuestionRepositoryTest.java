@@ -111,7 +111,7 @@ class RecruitQuestionRepositoryTest {
         for (int i = 10; i >= 0 ; i--) {
             recruitQuestionRepository.save(new RecruitQuestion(crew, question, i));
         }  // offset save [10, 0]
-        List<RecruitQuestion> findRecruitQuestionList = recruitQuestionRepository.findAllByCrewId(crew.getId());
+        List<RecruitQuestion> findRecruitQuestionList = recruitQuestionRepository.findAllByCrew(crew);
         //then
         for (int i = 0; i <= 10 ; i++) {
             Assertions.assertThat(findRecruitQuestionList.get(i).getQuestionOffset()).isEqualTo(i);
