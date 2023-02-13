@@ -14,14 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PersonalRunningRecord extends RunningRecord{
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Builder
     public PersonalRunningRecord(LocalDateTime startDateTime, double runningDistance, int runningTime,
                                  int runningFace, int calories, String running_detail, User user) {
-        super(startDateTime, runningDistance, runningTime, runningFace, calories, running_detail);
-        this.user = user;
+        super(startDateTime, runningDistance, runningTime, runningFace, calories, running_detail, user);
     }
+
 }
