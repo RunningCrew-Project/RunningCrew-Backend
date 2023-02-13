@@ -257,10 +257,10 @@ class RunningNoticeRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 15); // size = 15
 
         //when
-        Slice<RunningNotice> findRunningNoticeSliceA = runningNoticeRepository.findAllByNoticeType(NoticeType.REGULAR, pageRequest);
+        Slice<RunningNotice> findRunningNoticeSliceA = runningNoticeRepository.findAllByNoticeType(NoticeType.REGULAR, member.getCrew(), pageRequest);
         List<RunningNotice> contentA = findRunningNoticeSliceA.getContent();
 
-        Slice<RunningNotice> findRunningNoticeSliceB = runningNoticeRepository.findAllByNoticeType(NoticeType.INSTANT, pageRequest);
+        Slice<RunningNotice> findRunningNoticeSliceB = runningNoticeRepository.findAllByNoticeType(NoticeType.INSTANT, member.getCrew(), pageRequest);
         List<RunningNotice> contentB = findRunningNoticeSliceB.getContent();
 
         //then
@@ -367,7 +367,7 @@ class RunningNoticeRepositoryTest {
                         .detail("detail")
                         .member(member)
                         .noticeType(NoticeType.INSTANT)
-                        .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 1))
+                        .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 0))
                         .runningPersonnel(4)
                         .status(RunningStatus.WAIT)
                         .build()

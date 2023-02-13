@@ -1,5 +1,6 @@
 package com.project.runningcrew.repository;
 
+import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
@@ -21,16 +22,16 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
 
     /**
      * 하루 간격의 날짜를 변수로 받아 그 날의 런닝 공지를 모두 반환한다.
-     * @param today
-     * @param tomorrow
+     * @param start
+     * @param end
      * @return list of RunningNotice
      */
-    @Query("select rn from RunningNotice rn where rn.runningDateTime between :today and :tomorrow")
-    List<RunningNotice> findAllByRunningDate(@Param("today") LocalDateTime today, @Param("tomorrow") LocalDateTime tomorrow);
+    @Query("select rn from RunningNotice rn where rn.runningDateTime >= :start and rn.runningDateTime < :end")
+    List<RunningNotice> findAllByRunningDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
 
     /**
-     * 특정 단어 search 를 제목 or 내용에 포함하는 런닝 공지를 모두 반환한다.
+     * 특정 단어 keyword 를 제목 or 내용에 포함하는 런닝 공지를 모두 반환한다.
      * @param keyword
      * @return list of RunningNotice
      */
@@ -50,6 +51,9 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
      * 특정 RunningStatus 의 RunningNotice 를 RunningDateTime 순으로 정렬하여 출력한다.
      * @param status
      * @return list of RunningNotice
+     *
+     * -> 추후 필요시 수정
+     *
      */
     @Query("select rn from RunningNotice rn where rn.status = :status order by  rn.runningDateTime")
     List<RunningNotice> findAllByRunningStatus(@Param("status") RunningStatus status);
@@ -62,8 +66,8 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
      * @param pageable
      * @return Slice of RunningNotice
      */
-    @Query("select rn from RunningNotice rn where rn.noticeType = :noticeType")
-    Slice<RunningNotice> findAllByNoticeType (@Param("noticeType") NoticeType noticeType, Pageable pageable );
+    @Query("select rn from RunningNotice rn where rn.noticeType = :noticeType and rn.member.crew = :crew")
+    Slice<RunningNotice> findAllByNoticeType (@Param("noticeType") NoticeType noticeType, @Param("crew") Crew crew, Pageable pageable );
 
 
 }
