@@ -2,19 +2,14 @@ package com.project.runningcrew.repository.images;
 
 import com.project.runningcrew.entity.images.RunningRecordImage;
 import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
-import com.project.runningcrew.entity.runningrecords.RunningRecord;
-import com.project.runningcrew.entity.users.LoginType;
-import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.UserRepository;
-import com.project.runningcrew.repository.runningrecords.PersonalRunningRecordRepository;
+import com.project.runningcrew.repository.TestEntityFactory;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,46 +24,15 @@ class RunningRecordImageRepositoryTest {
     RunningRecordImageRepository runningRecordImageRepository;
 
     @Autowired
-    UserRepository userRepository;
+    TestEntityFactory testEntityFactory;
 
-    @Autowired
-    PersonalRunningRecordRepository personalRunningRecordRepository;
-
-    public User testUser() {
-        User user = User.builder().email("email@naver.com")
-                .name("name")
-                .nickname("nickname")
-                .imgUrl("imgUrl")
-                .login_type(LoginType.EMAIL)
-                .phoneNumber("010-0000-0000")
-                .password("123a!")
-                .location("location")
-                .sex(Sex.MAN)
-                .birthday(LocalDate.of(1990, 1, 1))
-                .height(170)
-                .weight(70)
-                .build();
-        return userRepository.save(user);
-    }
-
-    public RunningRecord testPersonalRunningRecord() {
-        PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
-                .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
-                .runningDistance(3.1)
-                .runningTime(1000)
-                .runningFace(1000)
-                .calories(300)
-                .running_detail("")
-                .user(testUser())
-                .build();
-        return personalRunningRecordRepository.save(personalRunningRecord);
-    }
-
-
+    @DisplayName("RunningRecordImage save 테스트")
     @Test
-    public void save() {
+    public void saveTest() {
         //given
-        RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", testPersonalRunningRecord());
+        User user = testEntityFactory.getUser(0);
+        PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
+        RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", personalRunningRecord);
 
         ///when
         RunningRecordImage savedRunningRecordImage = runningRecordImageRepository.save(runningRecordImage);
@@ -77,10 +41,13 @@ class RunningRecordImageRepositoryTest {
         assertThat(savedRunningRecordImage).isEqualTo(runningRecordImage);
     }
 
+    @DisplayName("RunningRecordImage findById 테스트")
     @Test
-    public void findById() {
+    public void findByIdTest() {
         //given
-        RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", testPersonalRunningRecord());
+        User user = testEntityFactory.getUser(0);
+        PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
+        RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", personalRunningRecord);
         runningRecordImageRepository.save(runningRecordImage);
 
         ///when
@@ -91,10 +58,13 @@ class RunningRecordImageRepositoryTest {
         assertThat(optRunningRecordImage).hasValue(runningRecordImage);
     }
 
+    @DisplayName("RunningRecordImage delete 테스트")
     @Test
-    public void delete() {
+    public void deleteTest() {
         //given
-        RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", testPersonalRunningRecord());
+        User user = testEntityFactory.getUser(0);
+        PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
+        RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", personalRunningRecord);
         runningRecordImageRepository.save(runningRecordImage);
 
         ///when
@@ -105,22 +75,24 @@ class RunningRecordImageRepositoryTest {
         assertThat(optRunningRecordImage).isEmpty();
     }
 
+    @DisplayName("RunningRecordImage findAllByRunningRecord 테스트")
     @Test
     public void findAllByRunningRecordTest() {
         //given
-        RunningRecord runningRecord = testPersonalRunningRecord();
+        User user = testEntityFactory.getUser(0);
+        PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
         for (int i = 0; i < 10; i++) {
-            RunningRecordImage runningRecordImage = new RunningRecordImage("fileName" + i, runningRecord);
+            RunningRecordImage runningRecordImage = new RunningRecordImage("fileName" + i, personalRunningRecord);
             runningRecordImageRepository.save(runningRecordImage);
         }
 
         ///when
-        List<RunningRecordImage> runningRecordImages = runningRecordImageRepository.findAllByRunningRecord(runningRecord);
+        List<RunningRecordImage> runningRecordImages = runningRecordImageRepository.findAllByRunningRecord(personalRunningRecord);
 
         //then
         assertThat(runningRecordImages.size()).isSameAs(10);
         for (RunningRecordImage runningRecordImage : runningRecordImages) {
-            assertThat(runningRecordImage.getRunningRecord()).isEqualTo(runningRecord);
+            assertThat(runningRecordImage.getRunningRecord()).isEqualTo(personalRunningRecord);
         }
     }
 
