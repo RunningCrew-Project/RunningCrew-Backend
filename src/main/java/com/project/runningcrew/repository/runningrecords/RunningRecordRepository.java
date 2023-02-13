@@ -15,11 +15,24 @@ import java.util.List;
 @Repository
 public interface RunningRecordRepository extends JpaRepository<RunningRecord, Long> {
 
+    /**
+     * 특정 user 의 RunningRecord 들을 페이징 하여 반환
+     * @param user 찾는 RunningRecord 를 가지는 User
+     * @param pageable
+     * @return 페이징 조건에 맞는 user 의 RunningRecord 가 담긴 Slice
+     */
     Slice<RunningRecord> findByUser(User user, Pageable pageable);
 
+
+    /**
+     *  범위에 속하는 날짜에 런닝을 시작한 모든 RunningRecord 들의 list 를 반환
+     * @param start 범위 시작
+     * @param end 범위 종료. end 는 포함하지 안흠
+     * @return start 와 end 사이에 런닝을 시작한 모든 RunningRecord 들의 list
+     */
     @Query("select  r from RunningRecord r " +
-            "where r.startDateTime >= :today and r.startDateTime <:tomorrow")
-    List<RunningRecord> findAllByStartDate(@Param("today") LocalDateTime today,
-                                                   @Param("tomorrow") LocalDateTime tomorrow);
+            "where r.startDateTime >= :start and r.startDateTime <:end")
+    List<RunningRecord> findAllByStartDate(@Param("start") LocalDateTime start,
+                                                   @Param("end") LocalDateTime end);
 
 }
