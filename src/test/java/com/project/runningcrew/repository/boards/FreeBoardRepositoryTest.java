@@ -128,11 +128,11 @@ class FreeBoardRepositoryTest {
 
 
 
-    @DisplayName("FreeBoard 페이징 테스트")
+    @DisplayName("각 Crew 의 자유게시판 paging 출력 테스트")
     @Test
-    void findFreeBoardAllTest() throws Exception {
+    void findFreeBoardByCrewTest() throws Exception {
         //given
-        Member member = testMember(1);
+        Member member = testMember(1); // user(1), crew(1), member(1)
 
         for (int i = 0; i < 100; i++) {
             freeBoardRepository.save(
@@ -143,7 +143,7 @@ class FreeBoardRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 15); // Page size = 15
 
         //when
-        Slice<FreeBoard> slice = freeBoardRepository.findFreeBoardAll(pageRequest);
+        Slice<FreeBoard> slice = freeBoardRepository.findFreeBoardByCrew(member.getCrew(), pageRequest);
         List<FreeBoard> content = slice.getContent();
 
         //then

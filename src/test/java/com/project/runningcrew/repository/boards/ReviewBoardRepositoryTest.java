@@ -47,13 +47,13 @@ class ReviewBoardRepositoryTest {
     public User testUser(int num) {
         User user = User.builder()
                 .email("email@email.com" + num)
-                .password("password123!" + num)
-                .name("name"+ num)
+                .password("password123!")
+                .name("name")
                 .nickname("nickname"+ num)
-                .imgUrl("imgUrl"+ num)
+                .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
-                .phoneNumber("phoneNumber"+ num)
-                .location("location"+ num)
+                .phoneNumber("phoneNumber")
+                .location("location")
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -65,9 +65,9 @@ class ReviewBoardRepositoryTest {
     public Crew testCrew(int num) {
         Crew crew = Crew.builder()
                 .name("name"+ num)
-                .location("location"+ num)
-                .introduction("introduction"+ num)
-                .crewImgUrl("crewImgUrl"+ num)
+                .location("location")
+                .introduction("introduction")
+                .crewImgUrl("crewImgUrl")
                 .build();
         return crewRepository.save(crew);
     }
@@ -148,37 +148,11 @@ class ReviewBoardRepositoryTest {
 
 
 
-    @DisplayName("ReviewBoard 페이징 테스트")
+    @DisplayName("특정 crew 의 ReviewBoard 페이징 출력 테스트")
     @Test
-    void findReviewBoardAllTest() throws Exception {
+    void findReviewBoardByCrew() throws Exception {
         //given
-        User user = userRepository.save(
-                User.builder()
-                        .email("email@email.com")
-                        .password("password123!")
-                        .name("name")
-                        .nickname("nickname")
-                        .imgUrl("imgUrl")
-                        .login_type(LoginType.EMAIL)
-                        .phoneNumber("phoneNumber")
-                        .location("location")
-                        .sex(Sex.MAN)
-                        .birthday(LocalDate.now())
-                        .height(100)
-                        .weight(100)
-                        .build()
-        );
-
-        Crew crew = crewRepository.save(
-                Crew.builder()
-                        .name("name")
-                        .location("location")
-                        .introduction("introduction")
-                        .crewImgUrl("crewImgUrl")
-                        .build()
-        );
-
-        Member member = memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
+        Member member = testMember(1); // user(1), crew(1)
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()
@@ -188,22 +162,19 @@ class ReviewBoardRepositoryTest {
                         .runningFace(100)
                         .calories(100)
                         .running_detail("running_detail")
-                        .user(user)
                         .build()
         );
 
-        String title = "title";
-        String detail = "detail";
         for (int i = 0; i < 100; i++) {
             reviewBoardRepository.save(
-                    new ReviewBoard(member, title + i, detail + i, personalRunningRecord)
+                    new ReviewBoard(member, "title" + i, "detail" + i, personalRunningRecord)
                     // ReviewBoard 100개 save
             );
         }
         PageRequest pageRequest = PageRequest.of(0, 15); // Page size = 15
 
         //when
-        Slice<ReviewBoard> slice = reviewBoardRepository.findReviewBoardAll(pageRequest);
+        Slice<ReviewBoard> slice = reviewBoardRepository.findReviewBoardByCrew(member.getCrew(), pageRequest);
         List<ReviewBoard> content = slice.getContent();
 
         //then

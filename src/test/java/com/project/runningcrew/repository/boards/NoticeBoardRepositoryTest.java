@@ -1,6 +1,7 @@
 package com.project.runningcrew.repository.boards;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.boards.NoticeBoard;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
@@ -15,9 +16,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,5 +127,31 @@ class NoticeBoardRepositoryTest {
         Assertions.assertThat(findNoticeBoardOpt).isEmpty();
     }
 
+
+
+    @DisplayName("각 Crew 의 공지게시판 paging 출력 테스트")
+    @Test
+    void nameTest() throws Exception {
+        //given
+        Member member = testMember(1); // user(1), crew(1), member(1)
+        for (int i = 0; i < 100; i++) {
+            noticeBoardRepository.save(
+                    new NoticeBoard(member, "title" + i, "content" + i)
+                    // FreeBoard 100개 save
+            );
+        }
+        PageRequest pageRequest = PageRequest.of(0, 15); // Page size = 15
+
+        //when
+        Slice<NoticeBoard> slice = noticeBoardRepository.findNoticeBoardByCrew(member.getCrew(), pageRequest);
+        List<NoticeBoard> content = slice.getContent();
+
+        //then
+        Assertions.assertThat(content.size()).isEqualTo(15);
+        Assertions.assertThat(slice.getNumber()).isEqualTo(0);
+        Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(15);
+        Assertions.assertThat(slice.isFirst()).isTrue();
+        Assertions.assertThat(slice.hasNext()).isTrue();
+    }
 
 }

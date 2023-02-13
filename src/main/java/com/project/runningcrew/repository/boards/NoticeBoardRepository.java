@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface NoticeBoardRepository extends JpaRepository<NoticeBoard, Long> {
 
@@ -15,8 +16,7 @@ public interface NoticeBoardRepository extends JpaRepository<NoticeBoard, Long> 
      * @param pageable
      * @return slice of NoticeBoard
      */
-
-    @Query("select nb from NoticeBoard nb")
-    Slice<NoticeBoard> findNoticeBoardAll(Pageable pageable);
+    @Query("select nb from NoticeBoard nb where nb.member.crew = :crew")
+    Slice<NoticeBoard> findNoticeBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
 
 }
