@@ -83,8 +83,10 @@ class RunningNoticeRepositoryTest {
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
-                .member(testMember(num))
+                .user(testUser(num))
+                .crew(testCrew(num))
                 .build();
+
         return crewRunningRecordRepository.save(crewRunningRecord);
     }
 
