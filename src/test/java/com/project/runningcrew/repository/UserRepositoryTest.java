@@ -1,5 +1,8 @@
 package com.project.runningcrew.repository;
 
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.users.LoginType;
 import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
@@ -20,11 +23,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserRepositoryTest {
 
     @Autowired UserRepository userRepository;
+    @Autowired TestEntityFactory testEntityFactory;
+
 
     @DisplayName("User save 테스트")
     @Test
     public void saveTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = User.builder()
                 .email("email@email.com")
                 .password("password123!")
@@ -33,7 +41,7 @@ class UserRepositoryTest {
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -51,6 +59,9 @@ class UserRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User savedUser = userRepository.save(
                 User.builder()
                         .email("email@email.com")
@@ -60,7 +71,7 @@ class UserRepositoryTest {
                         .imgUrl("imgUrl")
                         .login_type(LoginType.EMAIL)
                         .phoneNumber("phoneNumber")
-                        .location("location")
+                        .dongArea(dongArea)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)
@@ -79,6 +90,9 @@ class UserRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User savedUser = userRepository.save(
                 User.builder()
                         .email("email@email.com")
@@ -88,7 +102,7 @@ class UserRepositoryTest {
                         .imgUrl("imgUrl")
                         .login_type(LoginType.EMAIL)
                         .phoneNumber("phoneNumber")
-                        .location("location")
+                        .dongArea(dongArea)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)

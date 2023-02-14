@@ -1,6 +1,9 @@
 package com.project.runningcrew.repository.images;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.images.RunningNoticeImage;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
@@ -32,8 +35,11 @@ class RunningNoticeImageRepositoryTest {
     @Test
     public void saveTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
@@ -49,8 +55,11 @@ class RunningNoticeImageRepositoryTest {
     @Test
     public void findByIdTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
@@ -68,8 +77,11 @@ class RunningNoticeImageRepositoryTest {
     @Test
     public void deleteTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
@@ -87,8 +99,11 @@ class RunningNoticeImageRepositoryTest {
     @Test
     void findAllByRunningNoticeTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         for (int i = 0; i < 10; i++) {

@@ -1,6 +1,9 @@
 package com.project.runningcrew.repository.boards;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.BlockedBoard;
 import com.project.runningcrew.entity.boards.Board;
 import com.project.runningcrew.entity.boards.FreeBoard;
@@ -11,6 +14,7 @@ import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.CrewRepository;
 import com.project.runningcrew.repository.MemberRepository;
+import com.project.runningcrew.repository.TestEntityFactory;
 import com.project.runningcrew.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +37,16 @@ class BlockedBoardRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired BoardRepository boardRepository;
     @Autowired BlockedBoardRepository blockedBoardRepository;
+    @Autowired TestEntityFactory testEntityFactory;
 
 
     @DisplayName("BlockBoard save 테스트")
     @Test
     void saveTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = userRepository.save(
                 User.builder()
                         .email("email@email.com")
@@ -48,7 +56,7 @@ class BlockedBoardRepositoryTest {
                         .imgUrl("imgUrl")
                         .login_type(LoginType.EMAIL)
                         .phoneNumber("phoneNumber")
-                        .location("location")
+                        .dongArea(dongArea)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)
@@ -58,9 +66,9 @@ class BlockedBoardRepositoryTest {
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
+                        .dongArea(dongArea)
                         .build()
         );
         String title = "title";
@@ -80,6 +88,9 @@ class BlockedBoardRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = userRepository.save(
                 User.builder()
                         .email("email@email.com")
@@ -89,7 +100,7 @@ class BlockedBoardRepositoryTest {
                         .imgUrl("imgUrl")
                         .login_type(LoginType.EMAIL)
                         .phoneNumber("phoneNumber")
-                        .location("location")
+                        .dongArea(dongArea)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)
@@ -99,9 +110,9 @@ class BlockedBoardRepositoryTest {
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
+                        .dongArea(dongArea)
                         .build()
         );
         String title = "title";
@@ -122,6 +133,9 @@ class BlockedBoardRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = userRepository.save(
                 User.builder()
                         .email("email@email.com")
@@ -131,7 +145,7 @@ class BlockedBoardRepositoryTest {
                         .imgUrl("imgUrl")
                         .login_type(LoginType.EMAIL)
                         .phoneNumber("phoneNumber")
-                        .location("location")
+                        .dongArea(dongArea)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)
@@ -141,9 +155,9 @@ class BlockedBoardRepositoryTest {
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
+                        .dongArea(dongArea)
                         .build()
         );
         String title = "title";

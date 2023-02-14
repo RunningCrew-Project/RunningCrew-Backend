@@ -1,6 +1,9 @@
 package com.project.runningcrew.repository.images;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.images.BoardImage;
 import com.project.runningcrew.entity.members.Member;
@@ -32,8 +35,11 @@ class BoardImageRepositoryTest {
     @Test
     public void saveTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
         BoardImage boardImage = new BoardImage("boardImage", freeBoard);
@@ -49,8 +55,11 @@ class BoardImageRepositoryTest {
     @Test
     public void findById() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
         BoardImage boardImage = new BoardImage("boardImage", freeBoard);
@@ -68,8 +77,11 @@ class BoardImageRepositoryTest {
     @Test
     public void delete() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
         BoardImage boardImage = new BoardImage("boardImage", freeBoard);
@@ -87,8 +99,11 @@ class BoardImageRepositoryTest {
     @Test
     void findAllByBoardTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea,0);
         Member member = testEntityFactory.getMember(user, crew);
         FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
 

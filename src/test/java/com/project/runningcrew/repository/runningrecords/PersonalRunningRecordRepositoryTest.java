@@ -1,5 +1,8 @@
 package com.project.runningcrew.repository.runningrecords;
 
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.TestEntityFactory;
@@ -29,7 +32,10 @@ class PersonalRunningRecordRepositoryTest {
     @Test
     public void saveTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
                 .runningDistance(3.1)
@@ -51,7 +57,10 @@ class PersonalRunningRecordRepositoryTest {
     @Test
     public void findByIdTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
                 .runningDistance(3.1)
@@ -76,7 +85,10 @@ class PersonalRunningRecordRepositoryTest {
     @Test
     public void delete() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
                 .runningDistance(3.1)

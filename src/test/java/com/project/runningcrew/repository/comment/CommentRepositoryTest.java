@@ -1,5 +1,8 @@
 package com.project.runningcrew.repository.comment;
 
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.comment.BoardComment;
 import com.project.runningcrew.entity.comment.Comment;
 import com.project.runningcrew.entity.Crew;
@@ -13,10 +16,7 @@ import com.project.runningcrew.entity.runningnotices.RunningStatus;
 import com.project.runningcrew.entity.users.LoginType;
 import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.CrewRepository;
-import com.project.runningcrew.repository.MemberRepository;
-import com.project.runningcrew.repository.RunningNoticeRepository;
-import com.project.runningcrew.repository.UserRepository;
+import com.project.runningcrew.repository.*;
 import com.project.runningcrew.repository.boards.BoardRepository;
 import com.project.runningcrew.repository.comment.CommentRepository;
 import org.assertj.core.api.Assertions;
@@ -38,21 +38,17 @@ class CommentRepositoryTest {
      * 테스트 용도 Board 는 FreeBoard 객체를 구현함.
      */
 
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    CrewRepository crewRepository;
-    @Autowired
-    MemberRepository memberRepository;
+    @Autowired UserRepository userRepository;
+    @Autowired CrewRepository crewRepository;
+    @Autowired MemberRepository memberRepository;
 
     @Autowired BoardRepository boardRepository;
-    @Autowired
-    CommentRepository commentRepository;
-    @Autowired
-    RunningNoticeRepository runningNoticeRepository;
+    @Autowired CommentRepository commentRepository;
+    @Autowired RunningNoticeRepository runningNoticeRepository;
+    @Autowired TestEntityFactory testEntityFactory;
 
 
-    public User testUser(int num) {
+    public User testUser(DongArea dongArea, int num) {
         User user = User.builder()
                 .email("email@email.com" + num)
                 .password("password123!")
@@ -61,7 +57,7 @@ class CommentRepositoryTest {
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -70,18 +66,18 @@ class CommentRepositoryTest {
         return userRepository.save(user);
     }
 
-    public Crew testCrew(int num) {
+    public Crew testCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder()
                 .name("name" + num)
-                .location("location")
+                .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
                 .build();
         return crewRepository.save(crew);
     }
 
-    public Member testMember(int num) {
-        Member member = new Member(testUser(num), testCrew(num), MemberRole.ROLE_NORMAL);
+    public Member testMember(User user, Crew crew) {
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         return memberRepository.save(member); // member(num) -> user(num), crew(num) 생성
     }
 
@@ -105,10 +101,22 @@ class CommentRepositoryTest {
     @Test
     void findAllByMemberIdTest() throws Exception {
         //given
-        Member memberA = testMember(1); // user(1), crew(1)
-        Member memberB = testMember(2); // user(2), crew(2)
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
 
-        Member testCreateMember = testMember(3); // user(3), crew(3)
+        User user1 = testUser(dongArea, 1);
+        User user2 = testUser(dongArea, 2);
+        User user3 = testUser(dongArea, 3);
+
+        Crew crew1 = testCrew(dongArea, 1);
+        Crew crew2 = testCrew(dongArea, 2);
+        Crew crew3 = testCrew(dongArea, 3);
+
+        Member memberA = testMember(user1, crew1); // user(1), crew(1)
+        Member memberB = testMember(user2, crew2); // user(2), crew(2)
+        Member testCreateMember = testMember(user3, crew3); // user(3), crew(3)
+
         FreeBoard testFreeBoard = boardRepository.save(new FreeBoard(testCreateMember, "title", "content"));
         RunningNotice testRunningNotice = runningNoticeRepository.save(testRunningNotice(testCreateMember));
 

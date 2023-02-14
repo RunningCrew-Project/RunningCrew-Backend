@@ -1,5 +1,8 @@
 package com.project.runningcrew.repository.images;
 
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.images.RunningRecordImage;
 import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
 import com.project.runningcrew.entity.users.User;
@@ -30,7 +33,10 @@ class RunningRecordImageRepositoryTest {
     @Test
     public void saveTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
         RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", personalRunningRecord);
 
@@ -45,7 +51,10 @@ class RunningRecordImageRepositoryTest {
     @Test
     public void findByIdTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
         RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", personalRunningRecord);
         runningRecordImageRepository.save(runningRecordImage);
@@ -62,7 +71,10 @@ class RunningRecordImageRepositoryTest {
     @Test
     public void deleteTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
         RunningRecordImage runningRecordImage = new RunningRecordImage("fileName", personalRunningRecord);
         runningRecordImageRepository.save(runningRecordImage);
@@ -79,7 +91,10 @@ class RunningRecordImageRepositoryTest {
     @Test
     public void findAllByRunningRecordTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
         for (int i = 0; i < 10; i++) {
             RunningRecordImage runningRecordImage = new RunningRecordImage("fileName" + i, personalRunningRecord);

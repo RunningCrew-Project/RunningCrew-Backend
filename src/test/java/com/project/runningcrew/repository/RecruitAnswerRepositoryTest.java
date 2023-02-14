@@ -2,6 +2,9 @@ package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.RecruitAnswer;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.LoginType;
@@ -28,9 +31,10 @@ class RecruitAnswerRepositoryTest {
     @Autowired private UserRepository userRepository;
     @Autowired private CrewRepository crewRepository;
     @Autowired private RecruitAnswerRepository recruitAnswerRepository;
+    @Autowired TestEntityFactory testEntityFactory;
 
 
-    public User testUser() {
+    public User testUser(DongArea dongArea) {
         User user = User.builder()
                 .email("email@email.com")
                 .password("password123!")
@@ -39,7 +43,7 @@ class RecruitAnswerRepositoryTest {
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -48,10 +52,10 @@ class RecruitAnswerRepositoryTest {
         return userRepository.save(user);
     }
 
-    public Crew testCrew() {
+    public Crew testCrew(DongArea dongArea) {
         Crew crew = Crew.builder()
                 .name("name")
-                .location("location")
+                .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
                 .build();
@@ -66,7 +70,12 @@ class RecruitAnswerRepositoryTest {
         //given
         String answer = "answer";
         int offset = 123;
-        RecruitAnswer recruitAnswer = new RecruitAnswer(testUser(), testCrew(), answer, offset);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea);
+        Crew crew = testCrew(dongArea);
+        RecruitAnswer recruitAnswer = new RecruitAnswer(user, crew, answer, offset);
 
         //when
         RecruitAnswer findRecruitAnswer = recruitAnswerRepository.save(recruitAnswer);
@@ -81,7 +90,12 @@ class RecruitAnswerRepositoryTest {
         //given
         String answer = "answer";
         int offset = 123;
-        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(testUser(), testCrew(), answer, offset));
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea);
+        Crew crew = testCrew(dongArea);
+        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(user, crew, answer, offset));
 
         //when
         Optional<RecruitAnswer> findRecruitAnswerOpt = recruitAnswerRepository.findById(savedRecruitAnswer.getId());
@@ -97,7 +111,12 @@ class RecruitAnswerRepositoryTest {
         //given
         String answer = "answer";
         int offset = 123;
-        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(testUser(), testCrew(), answer, offset));
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea);
+        Crew crew = testCrew(dongArea);
+        RecruitAnswer savedRecruitAnswer = recruitAnswerRepository.save(new RecruitAnswer(user, crew, answer, offset));
 
         //when
         recruitAnswerRepository.delete(savedRecruitAnswer);
@@ -111,6 +130,9 @@ class RecruitAnswerRepositoryTest {
     @Test
     void findAllByUserAndCrewTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
         User user = userRepository.save(
                 User.builder()
                         .email("email@email.com")
@@ -120,7 +142,7 @@ class RecruitAnswerRepositoryTest {
                         .imgUrl("imgUrl")
                         .login_type(LoginType.EMAIL)
                         .phoneNumber("phoneNumber")
-                        .location("location")
+                        .dongArea(dongArea)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)
@@ -131,7 +153,7 @@ class RecruitAnswerRepositoryTest {
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
+                        .dongArea(dongArea)
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
                         .build()
@@ -160,8 +182,11 @@ class RecruitAnswerRepositoryTest {
     @Rollback(value = false)
     void findUserByRecruitAnswerTest() throws Exception {
         //given
-        User user = testUser();
-        Crew crew = testCrew();
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea);
+        Crew crew = testCrew(dongArea);
         recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 1));
         recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 2));
         recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 3));
