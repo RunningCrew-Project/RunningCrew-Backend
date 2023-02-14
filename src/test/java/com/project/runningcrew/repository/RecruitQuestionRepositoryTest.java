@@ -2,6 +2,9 @@ package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.RecruitQuestion;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,17 +23,20 @@ class RecruitQuestionRepositoryTest {
 
     @Autowired CrewRepository crewRepository;
     @Autowired RecruitQuestionRepository recruitQuestionRepository;
-
+    @Autowired TestEntityFactory testEntityFactory;
 
 
     @DisplayName("RecruitQuestion save 테스트")
     @Test
     void saveTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
+                        .dongArea(dongArea)
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
                         .build()
@@ -50,10 +56,13 @@ class RecruitQuestionRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
+                        .dongArea(dongArea)
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
                         .build()
@@ -74,10 +83,13 @@ class RecruitQuestionRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
+                        .dongArea(dongArea)
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
                         .build()
@@ -98,10 +110,13 @@ class RecruitQuestionRepositoryTest {
     @Test
     void findAllByCrewIdTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
+                        .dongArea(dongArea)
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
                         .build()

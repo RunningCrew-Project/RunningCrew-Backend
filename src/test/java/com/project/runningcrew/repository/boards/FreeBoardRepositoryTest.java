@@ -1,6 +1,9 @@
 package com.project.runningcrew.repository.boards;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
@@ -9,6 +12,7 @@ import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.CrewRepository;
 import com.project.runningcrew.repository.MemberRepository;
+import com.project.runningcrew.repository.TestEntityFactory;
 import com.project.runningcrew.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -35,9 +39,10 @@ class FreeBoardRepositoryTest {
     @Autowired UserRepository userRepository;
     @Autowired CrewRepository crewRepository;
     @Autowired MemberRepository memberRepository;
+    @Autowired TestEntityFactory testEntityFactory;
 
 
-    public User testUser(int num) {
+    public User testUser(DongArea dongArea, int num) {
         User user = User.builder()
                 .email("email@email.com" + num)
                 .password("password123!")
@@ -46,7 +51,7 @@ class FreeBoardRepositoryTest {
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -55,18 +60,18 @@ class FreeBoardRepositoryTest {
         return userRepository.save(user);
     }
 
-    public Crew testCrew(int num) {
+    public Crew testCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder()
                 .name("name"+ num)
-                .location("location")
+                .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
                 .build();
         return crewRepository.save(crew);
     }
 
-    public Member testMember(int num) {
-        Member member = new Member(testUser(num), testCrew(num), MemberRole.ROLE_NORMAL);
+    public Member testMember(User user, Crew crew) {
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         return memberRepository.save(member);
     }
 
@@ -79,7 +84,13 @@ class FreeBoardRepositoryTest {
         int num = 1;
         String title = "title";
         String content = "content";
-        FreeBoard freeBoard = new FreeBoard(testMember(num), title, content);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+        FreeBoard freeBoard = new FreeBoard(member, title, content);
 
         //when
         FreeBoard savedFreeBoard = freeBoardRepository.save(freeBoard);
@@ -97,7 +108,13 @@ class FreeBoardRepositoryTest {
         int num = 1;
         String title = "title";
         String content = "content";
-        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(testMember(num), title, content));
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(member, title, content));
 
         //when
         Optional<FreeBoard> findFreeBoardOpt = freeBoardRepository.findById(savedFreeBoard.getId());
@@ -116,7 +133,13 @@ class FreeBoardRepositoryTest {
         int num = 1;
         String title = "title";
         String content = "content";
-        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(testMember(num), title, content));
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+        FreeBoard savedFreeBoard = freeBoardRepository.save( new FreeBoard(member, title, content));
 
         //when
         freeBoardRepository.delete(savedFreeBoard);
@@ -132,7 +155,12 @@ class FreeBoardRepositoryTest {
     @Test
     void findFreeBoardByCrewTest() throws Exception {
         //given
-        Member member = testMember(1); // user(1), crew(1), member(1)
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew); // user(1), crew(1), member(1)
 
         for (int i = 0; i < 100; i++) {
             freeBoardRepository.save(

@@ -2,6 +2,7 @@ package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.Gps;
+import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.FreeBoard;
@@ -15,6 +16,7 @@ import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.LoginType;
 import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.repository.areas.DongAreaRepository;
 import com.project.runningcrew.repository.areas.GuAreaRepository;
 import com.project.runningcrew.repository.areas.SidoAreaRepository;
 import com.project.runningcrew.repository.boards.BoardRepository;
@@ -52,15 +54,18 @@ public class TestEntityFactory {
     @Autowired
     GuAreaRepository guAreaRepository;
 
-    public User getUser(int num) {
+    @Autowired
+    DongAreaRepository dongAreaRepository;
+
+    public User getUser(DongArea dongArea, int num) {
         User user = User.builder().email("email" + num + "@naver.com")
                 .name("name" + num)
                 .nickname("nickname" + num)
                 .imgUrl("imgUrl" + num)
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("010-0000-0000")
+                .dongArea(dongArea)
                 .password("123a!")
-                .location("location")
                 .sex(Sex.MAN)
                 .birthday(LocalDate.of(1990, 1, 1))
                 .height(170)
@@ -69,11 +74,11 @@ public class TestEntityFactory {
         return userRepository.save(user);
     }
 
-    public Crew getCrew(int num) {
+    public Crew getCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder().name("crew" + num)
-                .location("location" + num)
                 .introduction("introduction" + num)
                 .crewImgUrl("crewImageUrl" + num)
+                .dongArea(dongArea)
                 .build();
         return crewRepository.save(crew);
     }
@@ -121,6 +126,11 @@ public class TestEntityFactory {
     public GuArea getGuArea(SidoArea sidoArea, int num) {
         GuArea guArea = new GuArea("gu" + num, sidoArea);
         return guAreaRepository.save(guArea);
+    }
+
+    public DongArea getDongArea(GuArea guArea, int num) {
+        DongArea dongArea = new DongArea("dong" + num, guArea);
+        return dongAreaRepository.save(dongArea);
     }
 
 }

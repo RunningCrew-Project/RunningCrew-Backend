@@ -2,6 +2,9 @@ package com.project.runningcrew.repository.runningrecords;
 
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.Gps;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.runningrecords.CrewRunningRecord;
@@ -39,7 +42,10 @@ class RunningRecordRepositoryTest {
     @Test
     public void saveTest_PersonalRunningRecord() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
                 .runningDistance(3.1)
@@ -73,7 +79,10 @@ class RunningRecordRepositoryTest {
     @Test
     public void findById_PersonalRunningRecord() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
                 .runningDistance(3.1)
@@ -98,8 +107,10 @@ class RunningRecordRepositoryTest {
     @Test
     public void delete_PersonalRunningRecord() {
         //given
-        User user = testEntityFactory.getUser(0);
-        PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);        PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
                 .runningDistance(3.1)
                 .runningTime(1000)
@@ -123,8 +134,11 @@ class RunningRecordRepositoryTest {
     @Test
     public void saveTest_CrewRunningRecord() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
@@ -163,8 +177,11 @@ class RunningRecordRepositoryTest {
     @Test
     public void findById_CrewRunningRecord() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
@@ -193,8 +210,11 @@ class RunningRecordRepositoryTest {
     @Test
     public void delete_CrewRunningRecord() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
@@ -223,8 +243,11 @@ class RunningRecordRepositoryTest {
     @Test
     public void findByUser_firstPage() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
 
         for (int i = 0; i < 10; i++) {
@@ -273,8 +296,11 @@ class RunningRecordRepositoryTest {
     @Test
     public void findByUser_lastPage() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
 
         for (int i = 0; i < 10; i++) {
@@ -323,7 +349,10 @@ class RunningRecordRepositoryTest {
     @Test
     public void findAllByByStartDateTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
         List<LocalDateTime> startDates = List.of(
                 LocalDateTime.of(2023, 3, 13, 0, 0),
                 LocalDateTime.of(2023, 3, 13, 11, 20),

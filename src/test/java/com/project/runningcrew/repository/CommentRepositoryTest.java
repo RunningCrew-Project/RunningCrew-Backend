@@ -2,6 +2,9 @@ package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Comment;
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.Board;
 import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.members.Member;
@@ -36,18 +39,19 @@ class CommentRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired BoardRepository boardRepository;
     @Autowired CommentRepository commentRepository;
+    @Autowired TestEntityFactory testEntityFactory;
 
 
-    public User testUser() {
+    public User testUser(DongArea dongArea, int num) {
         User user = User.builder()
-                .email("email@email.com")
+                .email("email@email.com" + num)
                 .password("password123!")
                 .name("name")
-                .nickname("nickname")
+                .nickname("nickname"+ num)
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -56,23 +60,23 @@ class CommentRepositoryTest {
         return userRepository.save(user);
     }
 
-    public Crew testCrew() {
+    public Crew testCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder()
-                .name("name")
-                .location("location")
+                .name("name"+ num)
+                .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
                 .build();
         return crewRepository.save(crew);
     }
 
-    public Member testMember() {
-        Member member = new Member(testUser(), testCrew(), MemberRole.ROLE_NORMAL);
+    public Member testMember(User user, Crew crew) {
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         return memberRepository.save(member);
     }
 
-    public FreeBoard testFreeBoard() {
-        FreeBoard freeBoard = new FreeBoard(testMember(), "title", "detail");
+    public FreeBoard testFreeBoard(Member member) {
+        FreeBoard freeBoard = new FreeBoard(member, "title", "detail");
         return boardRepository.save(freeBoard);
     }
 
@@ -81,7 +85,14 @@ class CommentRepositoryTest {
     @Test
     void saveTest() throws Exception {
         //given
-        Comment comment = new Comment(testMember(), "detail", testFreeBoard());
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+        FreeBoard freeBoard = testFreeBoard(member);
+        Comment comment = new Comment(member, "detail", freeBoard);
 
         //when
         Comment savedComment = commentRepository.save(comment);
@@ -95,7 +106,14 @@ class CommentRepositoryTest {
     @Test
     void findByIdTest() throws Exception {
         //given
-        Comment savedComment = commentRepository.save(new Comment(testMember(), "detail", testFreeBoard()));
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+        FreeBoard freeBoard = testFreeBoard(member);
+        Comment savedComment = commentRepository.save(new Comment(member, "detail", freeBoard));
 
         //when
         Optional<Comment> findCommentOpt = commentRepository.findById(savedComment.getId());
@@ -109,7 +127,14 @@ class CommentRepositoryTest {
     @Test
     void deleteTest() throws Exception {
         //given
-        Comment savedComment = commentRepository.save(new Comment(testMember(), "detail", testFreeBoard()));
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+        FreeBoard freeBoard = testFreeBoard(member);
+        Comment savedComment = commentRepository.save(new Comment(member, "detail", freeBoard));
 
         //when
         commentRepository.delete(savedComment);
@@ -124,6 +149,9 @@ class CommentRepositoryTest {
     @Test
     void findAllByBoardTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
         User user = userRepository.save(
                 User.builder()
                 .email("email@email.com")
@@ -133,7 +161,7 @@ class CommentRepositoryTest {
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -144,7 +172,7 @@ class CommentRepositoryTest {
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
+                        .dongArea(dongArea)
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
                         .build()
@@ -176,6 +204,9 @@ class CommentRepositoryTest {
     @Test
     void findAllByMemberIdTest() throws Exception {
         //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
         User user = userRepository.save(
                 User.builder()
                         .email("email@email.com")
@@ -185,7 +216,7 @@ class CommentRepositoryTest {
                         .imgUrl("imgUrl")
                         .login_type(LoginType.EMAIL)
                         .phoneNumber("phoneNumber")
-                        .location("location")
+                        .dongArea(dongArea)
                         .sex(Sex.MAN)
                         .birthday(LocalDate.now())
                         .height(100)
@@ -196,7 +227,7 @@ class CommentRepositoryTest {
         Crew crew = crewRepository.save(
                 Crew.builder()
                         .name("name")
-                        .location("location")
+                        .dongArea(dongArea)
                         .introduction("introduction")
                         .crewImgUrl("crewImgUrl")
                         .build()

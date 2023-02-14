@@ -2,6 +2,9 @@ package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.RunningMember;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.users.User;
@@ -31,8 +34,11 @@ class RunningMemberRepositoryTest {
     @Test
     public void saveTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
@@ -48,8 +54,11 @@ class RunningMemberRepositoryTest {
     @Test
     public void findByIdTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
@@ -67,8 +76,11 @@ class RunningMemberRepositoryTest {
     @Test
     public void deleteTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
@@ -86,15 +98,18 @@ class RunningMemberRepositoryTest {
     @Test
     void findAllByMemberTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
         for (int i = 1; i < 10; i++) {
-            User tempUser = testEntityFactory.getUser(i);
+            User tempUser = testEntityFactory.getUser(dongArea, i);
             Member tempMember = testEntityFactory.getMember(tempUser, crew);
             RunningNotice tempRunningNotice = testEntityFactory.getRunningNotice(tempMember, i);
             RunningMember tempRunningMember = new RunningMember(tempRunningNotice, member);
@@ -115,15 +130,18 @@ class RunningMemberRepositoryTest {
     @Test
     void countAllByRunningNoticeTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
         for (int i = 1; i < 10; i++) {
-            User tempUser = testEntityFactory.getUser(i);
+            User tempUser = testEntityFactory.getUser(dongArea, i);
             Member tempMember = testEntityFactory.getMember(tempUser, crew);
             RunningMember tempRunningMember = new RunningMember(runningNotice, tempMember);
             runningMemberRepository.save(tempRunningMember);
@@ -140,15 +158,18 @@ class RunningMemberRepositoryTest {
     @Test
     void findAllByRunningNoticeTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
         for (int i = 1; i < 10; i++) {
-            User tempUser = testEntityFactory.getUser(i);
+            User tempUser = testEntityFactory.getUser(dongArea, i);
             Member tempMember = testEntityFactory.getMember(tempUser, crew);
             RunningMember tempRunningMember = new RunningMember(runningNotice, tempMember);
             runningMemberRepository.save(tempRunningMember);

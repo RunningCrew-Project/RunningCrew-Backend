@@ -1,6 +1,9 @@
 package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.runningnotices.NoticeType;
@@ -38,18 +41,19 @@ class RunningNoticeRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired CrewRunningRecordRepository crewRunningRecordRepository;
     @Autowired RunningNoticeRepository runningNoticeRepository;
+    @Autowired TestEntityFactory testEntityFactory;
 
 
-    public User testUser(int num) {
+    public User testUser(DongArea dongArea, int num) {
         User user = User.builder()
                 .email("email@email.com" + num)
                 .password("password123!")
                 .name("name")
-                .nickname("nickname" + num)
+                .nickname("nickname"+ num)
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -58,23 +62,22 @@ class RunningNoticeRepositoryTest {
         return userRepository.save(user);
     }
 
-    public Crew testCrew(int num) {
+    public Crew testCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder()
-                .name("name" + num)
-                .location("location")
+                .name("name"+ num)
+                .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
                 .build();
         return crewRepository.save(crew);
     }
 
-    public Member testMember(int num) {
-        Member member = new Member(testUser(num), testCrew(num), MemberRole.ROLE_NORMAL);
+    public Member testMember(User user, Crew crew) {
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         return memberRepository.save(member);
     }
 
-    public RunningRecord testRunningRecord() {
-
+    public RunningRecord testRunningRecord(User user, Crew crew) {
         int num = 1;
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
@@ -83,8 +86,8 @@ class RunningNoticeRepositoryTest {
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
-                .user(testUser(num))
-                .crew(testCrew(num))
+                .user(user)
+                .crew(crew)
                 .build();
 
         return crewRunningRecordRepository.save(crewRunningRecord);
@@ -96,9 +99,15 @@ class RunningNoticeRepositoryTest {
     void saveTest() throws Exception {
         //given
         int num = 1;
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
         RunningNotice runningNotice = RunningNotice.builder().title("title")
                 .detail("detail")
-                .member(testMember(num))
+                .member(member)
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                 .runningPersonnel(4)
@@ -119,9 +128,15 @@ class RunningNoticeRepositoryTest {
     void findByIdTest() throws Exception {
         //given
         int num = 1;
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
         RunningNotice runningNotice = RunningNotice.builder().title("title")
                 .detail("detail")
-                .member(testMember(num))
+                .member(member)
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                 .runningPersonnel(4)
@@ -144,9 +159,15 @@ class RunningNoticeRepositoryTest {
     void deleteTest() throws Exception {
         //given
         int num = 1;
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
         RunningNotice runningNotice = RunningNotice.builder().title("title")
                 .detail("detail")
-                .member(testMember(num))
+                .member(member)
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                 .runningPersonnel(4)
@@ -168,8 +189,14 @@ class RunningNoticeRepositoryTest {
     @Test
     void findAllByMemberTest() throws Exception {
         //given
-        Member memberA = testMember(1);
-        Member memberB = testMember(2);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User userA = testUser(dongArea, 1);
+        User userB = testUser(dongArea, 2);
+        Crew crew = testCrew(dongArea, 1);
+        Member memberA = testMember(userA, crew);
+        Member memberB = testMember(userB, crew);
 
         RunningNotice runningNoticeA = runningNoticeRepository.save(
                 RunningNotice.builder().title("titleA")
@@ -220,7 +247,12 @@ class RunningNoticeRepositoryTest {
     @Test
     void findAllByCrewAndNoticeTypeTest() throws Exception {
         //given
-        Member member = testMember(1);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
 
         RunningNotice runningNoticeA = runningNoticeRepository.save(
                 RunningNotice.builder().title("title_REGULAR")
@@ -288,7 +320,12 @@ class RunningNoticeRepositoryTest {
     void findListAllByCrewAndKeyWordTest() throws Exception {
         //given
         String keyword = "key";
-        Member member = testMember(1);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
         RunningNotice runningNoticeA = runningNoticeRepository.save(
                 RunningNotice.builder().title("abc_key_def")
                         .detail("detail")
@@ -338,7 +375,12 @@ class RunningNoticeRepositoryTest {
     void findSliceAllByCrewAndKeyWordTest() throws Exception {
         //given
         String keyword = "key";
-        Member member = testMember(1);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
         RunningNotice runningNoticeA = runningNoticeRepository.save(
                 RunningNotice.builder().title("abc_key_def")
                         .detail("detail")
@@ -394,7 +436,12 @@ class RunningNoticeRepositoryTest {
         LocalDateTime today = LocalDateTime.of(2023, 2, 11, 0, 0);
         LocalDateTime tomorrow = LocalDateTime.of(2023, 2,12, 0, 0);
 
-        Member member = testMember(1);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
         RunningNotice runningNotice1 = runningNoticeRepository.save(
                 RunningNotice.builder().title("title")
                         .detail("detail")
@@ -441,7 +488,12 @@ class RunningNoticeRepositoryTest {
     @Test
     void findAllByCrewAndStatusTest() throws Exception {
         //given
-        Member member = testMember(1);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
         RunningNotice runningNotice1 = runningNoticeRepository.save(
                 RunningNotice.builder().title("title")
                         .detail("detail")

@@ -1,6 +1,9 @@
 package com.project.runningcrew.repository.boards;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.Board;
 import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.boards.ReviewBoard;
@@ -12,6 +15,7 @@ import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.CrewRepository;
 import com.project.runningcrew.repository.MemberRepository;
+import com.project.runningcrew.repository.TestEntityFactory;
 import com.project.runningcrew.repository.UserRepository;
 import com.project.runningcrew.repository.runningrecords.PersonalRunningRecordRepository;
 import org.assertj.core.api.Assertions;
@@ -40,8 +44,10 @@ class BoardRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired PersonalRunningRecordRepository personalRunningRecordRepository;
     @Autowired BoardRepository boardRepository;
+    @Autowired TestEntityFactory testEntityFactory;
 
-    public User testUser(int num) {
+
+    public User testUser(DongArea dongArea, int num) {
         User user = User.builder()
                 .email("email@email.com" + num)
                 .password("password123!")
@@ -50,7 +56,7 @@ class BoardRepositoryTest {
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .location("location")
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
@@ -59,22 +65,22 @@ class BoardRepositoryTest {
         return userRepository.save(user);
     }
 
-    public Crew testCrew(int num) {
+    public Crew testCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder()
                 .name("name"+ num)
-                .location("location")
+                .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
                 .build();
         return crewRepository.save(crew);
     }
 
-    public Member testMember(int num) {
-        Member member = new Member(testUser(num), testCrew(num), MemberRole.ROLE_NORMAL);
+    public Member testMember(User user, Crew crew) {
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         return memberRepository.save(member);
     }
 
-    public PersonalRunningRecord testPersonalRunningRecord(int num) {
+    public PersonalRunningRecord testPersonalRunningRecord(User user, int num) {
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .startDateTime(LocalDateTime.now())
                 .runningDistance(100)
@@ -82,7 +88,7 @@ class BoardRepositoryTest {
                 .runningFace(100)
                 .calories(100)
                 .running_detail("running_detail")
-                .user(testUser(num))
+                .user(user)
                 .build();
         return personalRunningRecordRepository.save(personalRunningRecord);
     }
@@ -92,8 +98,14 @@ class BoardRepositoryTest {
     @Test
     void findAllByMemberTest() throws Exception {
         //given
-        Member memberA = testMember(1);
-        Member memberB = testMember(2);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User userA = testUser(dongArea, 1);
+        User userB = testUser(dongArea, 2);
+        Crew crew = testCrew(dongArea, 1);
+        Member memberA = testMember(userA, crew);
+        Member memberB = testMember(userB, crew);
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()
@@ -129,7 +141,12 @@ class BoardRepositoryTest {
     void findListAllByKeywordAndCrewTest() throws Exception {
         //given
         String keyword = "key";
-        Member member = testMember(1); // user(1), crew(1)
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew); // user(1), crew(1)
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()
@@ -170,7 +187,12 @@ class BoardRepositoryTest {
     void findSliceAllByKeywordAndCrewTest() throws Exception {
         //given
         String keyword = "key";
-        Member member = testMember(1); // user(1), crew(1)
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew); // user(1), crew(1)
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()

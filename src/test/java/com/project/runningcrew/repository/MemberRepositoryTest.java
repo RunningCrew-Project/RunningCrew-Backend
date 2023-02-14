@@ -1,6 +1,9 @@
 package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.areas.DongArea;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.User;
@@ -30,8 +33,11 @@ class MemberRepositoryTest {
     @Test
     public void saveTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
 
         ///when
@@ -46,8 +52,11 @@ class MemberRepositoryTest {
     @Test
     public void findByIdTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         memberRepository.save(member);
 
@@ -63,8 +72,11 @@ class MemberRepositoryTest {
     @Test
     public void deleteTest() {
         //given
-        User user = testEntityFactory.getUser(0);
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
         Member savedMember = memberRepository.save(member);
 
@@ -80,10 +92,13 @@ class MemberRepositoryTest {
     @Test
     void findAllByUserTest() {
         //given
-        User user = testEntityFactory.getUser(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
 
         for (int i = 0; i < 10; i++) {
-            Crew crew = testEntityFactory.getCrew(i);
+            Crew crew = testEntityFactory.getCrew(dongArea, i);
             Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
             memberRepository.save(member);
         }
@@ -102,10 +117,13 @@ class MemberRepositoryTest {
     @Test
     void countAllByCrewTest() {
         //given
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
 
         for (int i = 0; i < 10; i++) {
-            User user = testEntityFactory.getUser(i);
+            User user = testEntityFactory.getUser(dongArea, i);
             Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
             memberRepository.save(member);
         }
@@ -121,11 +139,13 @@ class MemberRepositoryTest {
     @Test
     void findAllByCrewTest() {
         //given
-        Crew crew = testEntityFactory.getCrew(0);
-
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
 
         for (int i = 0; i < 10; i++) {
-            User user = testEntityFactory.getUser(i);
+            User user = testEntityFactory.getUser(dongArea, i);
             Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
             memberRepository.save(member);
         }
@@ -144,10 +164,13 @@ class MemberRepositoryTest {
     @Test
     void findAllByCrewAndRoleTest() {
         //given
-        Crew crew = testEntityFactory.getCrew(0);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
 
         for (int i = 0; i < 10; i++) {
-            User user = testEntityFactory.getUser(i);
+            User user = testEntityFactory.getUser(dongArea, i);
 
             Member member;
             if (i == 0) {
