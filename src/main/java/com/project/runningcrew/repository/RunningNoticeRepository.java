@@ -33,10 +33,21 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
     /**
      * 특정 Crew 의  keyword 를 제목 or 내용에 포함하는 런닝 공지를 모두 반환한다.
      * @param keyword
+     * @param crew
      * @return list of RunningNotice
      */
     @Query("select rn from RunningNotice rn where rn.member.crew = :crew and (rn.title like %:keyword% or rn.detail like %:keyword%)")
-    List<RunningNotice> findAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew);
+    List<RunningNotice> findListAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew);
+
+
+    /**
+     * 특정 Crew 의  keyword 를 제목 or 내용에 포함하는 런닝 공지를 모두 반환한다.(paging 적용)
+     * @param keyword
+     * @param crew
+     * @return slice of RunningNotice
+     */
+    @Query("select rn from RunningNotice rn where rn.member.crew = :crew and (rn.title like %:keyword% or rn.detail like %:keyword%)")
+    Slice<RunningNotice> findSliceAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew);
 
 
     /**

@@ -285,7 +285,7 @@ class RunningNoticeRepositoryTest {
 
     @DisplayName("특정 키워드 포함 RunningNotice 출력 테스트")
     @Test
-    void findAllByCrewAndKeyWordTest() throws Exception {
+    void findListAllByCrewAndKeyWordTest() throws Exception {
         //given
         String keyword = "key";
         Member member = testMember(1);
@@ -323,10 +323,65 @@ class RunningNoticeRepositoryTest {
         ); // 미포함
 
         //when
-        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByCrewAndKeyWord(keyword, member.getCrew());
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findListAllByCrewAndKeyWord(keyword, member.getCrew());
 
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
+    }
+
+
+
+
+
+    @DisplayName("특정 키워드 포함 RunningNotice 출력 테스트 paging 적용")
+    @Test
+    void findSliceAllByCrewAndKeyWordTest() throws Exception {
+        //given
+        String keyword = "key";
+        Member member = testMember(1);
+        RunningNotice runningNoticeA = runningNoticeRepository.save(
+                RunningNotice.builder().title("abc_key_def")
+                        .detail("detail")
+                        .member(member)
+                        .noticeType(NoticeType.REGULAR)
+                        .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
+                        .runningPersonnel(4)
+                        .status(RunningStatus.WAIT)
+                        .build()
+        ); // title 에 포함
+
+        RunningNotice runningNoticeA2 = runningNoticeRepository.save(
+                RunningNotice.builder().title("title")
+                        .detail("abc_key_def")
+                        .member(member)
+                        .noticeType(NoticeType.INSTANT)
+                        .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
+                        .runningPersonnel(4)
+                        .status(RunningStatus.WAIT)
+                        .build()
+        ); // detail 에 포함
+
+        RunningNotice runningNoticeB = runningNoticeRepository.save(
+                RunningNotice.builder().title("title")
+                        .detail("detail")
+                        .member(member)
+                        .noticeType(NoticeType.INSTANT)
+                        .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
+                        .runningPersonnel(4)
+                        .status(RunningStatus.WAIT)
+                        .build()
+        ); // 미포함
+
+        //when
+        Slice<RunningNotice> slice = runningNoticeRepository.findSliceAllByCrewAndKeyWord(keyword, member.getCrew());
+        List<RunningNotice> content = slice.getContent();
+
+        //then
+        Assertions.assertThat(content.size()).isEqualTo(2);
+        Assertions.assertThat(slice.getNumber()).isEqualTo(0);
+        Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(slice.isFirst()).isTrue();
+        Assertions.assertThat(slice.hasNext()).isFalse();
     }
 
 
