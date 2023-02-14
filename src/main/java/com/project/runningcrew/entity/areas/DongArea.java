@@ -13,6 +13,7 @@ public class DongArea {
 
     @Id
     @GeneratedValue
+    @Column(name = "dong_area_id")
     private Long id;
 
     @Column(nullable = false)

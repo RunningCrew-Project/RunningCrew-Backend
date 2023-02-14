@@ -13,6 +13,7 @@ public class GuArea {
 
     @Id
     @GeneratedValue
+    @Column(name = "gu_area_id")
     private Long id;
 
     @Column(nullable = false)

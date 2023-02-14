@@ -13,6 +13,7 @@ public class SidoArea {
 
     @Id
     @GeneratedValue
+    @Column(name = "sido_area_id")
     private Long id;
 
     @Column(nullable = false)
