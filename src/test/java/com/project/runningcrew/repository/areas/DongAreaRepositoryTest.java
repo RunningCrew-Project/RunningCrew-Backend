@@ -93,4 +93,22 @@ class DongAreaRepositoryTest {
         assertThat(dongAreas.size()).isEqualTo(10);
     }
 
+    @DisplayName("DongArea findByName 테스트")
+    @Test
+    public void findByNameTest() {
+        //given
+        String name = "dong";
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea,0);
+        DongArea dongArea = new DongArea(name, guArea);
+        dongAreaRepository.save(dongArea);
+
+        ///when
+        Optional<DongArea> optDongArea = dongAreaRepository.findByName(name);
+
+        //then
+        assertThat(optDongArea).isNotEmpty();
+        assertThat(optDongArea).hasValue(dongArea);
+    }
+
 }
