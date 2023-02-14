@@ -27,6 +27,6 @@ public interface RecruitAnswerRepository extends JpaRepository<RecruitAnswer, Lo
      * @return
      */
     @Query("select distinct(ra.user) from RecruitAnswer ra where ra.crew = :crew")
-    List<User> findUserByRecruitAnswer(@Param("crew") Crew crew);
+    List<User> findUserByCrew(@Param("crew") Crew crew);
 
 }

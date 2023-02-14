@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -125,10 +126,10 @@ class BoardRepositoryTest {
 
     @DisplayName("특정 keyword 를 포함하는 모든 게시물 출력 테스트")
     @Test
-    void findAllByTitleAndDetailTest() throws Exception {
+    void findListAllByKeywordAndCrewTest() throws Exception {
         //given
         String keyword = "key";
-        Member member = testMember(1);
+        Member member = testMember(1); // user(1), crew(1)
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()
@@ -138,6 +139,7 @@ class BoardRepositoryTest {
                         .runningFace(100)
                         .calories(100)
                         .running_detail("running_detail")
+                        .user(member.getUser())
                         .build()
         );
 
@@ -154,9 +156,57 @@ class BoardRepositoryTest {
         ); // ReviewBoard, keyword title 포함
 
         //when
-        List<Board> findBoardList = boardRepository.findAllByTitleAndDetail(keyword);
+        List<Board> findBoardList = boardRepository.findListAllByCrewAndKeyWord(keyword, member.getCrew());
         //then
         Assertions.assertThat(findBoardList.size()).isEqualTo(2);
+    }
+
+
+
+
+
+    @DisplayName("특정 keyword 를 포함하는 모든 게시물 출력 테스트 paging 적용")
+    @Test
+    void findSliceAllByKeywordAndCrewTest() throws Exception {
+        //given
+        String keyword = "key";
+        Member member = testMember(1); // user(1), crew(1)
+
+        PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
+                PersonalRunningRecord.builder()
+                        .startDateTime(LocalDateTime.now())
+                        .runningDistance(100)
+                        .runningTime(100)
+                        .runningFace(100)
+                        .calories(100)
+                        .running_detail("running_detail")
+                        .user(member.getUser())
+                        .build()
+        );
+
+        FreeBoard freeBoard = freeBoardRepository.save(
+                new FreeBoard(member, "title", "cont_key_ent")
+        ); // FreeBoard, keyword content 포함
+
+        FreeBoard freeBoard2 = freeBoardRepository.save(
+                new FreeBoard(member, "title", "content")
+        ); // FreeBoard, keyword 미포함
+
+        ReviewBoard reviewBoard = reviewBoardRepository.save(
+                new ReviewBoard(member, "tit_key_le", "content", personalRunningRecord)
+        ); // ReviewBoard, keyword title 포함
+
+        //when
+        Slice<Board> slice = boardRepository.findSliceAllByCrewAndKeyWord(keyword, member.getCrew());
+        List<Board> content = slice.getContent();
+
+        //then
+        Assertions.assertThat(content.size()).isEqualTo(2);
+        Assertions.assertThat(slice.getNumber()).isEqualTo(0);
+        Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(2);
+        Assertions.assertThat(slice.isFirst()).isTrue();
+        Assertions.assertThat(slice.hasNext()).isFalse();
+
     }
 
 

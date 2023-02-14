@@ -167,7 +167,7 @@ class RecruitAnswerRepositoryTest {
         recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 3));
 
         //when
-        List<User> findUserList = recruitAnswerRepository.findUserByRecruitAnswer(crew);
+        List<User> findUserList = recruitAnswerRepository.findUserByCrew(crew);
 
         //then
         Assertions.assertThat(findUserList.size()).isEqualTo(1);
