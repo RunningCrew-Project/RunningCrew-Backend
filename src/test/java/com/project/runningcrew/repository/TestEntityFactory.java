@@ -2,6 +2,8 @@ package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.Gps;
+import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
@@ -13,6 +15,8 @@ import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.LoginType;
 import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.repository.areas.GuAreaRepository;
+import com.project.runningcrew.repository.areas.SidoAreaRepository;
 import com.project.runningcrew.repository.boards.BoardRepository;
 import com.project.runningcrew.repository.runningrecords.RunningRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,12 @@ public class TestEntityFactory {
 
     @Autowired
     RunningRecordRepository runningRecordRepository;
+
+    @Autowired
+    SidoAreaRepository sidoAreaRepository;
+
+    @Autowired
+    GuAreaRepository guAreaRepository;
 
     public User getUser(int num) {
         User user = User.builder().email("email" + num + "@naver.com")
@@ -101,6 +111,16 @@ public class TestEntityFactory {
                 .user(user)
                 .build();
         return runningRecordRepository.save(personalRunningRecord);
+    }
+
+    public SidoArea getSidoArea(int num) {
+        SidoArea sidoArea = new SidoArea("sido" + num);
+        return sidoAreaRepository.save(sidoArea);
+    }
+
+    public GuArea getGuArea(SidoArea sidoArea, int num) {
+        GuArea guArea = new GuArea("gu" + num, sidoArea);
+        return guAreaRepository.save(guArea);
     }
 
 }
