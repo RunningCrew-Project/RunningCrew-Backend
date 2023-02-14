@@ -1,5 +1,6 @@
-package com.project.runningcrew.entity;
+package com.project.runningcrew.entity.comment;
 
+import com.project.runningcrew.entity.BaseEntity;
 import com.project.runningcrew.entity.boards.Board;
 import com.project.runningcrew.entity.members.Member;
 import lombok.AccessLevel;
@@ -13,8 +14,10 @@ import javax.validation.constraints.Size;
 @Entity
 @Getter
 @Table(name = "comments")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "comment_type")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseEntity {
+public abstract class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -30,14 +33,9 @@ public class Comment extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String detail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
-    private Board board;
-
-    public Comment(Member member, String detail, Board board) {
+    public Comment(Member member, String detail) {
         this.member = member;
         this.detail = detail;
-        this.board = board;
     }
 
     public void updateDetail(String detail) {
