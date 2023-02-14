@@ -1,6 +1,7 @@
 package com.project.runningcrew.entity.users;
 
 import com.project.runningcrew.entity.BaseEntity;
+import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.members.Member;
 import lombok.*;
 
@@ -48,14 +49,14 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dong_area_id")
+    private DongArea dongArea;
+
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{4,16}$",
             message = "비밀번호는 4글자 이상 16글자 이하의 영문, 숫자, 특수문자의 조합이여야 합니다.")
     @NotNull
     private String password;
-
-    @NotNull
-    @Column(nullable = false)
-    private String location;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -84,7 +85,7 @@ public class User extends BaseEntity {
                 .imgUrl(imgUrl)
                 .login_type(login_type)
                 .phoneNumber(phoneNumber)
-                .location("")
+                .dongArea(null)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.of(1990,1,1))
                 .height(170)
@@ -94,7 +95,7 @@ public class User extends BaseEntity {
 
     @Builder
     public User(String email, String password, String name, String nickname, String imgUrl,
-                LoginType login_type, String phoneNumber, String location, Sex sex,
+                LoginType login_type, String phoneNumber, DongArea dongArea, Sex sex,
                 LocalDate birthday, int height, int weight) {
 
         this.email = email;
@@ -104,7 +105,7 @@ public class User extends BaseEntity {
         this.imgUrl = imgUrl;
         this.login_type = login_type;
         this.phoneNumber = phoneNumber;
-        this.location = location;
+        this.dongArea = dongArea;
         this.sex = sex;
         this.birthday = birthday;
         this.height = height;
@@ -124,8 +125,8 @@ public class User extends BaseEntity {
         this.imgUrl = imgUrl;
     }
 
-    public void updateLocation(String location) {
-        this.location = location;
+    public void updateDongArea(DongArea dongArea) {
+        this.dongArea = dongArea;
     }
 
     public void updateSex(Sex sex) {

@@ -1,5 +1,6 @@
 package com.project.runningcrew.entity;
 
+import com.project.runningcrew.entity.areas.DongArea;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,10 +26,6 @@ public class Crew extends BaseEntity {
     @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-    @NotBlank(message = "활동 지역은 필수값입니다.")
-    @Size(min = 1, max = 100, message = "활동 지역은 1 자 이상 100 자 이하입니다.")
-    @Column(nullable = false, length = 100)
-    private String location;
 
     @NotBlank(message = "크루 소개는 필수값입니다.")
     @Size(min = 1, max = 500, message = "크루 소개는 1 자 이상 500 자 이하입니다.")
@@ -39,20 +36,24 @@ public class Crew extends BaseEntity {
     @Column(nullable = false)
     private String crewImgUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dong_area_id", nullable = false)
+    private DongArea dongArea;
+
     @Builder
-    public Crew(String name, String location, String introduction, String crewImgUrl) {
+    public Crew(String name, String introduction, String crewImgUrl, DongArea dongArea) {
         this.name = name;
-        this.location = location;
         this.introduction = introduction;
         this.crewImgUrl = crewImgUrl;
+        this.dongArea = dongArea;
     }
 
     public void updateName(String name) {
         this.name = name;
     }
 
-    public void updateLocation(String location) {
-        this.location = location;
+    public void updateDongArea(DongArea dongArea) {
+        this.dongArea = dongArea;
     }
 
     public void updateIntroduction(String introduction) {
