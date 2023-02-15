@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -345,7 +344,7 @@ class RunningRecordRepositoryTest {
         assertThat(runningRecords.hasNext()).isFalse();
     }
 
-    @DisplayName("findAllByByStartDate 테스트")
+    @DisplayName("findAllByUserAndStartDateTimes 테스트")
     @Test
     public void findAllByByStartDateTest() {
         //given
@@ -375,7 +374,7 @@ class RunningRecordRepositoryTest {
 
         ///when
         List<RunningRecord> personalRunningRecords = runningRecordRepository
-                .findAllByStartDate(today, tomorrow);
+                .findAllByUserAndStartDateTimes(user, today, tomorrow);
 
         //then
         assertThat(personalRunningRecords.size()).isSameAs(2);
