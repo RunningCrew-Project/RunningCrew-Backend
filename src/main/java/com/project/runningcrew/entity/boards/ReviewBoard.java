@@ -22,6 +22,11 @@ public class ReviewBoard extends Board{
         this.runningRecord = runningRecord;
     }
 
+    public ReviewBoard(Long id, Member member, String title, String detail, RunningRecord runningRecord) {
+        super(id, member, title, detail);
+        this.runningRecord = runningRecord;
+    }
+
     public void updateRunningRecord(RunningRecord runningRecord) {
         this.runningRecord = runningRecord;
     }

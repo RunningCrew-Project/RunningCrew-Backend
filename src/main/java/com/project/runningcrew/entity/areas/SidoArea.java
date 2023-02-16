@@ -23,4 +23,9 @@ public class SidoArea {
         this.name = name;
     }
 
+    public SidoArea(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
 }

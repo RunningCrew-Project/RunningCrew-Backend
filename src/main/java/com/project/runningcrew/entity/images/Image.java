@@ -31,4 +31,9 @@ public abstract class Image extends BaseEntity {
         this.fileName = fileName;
     }
 
+    public Image(Long id, String fileName) {
+        this.id = id;
+        this.fileName = fileName;
+    }
+
 }

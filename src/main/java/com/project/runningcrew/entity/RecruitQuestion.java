@@ -37,4 +37,11 @@ public class RecruitQuestion extends BaseEntity{
         this.questionOffset = questionOffset;
     }
 
+    public RecruitQuestion(Long id, Crew crew, String question, int questionOffset) {
+        this.id = id;
+        this.crew = crew;
+        this.question = question;
+        this.questionOffset = questionOffset;
+    }
+
 }

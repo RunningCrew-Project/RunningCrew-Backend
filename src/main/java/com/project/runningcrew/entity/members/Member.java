@@ -43,6 +43,16 @@ public class Member extends BaseEntity {
         this.role = role;
     }
 
+    public Member(Long id, User user, Crew crew, MemberRole role) {
+        if (user != null) {
+            setUser(user);
+        }
+
+        this.id = id;
+        this.crew = crew;
+        this.role = role;
+    }
+
     private void setUser(User user) {
         this.user = user;
         user.getMembers().add(this);

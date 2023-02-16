@@ -57,8 +57,9 @@ public abstract class RunningRecord extends BaseEntity {
     @OneToMany(mappedBy = "runningRecord", cascade = CascadeType.ALL)
     private List<Gps> gpsList = new ArrayList<>();
 
-    public RunningRecord(LocalDateTime startDateTime, double runningDistance, int runningTime,
+    public RunningRecord(Long id, LocalDateTime startDateTime, double runningDistance, int runningTime,
                          int runningFace, int calories, String running_detail, User user) {
+        this.id = id;
         this.startDateTime = startDateTime;
         this.runningDistance = runningDistance;
         this.runningTime = runningTime;
@@ -67,5 +68,6 @@ public abstract class RunningRecord extends BaseEntity {
         this.running_detail = running_detail;
         this.user = user;
     }
+
 
 }

@@ -18,4 +18,8 @@ public class FreeBoard extends Board{
         super(member, title, content);
     }
 
+    public FreeBoard(Long id, Member member, String title, String detail) {
+        super(id, member, title, detail);
+    }
+
 }

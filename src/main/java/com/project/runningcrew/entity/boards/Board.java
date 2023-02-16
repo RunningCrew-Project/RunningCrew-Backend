@@ -43,6 +43,13 @@ public abstract class Board extends BaseEntity {
         this.detail = detail;
     }
 
+    public Board(Long id, Member member, String title, String detail) {
+        this.id = id;
+        this.member = member;
+        this.title = title;
+        this.detail = detail;
+    }
+
     public void updateTitle(String title) {
         this.title = title;
     }
