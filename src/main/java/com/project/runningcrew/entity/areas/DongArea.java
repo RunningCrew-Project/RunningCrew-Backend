@@ -28,4 +28,10 @@ public class DongArea {
         this.guArea = guArea;
     }
 
+    public DongArea(Long id, String name, GuArea guArea) {
+        this.id = id;
+        this.name = name;
+        this.guArea = guArea;
+    }
+
 }

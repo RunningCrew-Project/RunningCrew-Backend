@@ -22,4 +22,9 @@ public class RunningRecordImage extends Image {
         this.runningRecord = runningRecord;
     }
 
+    public RunningRecordImage(Long id, String fileName, RunningRecord runningRecord) {
+        super(id, fileName);
+        this.runningRecord = runningRecord;
+    }
+
 }

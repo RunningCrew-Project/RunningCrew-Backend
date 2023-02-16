@@ -23,4 +23,9 @@ public class RunningNoticeComment extends Comment{
         this.runningNotice = runningNotice;
     }
 
+    public RunningNoticeComment(Long id, Member member, String detail, RunningNotice runningNotice) {
+        super(id, member, detail);
+        this.runningNotice = runningNotice;
+    }
+
 }

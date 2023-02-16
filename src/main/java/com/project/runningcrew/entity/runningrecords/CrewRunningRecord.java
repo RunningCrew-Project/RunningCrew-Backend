@@ -25,10 +25,10 @@ public class CrewRunningRecord extends RunningRecord {
     private RunningNotice runningNotice;
 
     @Builder
-    public CrewRunningRecord(LocalDateTime startDateTime, double runningDistance, int runningTime,
-                             int runningFace, int calories, String running_detail, User user,
-                             Crew crew, RunningNotice runningNotice) {
-        super(startDateTime, runningDistance, runningTime, runningFace, calories, running_detail, user);
+    public CrewRunningRecord(Long id, LocalDateTime startDateTime, double runningDistance,
+                             int runningTime, int runningFace, int calories, String running_detail,
+                             User user,Crew crew, RunningNotice runningNotice) {
+        super(id, startDateTime, runningDistance, runningTime, runningFace, calories, running_detail, user);
         this.crew = crew;
         this.runningNotice = runningNotice;
     }

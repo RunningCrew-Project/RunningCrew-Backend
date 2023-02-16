@@ -21,4 +21,9 @@ public class RunningNoticeImage extends Image{
         this.runningNotice = runningNotice;
     }
 
+    public RunningNoticeImage(Long id, String fileName, RunningNotice runningNotice) {
+        super(id, fileName);
+        this.runningNotice = runningNotice;
+    }
+
 }

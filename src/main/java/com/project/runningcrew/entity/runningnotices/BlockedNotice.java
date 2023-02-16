@@ -32,4 +32,10 @@ public class BlockedNotice extends BaseEntity {
         this.member = member;
     }
 
+    public BlockedNotice(Long id, RunningNotice runningNotice, Member member) {
+        this.id = id;
+        this.runningNotice = runningNotice;
+        this.member = member;
+    }
+
 }

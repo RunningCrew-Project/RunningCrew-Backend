@@ -38,6 +38,12 @@ public abstract class Comment extends BaseEntity {
         this.detail = detail;
     }
 
+    public Comment(Long id, Member member, String detail) {
+        this.id = id;
+        this.member = member;
+        this.detail = detail;
+    }
+
     public void updateDetail(String detail) {
         this.detail = detail;
     }

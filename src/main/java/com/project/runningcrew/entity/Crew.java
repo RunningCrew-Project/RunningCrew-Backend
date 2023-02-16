@@ -41,7 +41,8 @@ public class Crew extends BaseEntity {
     private DongArea dongArea;
 
     @Builder
-    public Crew(String name, String introduction, String crewImgUrl, DongArea dongArea) {
+    public Crew(Long id, String name, String introduction, String crewImgUrl, DongArea dongArea) {
+        this.id = id;
         this.name = name;
         this.introduction = introduction;
         this.crewImgUrl = crewImgUrl;

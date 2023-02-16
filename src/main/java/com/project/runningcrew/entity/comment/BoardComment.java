@@ -23,4 +23,9 @@ public class BoardComment extends Comment{
         this.board = board;
     }
 
+    public BoardComment(Long id, Member member, String detail, Board board) {
+        super(id, member, detail);
+        this.board = board;
+    }
+
 }

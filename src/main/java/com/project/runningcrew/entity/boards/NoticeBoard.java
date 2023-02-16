@@ -18,4 +18,8 @@ public class NoticeBoard extends Board {
         super(member, title, content);
     }
 
+    public NoticeBoard(Long id, Member member, String title, String detail) {
+        super(id, member, title, detail);
+    }
+    
 }

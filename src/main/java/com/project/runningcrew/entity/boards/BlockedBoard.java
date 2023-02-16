@@ -32,6 +32,12 @@ public class BlockedBoard extends BaseEntity {
         this.member = member;
     }
 
+    public BlockedBoard(Long id, Board board, Member member) {
+        this.id = id;
+        this.board = board;
+        this.member = member;
+    }
+
 }
 
 

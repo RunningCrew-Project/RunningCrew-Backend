@@ -21,4 +21,9 @@ public class BoardImage extends Image{
         this.board = board;
     }
 
+    public BoardImage(Long id, String fileName, Board board) {
+        super(id, fileName);
+        this.board = board;
+    }
+
 }

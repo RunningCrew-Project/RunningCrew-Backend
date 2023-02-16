@@ -62,9 +62,10 @@ public class RunningNotice extends BaseEntity {
     private RunningRecord preRunningRecord;
 
     @Builder
-    public RunningNotice(String title, String detail, Member member, NoticeType noticeType,
+    public RunningNotice(Long id, String title, String detail, Member member, NoticeType noticeType,
                          LocalDateTime runningDateTime, int runningPersonnel, RunningStatus status,
                          RunningRecord preRunningRecord) {
+        this.id = id;
         this.title = title;
         this.detail = detail;
         this.member = member;

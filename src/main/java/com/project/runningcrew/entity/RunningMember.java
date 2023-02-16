@@ -32,4 +32,10 @@ public class RunningMember extends BaseEntity {
         this.member = member;
     }
 
+    public RunningMember(Long id, RunningNotice runningNotice, Member member) {
+        this.id = id;
+        this.runningNotice = runningNotice;
+        this.member = member;
+    }
+
 }

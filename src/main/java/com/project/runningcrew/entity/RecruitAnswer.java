@@ -45,4 +45,12 @@ public class RecruitAnswer extends BaseEntity{
         this.answerOffset = answerOffset;
     }
 
+    public RecruitAnswer(Long id, User user, Crew crew, String answer, int answerOffset) {
+        this.id = id;
+        this.user = user;
+        this.crew = crew;
+        this.answer = answer;
+        this.answerOffset = answerOffset;
+    }
+
 }
