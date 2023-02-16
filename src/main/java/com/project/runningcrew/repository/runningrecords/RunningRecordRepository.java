@@ -25,14 +25,16 @@ public interface RunningRecordRepository extends JpaRepository<RunningRecord, Lo
 
 
     /**
-     *  범위에 속하는 날짜에 런닝을 시작한 모든 RunningRecord 들의 list 를 반환
+     * 특정 user 의 RunningRecord 중 범위에 속하는 날짜에 런닝을 시작한 모든 RunningRecord 를 반환
+     * @param user 찾는 user
      * @param start 범위 시작
      * @param end 범위 종료. end 는 포함하지 안흠
-     * @return start 와 end 사이에 런닝을 시작한 모든 RunningRecord 들의 list
+     * @return 특정 user 의 start 와 end 사이에 런닝을 시작한 모든 RunningRecord 들의 list
      */
-    @Query("select  r from RunningRecord r " +
-            "where r.startDateTime >= :start and r.startDateTime <:end")
-    List<RunningRecord> findAllByStartDate(@Param("start") LocalDateTime start,
-                                                   @Param("end") LocalDateTime end);
+    @Query("select  r from RunningRecord r where r.user = :user and " +
+            "r.startDateTime >= :start and r.startDateTime <:end")
+    List<RunningRecord> findAllByUserAndStartDateTimes(@Param("user") User user,
+                                                       @Param("start") LocalDateTime start,
+                                                       @Param("end") LocalDateTime end);
 
 }
