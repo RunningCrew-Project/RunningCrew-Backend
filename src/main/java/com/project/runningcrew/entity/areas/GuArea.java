@@ -28,4 +28,10 @@ public class GuArea {
         this.sidoArea = sidoArea;
     }
 
+    public GuArea(Long id, String name, SidoArea sidoArea) {
+        this.id = id;
+        this.name = name;
+        this.sidoArea = sidoArea;
+    }
+
 }

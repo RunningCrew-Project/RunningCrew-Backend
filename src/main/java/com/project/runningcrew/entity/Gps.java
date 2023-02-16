@@ -43,6 +43,17 @@ public class Gps extends BaseEntity{
         }
     }
 
+    public Gps(Long id, Double latitude, Double longitude, int gpsOffset, RunningRecord runningRecord) {
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.gpsOffset = gpsOffset;
+
+        if (runningRecord != null) {
+            setRunningRecord(runningRecord);
+        }
+    }
+
     private void setRunningRecord(RunningRecord runningRecord) {
         this.runningRecord = runningRecord;
         runningRecord.getGpsList().add(this);
