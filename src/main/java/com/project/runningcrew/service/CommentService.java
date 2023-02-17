@@ -36,9 +36,10 @@ public class CommentService {
     }
 
     /**
-     * 새로운 내용이 기존의 내용과 다르다면 댓글 수정이 가능하다. 기존 내용과 같다면 ->
+     * 새로운 내용이 기존의 내용과 다르다면 댓글 수정이 가능하다.
      * @param comment
      * @param newDetail
+     * @throws CommentNotChangeException detail 의 값이 변경되지 않은 경우
      */
     public void changeComment(Comment comment, String newDetail) {
         if(!comment.getDetail().equals(newDetail)) {
