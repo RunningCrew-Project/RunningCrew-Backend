@@ -29,7 +29,7 @@ public class CommentService {
     /**
      * 입력된 Comment 를 저장한다.
      * @param comment
-     * @return 저장된 Comment 의 id
+     * @return 저장된 BoardComment 의 id
      */
     public Long saveComment(Comment comment) {
         return commentRepository.save(comment).getId();
