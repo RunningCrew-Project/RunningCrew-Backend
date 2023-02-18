@@ -1,6 +1,7 @@
 package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.users.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,5 +61,13 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
     @Query(value = "select * from crews where crews.dong_area_id = :dongAreaId" +
             " order by random() limit :maxSize", nativeQuery = true)
     List<Crew> findRandomByDongAreaId(@Param("dongAreaId") Long dongAreaId, @Param("maxSize") int maxSize);
+
+    /**
+     * 입력받은 User 가 속한 모든 Crew 를 반환
+     * @param user
+     * @return User 가 속한 모든 Crew
+     */
+    @Query(value = "select m.crew from Member m where m.user = :user")
+    List<Crew> findAllByUser(@Param("user") User user);
 
 }
