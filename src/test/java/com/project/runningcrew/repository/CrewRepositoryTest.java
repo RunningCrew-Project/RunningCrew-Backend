@@ -4,6 +4,9 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
+import com.project.runningcrew.entity.members.Member;
+import com.project.runningcrew.entity.members.MemberRole;
+import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.areas.DongAreaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,9 @@ class CrewRepositoryTest {
     DongAreaRepository dongAreaRepository;
 
     @Autowired
+    MemberRepository memberRepository;
+
+    @Autowired
     TestEntityFactory testEntityFactory;
 
     @BeforeEach
@@ -39,18 +45,18 @@ class CrewRepositoryTest {
         DongArea dongArea2 = testEntityFactory.getDongArea(guArea, 2);
 
         for (int i = 0; i < 25; i++) {
-            Crew crew = Crew.builder().name("crew"+i)
-                    .introduction("introduction"+i)
-                    .crewImgUrl("crewImageUrl"+i)
+            Crew crew = Crew.builder().name("crew" + i)
+                    .introduction("introduction" + i)
+                    .crewImgUrl("crewImageUrl" + i)
                     .dongArea(dongArea1)
                     .build();
             crewRepository.save(crew);
         }
 
         for (int i = 25; i < 50; i++) {
-            Crew crew = Crew.builder().name("crew"+i)
-                    .introduction("introduction"+i)
-                    .crewImgUrl("crewImageUrl"+i)
+            Crew crew = Crew.builder().name("crew" + i)
+                    .introduction("introduction" + i)
+                    .crewImgUrl("crewImageUrl" + i)
                     .dongArea(dongArea2)
                     .build();
             crewRepository.save(crew);
@@ -173,6 +179,31 @@ class CrewRepositoryTest {
         for (Crew crew : randomCrewList) {
             assertThat(crew.getDongArea()).isEqualTo(optDongArea.get());
         }
+    }
+
+    @Test
+    public void findAllByUserTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+
+        for (int i = 50; i < 60; i++) {
+            Crew crew = Crew.builder().name("crew" + i)
+                    .introduction("introduction" + i)
+                    .crewImgUrl("crewImageUrl")
+                    .dongArea(dongArea)
+                    .build();
+            crewRepository.save(crew);
+            memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
+        }
+
+        ///when
+        List<Crew> crews = crewRepository.findAllByUser(user);
+
+        //then
+        assertThat(crews.size()).isSameAs(10);
     }
 
 }
