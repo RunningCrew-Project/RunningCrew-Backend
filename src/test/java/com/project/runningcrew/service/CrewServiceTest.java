@@ -6,6 +6,7 @@ import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.CrewNotFoundException;
 import com.project.runningcrew.repository.CrewRepository;
+import com.project.runningcrew.service.images.ImageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,9 @@ class CrewServiceTest {
 
     @Mock
     private CrewRepository crewRepository;
+
+    @Mock
+    private ImageService imageService;
 
     @InjectMocks
     private CrewService crewService;
@@ -65,35 +70,58 @@ class CrewServiceTest {
 
     @DisplayName("크루 저장 테스트")
     @Test
-    public void saveTest(@Mock DongArea dongArea) {
+    public void saveTest(@Mock DongArea dongArea, @Mock MultipartFile multipartFile) {
         //given
         Long crewId = 1L;
+        String crewImgUrl = "crewImgUrl";
         Crew crew = Crew.builder().id(crewId)
                 .name("name")
                 .introduction("introduction")
-                .crewImgUrl("crewImgUrl")
                 .dongArea(dongArea)
                 .build();
         when(crewRepository.save(crew)).thenReturn(crew);
-        //TODO MultipartFile flow 추가
+        when(imageService.uploadImage(multipartFile, "crew")).thenReturn(crewImgUrl);
 
         ///when
-        Long saveId = crewService.saveCrew(crew);
+        Long saveId = crewService.saveCrew(crew, multipartFile);
 
         //then
         assertThat(saveId).isSameAs(crewId);
+        assertThat(crew.getCrewImgUrl()).isEqualTo(crewImgUrl);
         verify(crewRepository, times(1)).save(crew);
+        verify(imageService, times(1)).uploadImage(multipartFile, "crew");
     }
 
     @DisplayName("크루 수정 테스트")
     @Test
-    public void updateCrewTest() {
+    public void updateCrewTest(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
+                               @Mock MultipartFile multipartFile) {
         //given
-        //TODO MultipartFile flow 추가
+        Long crewId = 1L;
+        String newCrewImgUrl = "crewImgUrl2";
+        Crew originCrew = Crew.builder().id(crewId)
+                .name("name1")
+                .introduction("introduction1")
+                .crewImgUrl("crewImgUrl1")
+                .dongArea(dongArea1)
+                .build();
+        Crew newCrew = Crew.builder()
+                .name("name2")
+                .introduction("introduction2")
+                .dongArea(dongArea2)
+                .build();
+        doNothing().when(imageService).deleteImage(originCrew.getCrewImgUrl());
+        when(imageService.uploadImage(multipartFile, "crew")).thenReturn(newCrewImgUrl);
 
         ///when
+        crewService.updateCrew(originCrew, newCrew, multipartFile);
         
         //then
+        assertThat(originCrew.getName()).isEqualTo(newCrew.getName());
+        assertThat(originCrew.getIntroduction()).isEqualTo(newCrew.getIntroduction());
+        assertThat(originCrew.getCrewImgUrl()).isEqualTo(newCrewImgUrl);
+        assertThat(originCrew.getDongArea()).isEqualTo(newCrew.getDongArea());
+        verify(imageService, times(1)).uploadImage(multipartFile, "crew");
     }
 
     @DisplayName("크루 삭제 테스트")
@@ -107,13 +135,30 @@ class CrewServiceTest {
                 .dongArea(dongArea)
                 .build();
         doNothing().when(crewRepository).delete(crew);
-        //TODO MultipartFile flow 추가
+        doNothing().when(imageService).deleteImage(crew.getCrewImgUrl());
 
         ///when
         crewService.deleteCrew(crew);
 
         //then
         verify(crewRepository, times(1)).delete(crew);
+        verify(imageService, times(1)).deleteImage(crew.getCrewImgUrl());
+    }
+
+    @DisplayName("키워드로 크루 개수 반환 테스트")
+    @Test
+    public void countAllByKeywordTest(@Mock DongArea dongArea) {
+        //given
+        Long count = 10L;
+        String keyword = "duction";
+        when(crewRepository.countAllByNameOrIntroductionOrArea(keyword)).thenReturn(count);
+
+        ///when
+        Long result = crewService.countAllByKeyword(keyword);
+
+        //then
+        assertThat(result).isSameAs(count);
+        verify(crewRepository, times(1)).countAllByNameOrIntroductionOrArea(keyword);
     }
 
     @DisplayName("키워드로 크루 찾기 첫 페이지 테스트")
