@@ -1,9 +1,12 @@
 package com.project.runningcrew.service;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.members.Member;
+import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.CrewNotFoundException;
 import com.project.runningcrew.repository.CrewRepository;
+import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.service.images.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,7 @@ public class CrewService {
 
     private final CrewRepository crewRepository;
     private final ImageService imageService;
+    private final MemberRepository memberRepository;
     private final String imageDirName = "crew";
 
     /**
@@ -34,16 +38,18 @@ public class CrewService {
     }
 
     /**
-     * 입력받은 Crew 이미지와 Crew 를 저장하고 , Crew 에 부여된 id 를 반환한다.
+     * 입력받은 Crew 이미지와 Crew 를 저장하고 Crew 의 리더를 생성한 후, Crew 에 부여된 id 를 반환한다.
      * @param crew 저장할 Crew
      * @param multipartFile Crew 의 이미지
      * @return Crew 에 부여된 id
      */
     @Transactional
-    public Long saveCrew(Crew crew, MultipartFile multipartFile) {
+    public Long saveCrew(User user, Crew crew, MultipartFile multipartFile) {
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         crew.updateCrewImgUrl(imageUrl);
-        return crewRepository.save(crew).getId();
+        Crew savedCrew = crewRepository.save(crew);
+        memberRepository.save(new Member(user, crew, MemberRole.ROLE_LEADER));
+        return savedCrew.getId();
     }
 
     /**
@@ -71,11 +77,15 @@ public class CrewService {
     }
 
     /**
-     * 입력받은 Crew 를 삭제한다.
+     * 입력받은 Crew 에 속한 Member 들을 삭제하고 Crew 와 Crew 이미지를 삭제한다.
      * @param crew 삭제할 Crew
      */
     @Transactional
     public void deleteCrew(Crew crew) {
+        List<Member> members = memberRepository.findAllByCrew(crew);
+        for (Member member : members) {
+            memberRepository.delete(member);
+        }
         crewRepository.delete(crew);
         imageService.deleteImage(crew.getCrewImgUrl());
     }

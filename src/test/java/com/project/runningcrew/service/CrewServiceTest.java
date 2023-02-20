@@ -3,9 +3,12 @@ package com.project.runningcrew.service;
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
+import com.project.runningcrew.entity.members.Member;
+import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.CrewNotFoundException;
 import com.project.runningcrew.repository.CrewRepository;
+import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.service.images.ImageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +36,9 @@ class CrewServiceTest {
 
     @Mock
     private ImageService imageService;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private CrewService crewService;
@@ -70,26 +76,30 @@ class CrewServiceTest {
 
     @DisplayName("크루 저장 테스트")
     @Test
-    public void saveTest(@Mock DongArea dongArea, @Mock MultipartFile multipartFile) {
+    public void saveTest(@Mock DongArea dongArea, @Mock User user, @Mock MultipartFile multipartFile) {
         //given
         Long crewId = 1L;
+        Long memberId = 2L;
         String crewImgUrl = "crewImgUrl";
         Crew crew = Crew.builder().id(crewId)
                 .name("name")
                 .introduction("introduction")
                 .dongArea(dongArea)
                 .build();
+        Member member = new Member(memberId, user, crew, MemberRole.ROLE_LEADER);
         when(crewRepository.save(crew)).thenReturn(crew);
         when(imageService.uploadImage(multipartFile, "crew")).thenReturn(crewImgUrl);
+        when(memberRepository.save(any())).thenReturn(member);
 
         ///when
-        Long saveId = crewService.saveCrew(crew, multipartFile);
+        Long saveId = crewService.saveCrew(user, crew, multipartFile);
 
         //then
         assertThat(saveId).isSameAs(crewId);
         assertThat(crew.getCrewImgUrl()).isEqualTo(crewImgUrl);
         verify(crewRepository, times(1)).save(crew);
         verify(imageService, times(1)).uploadImage(multipartFile, "crew");
+        verify(memberRepository, times(1)).save(any());
     }
 
     @DisplayName("크루 수정 테스트")
@@ -115,7 +125,7 @@ class CrewServiceTest {
 
         ///when
         crewService.updateCrew(originCrew, newCrew, multipartFile);
-        
+
         //then
         assertThat(originCrew.getName()).isEqualTo(newCrew.getName());
         assertThat(originCrew.getIntroduction()).isEqualTo(newCrew.getIntroduction());
@@ -134,8 +144,15 @@ class CrewServiceTest {
                 .crewImgUrl("crewImgUrl")
                 .dongArea(dongArea)
                 .build();
+        List<Member> members = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            User user = User.builder().build();
+            members.add(new Member(user, crew, MemberRole.ROLE_NORMAL));
+        }
         doNothing().when(crewRepository).delete(crew);
         doNothing().when(imageService).deleteImage(crew.getCrewImgUrl());
+        when(memberRepository.findAllByCrew(crew)).thenReturn(members);
+        doNothing().when(memberRepository).delete(any());
 
         ///when
         crewService.deleteCrew(crew);
@@ -143,6 +160,8 @@ class CrewServiceTest {
         //then
         verify(crewRepository, times(1)).delete(crew);
         verify(imageService, times(1)).deleteImage(crew.getCrewImgUrl());
+        verify(memberRepository, times(1)).findAllByCrew(crew);
+        verify(memberRepository, times(members.size())).delete(any());
     }
 
     @DisplayName("키워드로 크루 개수 반환 테스트")
