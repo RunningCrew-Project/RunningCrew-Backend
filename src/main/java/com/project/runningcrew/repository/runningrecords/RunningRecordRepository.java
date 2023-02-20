@@ -23,6 +23,12 @@ public interface RunningRecordRepository extends JpaRepository<RunningRecord, Lo
      */
     Slice<RunningRecord> findByUser(User user, Pageable pageable);
 
+    /**
+     * 특정 user 의 모든 RunningRecord 반환
+     * @param user 찾는 RunningRecord 를 가지는 User
+     * @return 특정 user 의 모든 RunningRecord
+     */
+    List<RunningRecord> findAllByUser(User user);
 
     /**
      * 특정 user 의 RunningRecord 중 범위에 속하는 날짜에 런닝을 시작한 모든 RunningRecord 를 반환
