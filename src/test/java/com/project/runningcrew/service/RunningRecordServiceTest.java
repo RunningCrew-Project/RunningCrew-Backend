@@ -1,10 +1,13 @@
 package com.project.runningcrew.service;
 
+import com.project.runningcrew.entity.images.RunningRecordImage;
 import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
 import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.RunningRecordNotFoundException;
+import com.project.runningcrew.repository.images.RunningRecordImageRepository;
 import com.project.runningcrew.repository.runningrecords.RunningRecordRepository;
+import com.project.runningcrew.service.images.ImageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +36,12 @@ class RunningRecordServiceTest {
 
     @Mock
     private RunningRecordRepository runningRecordRepository;
+
+    @Mock
+    private ImageService imageService;
+
+    @Mock
+    private RunningRecordImageRepository runningRecordImageRepository;
 
     @InjectMocks
     private RunningRecordService runningRecordService;
@@ -57,6 +68,7 @@ class RunningRecordServiceTest {
 
         //then
         assertThat(runningRecord).isEqualTo(personalRunningRecord);
+        verify(runningRecordRepository, times(1)).findById(id);
     }
 
     @DisplayName("findById throw exception 테스트")
@@ -78,6 +90,10 @@ class RunningRecordServiceTest {
     public void saveRunningRecordTest(@Mock User user) {
         //given
         Long id = 1L;
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            multipartFiles.add(new MockMultipartFile("image", "".getBytes()));
+        }
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
                 .id(id)
                 .startDateTime(LocalDateTime.of(2023, 2, 16, 15, 0))
@@ -89,12 +105,16 @@ class RunningRecordServiceTest {
                 .user(user)
                 .build();
         when(runningRecordRepository.save(personalRunningRecord)).thenReturn(personalRunningRecord);
+        when(imageService.uploadImage(any(), any())).thenReturn("crewImgURl");
+        when(runningRecordImageRepository.save(any())).thenReturn(new RunningRecordImage("crewImgURl", personalRunningRecord));
 
         ///when
-        Long runningRecordId = runningRecordService.saveRunningRecord(personalRunningRecord);
+        Long runningRecordId = runningRecordService.saveRunningRecord(personalRunningRecord, multipartFiles);
 
         //then
         verify(runningRecordRepository, times(1)).save(any());
+        verify(imageService, times(multipartFiles.size())).uploadImage(any(), any());
+        verify(runningRecordImageRepository, times(multipartFiles.size())).save(any());
         assertThat(runningRecordId).isSameAs(id);
     }
 
@@ -129,6 +149,7 @@ class RunningRecordServiceTest {
         assertThat(result.hasPrevious()).isFalse();
         assertThat(result.hasNext()).isTrue();
         assertThat(result.isFirst()).isTrue();
+        verify(runningRecordRepository, times(1)).findByUser(user, pageRequest);
     }
 
     @DisplayName("findByUser 중간 페이지 테스트")
@@ -163,6 +184,7 @@ class RunningRecordServiceTest {
         assertThat(result.hasNext()).isTrue();
         assertThat(result.isFirst()).isFalse();
         assertThat(result.isLast()).isFalse();
+        verify(runningRecordRepository, times(1)).findByUser(user, pageRequest);
     }
 
     @DisplayName("findByUser 마지막 페이지 테스트")
@@ -196,6 +218,7 @@ class RunningRecordServiceTest {
         assertThat(result.hasPrevious()).isTrue();
         assertThat(result.hasNext()).isFalse();
         assertThat(result.isLast()).isTrue();
+        verify(runningRecordRepository, times(1)).findByUser(user, pageRequest);
     }
 
     @DisplayName("findAllByUserAndStartDate 테스트")
