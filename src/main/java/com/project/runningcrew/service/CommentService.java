@@ -6,7 +6,6 @@ import com.project.runningcrew.entity.comment.Comment;
 import com.project.runningcrew.entity.comment.RunningNoticeComment;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.exception.CommentNotChangeException;
 import com.project.runningcrew.repository.comment.BoardCommentRepository;
 import com.project.runningcrew.repository.comment.CommentRepository;
 import com.project.runningcrew.repository.comment.RunningNoticeCommentRepository;
@@ -35,19 +34,18 @@ public class CommentService {
         return commentRepository.save(comment).getId();
     }
 
+
     /**
      * 새로운 내용이 기존의 내용과 다르다면 댓글 수정이 가능하다.
      * @param comment
      * @param newDetail
-     * @throws CommentNotChangeException detail 의 값이 변경되지 않은 경우
      */
     public void changeComment(Comment comment, String newDetail) {
         if(!comment.getDetail().equals(newDetail)) {
             comment.updateDetail(newDetail);
-        } else {
-            throw new CommentNotChangeException();
         }
     }
+
 
     /**
      * 입력된 Comment 를 삭제한다.
