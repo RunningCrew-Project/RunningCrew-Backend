@@ -1,6 +1,7 @@
 package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.RunningMember;
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
@@ -45,6 +46,9 @@ public class TestEntityFactory {
 
     @Autowired
     RunningRecordRepository runningRecordRepository;
+
+    @Autowired
+    RunningMemberRepository runningMemberRepository;
 
     @Autowired
     SidoAreaRepository sidoAreaRepository;
@@ -129,6 +133,11 @@ public class TestEntityFactory {
     public DongArea getDongArea(GuArea guArea, int num) {
         DongArea dongArea = new DongArea("dong" + num, guArea);
         return dongAreaRepository.save(dongArea);
+    }
+
+    public RunningMember getRunningMember(RunningNotice runningNotice, Member member) {
+        RunningMember runningMember = new RunningMember(runningNotice, member);
+        return runningMemberRepository.save(runningMember);
     }
 
 }

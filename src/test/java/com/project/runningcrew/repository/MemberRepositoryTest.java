@@ -6,13 +6,17 @@ import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
+import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.users.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
@@ -202,6 +206,31 @@ class MemberRepositoryTest {
         for (Member normalMember : normalMembers) {
             assertThat(normalMember.getRole()).isSameAs(MemberRole.ROLE_NORMAL);
         }
+    }
+
+    @DisplayName("RunningNotice 에 참가한 모든 Member 반환 테스트")
+    @Test
+    public void findAllByRunningNoticeTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+
+        for (int i = 1; i < 11; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(user, crew);
+            testEntityFactory.getRunningMember(runningNotice, tempMember);
+        }
+
+        ///when
+        List<Member> members = memberRepository.findAllByRunningNotice(runningNotice);
+
+        //then
+        assertThat(members.size()).isSameAs(10);
     }
 
 }
