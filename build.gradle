@@ -32,6 +32,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.7'
+    implementation group: 'org.qlrm', name: 'qlrm', version: '3.0.4'
 }
 
 tasks.named('test') {

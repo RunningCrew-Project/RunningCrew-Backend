@@ -1,15 +1,19 @@
 package com.project.runningcrew.service;
 
+import com.project.runningcrew.dto.SimpleRunningRecordDto;
+import com.project.runningcrew.entity.images.RunningRecordImage;
 import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.RunningRecordNotFoundException;
+import com.project.runningcrew.repository.images.RunningRecordImageRepository;
 import com.project.runningcrew.repository.runningrecords.RunningRecordRepository;
+import com.project.runningcrew.service.images.ImageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,9 +26,13 @@ import java.util.List;
 public class RunningRecordService {
 
     private final RunningRecordRepository runningRecordRepository;
+    private final ImageService imageService;
+    private final RunningRecordImageRepository runningRecordImageRepository;
+    private final String imageDirName = "runningRecord";
 
     /**
      * 입력받은 id 를 가진 RunningRecord 를 찾아 반환한다. 없다면 RunningRecordNotFoundException 를 throw 한다.
+     *
      * @param runningRecordId 찾는 RunningRecord 의 id
      * @return 입력받은 id 를 가진 RunningRecord 를 반환한다.
      * @throws RunningRecordNotFoundException 입력 받은 id 를 가진 RunningRecord 가 없을때
@@ -35,19 +43,26 @@ public class RunningRecordService {
     }
 
     /**
-     * 입력받은 RunningRecord 를 저장하고, RunningRecord 에 부여된 id 를 반환한다.
-     * @param runningRecord 저장할 RunningRecord
+     * 입력받은 MultipartFile 들과 RunningRecord 를 저장하고, RunningRecord 에 부여된 id 를 반환한다.
+     *
+     * @param runningRecord  저장할 RunningRecord
+     * @param multipartFiles 저장할 모든 MultipartFile
      * @return RunningRecord 에 부여된 id
      */
     @Transactional
-    public Long saveRunningRecord(RunningRecord runningRecord) {
-        return runningRecordRepository.save(runningRecord).getId();
+    public Long saveRunningRecord(RunningRecord runningRecord, List<MultipartFile> multipartFiles) {
+        RunningRecord savedRunningRecord = runningRecordRepository.save(runningRecord);
+        for (MultipartFile multipartFile : multipartFiles) {
+            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
+            runningRecordImageRepository.save(new RunningRecordImage(imageUrl, savedRunningRecord));
+        }
+        return savedRunningRecord.getId();
     }
 
-
     /**
-     * 입력받은 User 의 RunningRecord 의 Slice
-     * @param user 찾는 RunningRecord 의 User
+     * 입력받은 User 의 RunningRecord 의 Slice 를 반환
+     *
+     * @param user     찾는 RunningRecord 의 User
      * @param pageable
      * @return RunningRecord 의 Slice
      */
@@ -57,7 +72,8 @@ public class RunningRecordService {
 
     /**
      * 입력받은 User 가 LocalDate 에 런닝을 시작한 모든 RunningRecord 를 반환
-     * @param user 찾는 RunningRecord 의 User
+     *
+     * @param user      찾는 RunningRecord 의 User
      * @param localDate 런닝을 시작한 날
      * @return 런닝을 시작한 날이 LocalDate 인 User 의 모든 RunningRecord
      */
@@ -65,6 +81,31 @@ public class RunningRecordService {
         LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0, 0));
         LocalDateTime nextDateTime = dateTime.plusDays(1);
         return runningRecordRepository.findAllByUserAndStartDateTimes(user, dateTime, nextDateTime);
+    }
+
+    /**
+     * 입력받은 User 의 SimpleRunningRecordDto 의 Slice 를 반환
+     *
+     * @param user     찾는 SimpleRunningRecordDto 의 User
+     * @param pageable
+     * @return SimpleRunningRecordDto 의 Slice
+     */
+    public Slice<SimpleRunningRecordDto> findSimpleRunningRecordDtoByUser(User user, Pageable pageable) {
+        return runningRecordRepository.findSimpleRunningRecordDtoByUser(user, pageable);
+    }
+
+    /**
+     * 입력받은 User 가 LocalDate 에 런닝을 시작한 모든 SimpleRunningRecordDto 를 반환
+     *
+     * @param user      찾는 RunningRecord 의 User
+     * @param localDate 런닝을 시작한 날
+     * @return 런닝을 시작한 날이 LocalDate 인 User 의 모든 SimpleRunningRecordDto
+     */
+    public List<SimpleRunningRecordDto> findSimpleRunningRecordDtoByUserAndStartDate(User user,
+                                                                                     LocalDate localDate) {
+        LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0, 0));
+        LocalDateTime nextDateTime = dateTime.plusDays(1);
+        return runningRecordRepository.findSimpleRunningRecordDtoByByUserAndStartDateTimes(user, dateTime, nextDateTime);
     }
 
 }
