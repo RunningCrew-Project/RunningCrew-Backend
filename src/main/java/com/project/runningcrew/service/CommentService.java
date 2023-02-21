@@ -34,6 +34,7 @@ public class CommentService {
         return commentRepository.save(comment).getId();
     }
 
+
     /**
      * 새로운 내용이 기존의 내용과 다르다면 댓글 수정이 가능하다.
      * @param comment
@@ -44,6 +45,7 @@ public class CommentService {
             comment.updateDetail(newDetail);
         }
     }
+
 
     /**
      * 입력된 Comment 를 삭제한다.
