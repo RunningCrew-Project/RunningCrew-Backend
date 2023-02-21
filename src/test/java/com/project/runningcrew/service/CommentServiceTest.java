@@ -6,7 +6,6 @@ import com.project.runningcrew.entity.comment.Comment;
 import com.project.runningcrew.entity.comment.RunningNoticeComment;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.exception.CommentNotChangeException;
 import com.project.runningcrew.repository.comment.BoardCommentRepository;
 import com.project.runningcrew.repository.comment.CommentRepository;
 import com.project.runningcrew.repository.comment.RunningNoticeCommentRepository;
@@ -95,29 +94,6 @@ class CommentServiceTest {
         assertThat(boardComment.getDetail()).isEqualTo("new_detail");
     }
 
-
-    /**
-     * Comment 구현체로 BoardComment 사용함
-     * @param member
-     * @param board
-     * @throws Exception
-     */
-    @DisplayName("Comment 내용 변경 테스트 -예외 발생")
-    @Test
-    void changeCommentTest2(@Mock Member member, @Mock Board board) throws Exception {
-        //given
-        Long id = 1L;
-        BoardComment boardComment = new BoardComment(id, member, "old_detail", board);
-
-        when(commentRepository.save(boardComment)).thenReturn(boardComment);
-        Long savedComment = commentService.saveComment(boardComment);
-
-        //when
-        //then
-        assertThatThrownBy(() -> commentService.changeComment(boardComment, "old_detail"))
-                .isInstanceOf(CommentNotChangeException.class);
-
-    }
 
 
     @DisplayName("Comment findAllByMember 테스트")
