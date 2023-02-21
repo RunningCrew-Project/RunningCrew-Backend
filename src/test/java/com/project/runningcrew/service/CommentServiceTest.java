@@ -6,7 +6,6 @@ import com.project.runningcrew.entity.comment.Comment;
 import com.project.runningcrew.entity.comment.RunningNoticeComment;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.exception.notchange.CommentNotChangeException;
 import com.project.runningcrew.repository.comment.BoardCommentRepository;
 import com.project.runningcrew.repository.comment.CommentRepository;
 import com.project.runningcrew.repository.comment.RunningNoticeCommentRepository;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 
 import java.util.ArrayList;
 import java.util.List;

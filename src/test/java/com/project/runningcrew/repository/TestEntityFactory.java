@@ -1,7 +1,6 @@
 package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.Gps;
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
@@ -12,7 +11,6 @@ import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.runningnotices.RunningStatus;
 import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
-import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.LoginType;
 import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
