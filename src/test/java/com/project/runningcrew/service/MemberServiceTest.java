@@ -3,6 +3,7 @@ package com.project.runningcrew.service;
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
+import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.MemberNotFoundException;
 import com.project.runningcrew.repository.MemberRepository;
@@ -217,6 +218,26 @@ class MemberServiceTest {
         }
         verify(memberRepository, times(1)).findAllByCrewAndRole(crew, MemberRole.ROLE_LEADER);
         verify(memberRepository, times(1)).findAllByCrewAndRole(crew, MemberRole.ROLE_MANAGER);
+    }
+
+    @DisplayName("런닝공지에 참가한 모든 멤버 반환 테스트")
+    @Test
+    public void findAllByRunningNoticeTest(@Mock Crew crew, @Mock RunningNotice runningNotice) {
+        //given
+        List<Member> members = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Member member = new Member(User.builder().build(), crew, MemberRole.ROLE_NORMAL);
+            members.add(member);
+        }
+
+        when(memberRepository.findAllByRunningNotice(runningNotice)).thenReturn(members);
+
+        ///when
+        List<Member> memberList = memberService.findAllByRunningNotice(runningNotice);
+
+        //then
+        assertThat(memberList.size()).isSameAs(10);
+        verify(memberRepository, times(1)).findAllByRunningNotice(runningNotice);
     }
 
 }
