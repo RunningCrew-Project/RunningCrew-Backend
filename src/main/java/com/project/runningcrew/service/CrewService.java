@@ -4,7 +4,7 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.exception.CrewNotFoundException;
+import com.project.runningcrew.exception.notFound.CrewNotFoundException;
 import com.project.runningcrew.repository.CrewRepository;
 import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.service.images.ImageService;

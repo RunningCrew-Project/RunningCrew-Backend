@@ -1,4 +1,4 @@
-package com.project.runningcrew.exception;
+package com.project.runningcrew.exception.notFound;
 
 public class ResourceNotFoundException extends RuntimeException{
     public ResourceNotFoundException(String message) {
