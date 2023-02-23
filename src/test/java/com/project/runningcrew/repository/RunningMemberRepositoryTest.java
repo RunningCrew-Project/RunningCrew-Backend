@@ -185,4 +185,26 @@ class RunningMemberRepositoryTest {
         }
     }
 
+    @DisplayName("RunningMember findByMemberAndRunningNotice 테스트")
+    @Test
+    public void findByMemberAndRunningNoticeTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningMember runningMember = new RunningMember(runningNotice, member);
+        runningMemberRepository.save(runningMember);
+
+        ///when
+        Optional<RunningMember> optRunningMember = runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice);
+
+        //then
+        assertThat(optRunningMember).isNotEmpty();
+        assertThat(optRunningMember).hasValue(runningMember);
+    }
+
 }

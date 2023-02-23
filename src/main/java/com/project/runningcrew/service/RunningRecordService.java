@@ -4,7 +4,7 @@ import com.project.runningcrew.dto.SimpleRunningRecordDto;
 import com.project.runningcrew.entity.images.RunningRecordImage;
 import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.exception.RunningRecordNotFoundException;
+import com.project.runningcrew.exception.notFound.RunningRecordNotFoundException;
 import com.project.runningcrew.repository.images.RunningRecordImageRepository;
 import com.project.runningcrew.repository.runningrecords.RunningRecordRepository;
 import com.project.runningcrew.service.images.ImageService;

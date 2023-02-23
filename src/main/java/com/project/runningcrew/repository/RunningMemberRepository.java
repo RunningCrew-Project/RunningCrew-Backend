@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RunningMemberRepository extends JpaRepository<RunningMember, Long> {
@@ -31,5 +32,13 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
      * @return runningNotice 를 포함하는 모든 RunningMember 의 list
      */
     List<RunningMember> findAllByRunningNotice(RunningNotice runningNotice);
+
+    /**
+     * Member 와 RunningNotice 를 포함하는 RunningMember 반환
+     * @param member
+     * @param runningNotice
+     * @return  Member 와 RunningNotice 를 포함하는 RunningMember 반환. 없다면 Option.empty() 반환
+     */
+    Optional<RunningMember> findByMemberAndRunningNotice(Member member, RunningNotice runningNotice);
 
 }

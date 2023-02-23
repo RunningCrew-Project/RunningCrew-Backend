@@ -5,7 +5,7 @@ import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.exception.MemberNotFoundException;
+import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
