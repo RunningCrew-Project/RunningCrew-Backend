@@ -233,4 +233,39 @@ class MemberRepositoryTest {
         assertThat(members.size()).isSameAs(10);
     }
 
+    @DisplayName("user 가 crew 가입함 테스트")
+    @Test
+    public void existsByUserAndCrew1() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+
+        ///when
+        boolean result = memberRepository.existsByUserAndCrew(user, crew);
+
+        //then
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("user 가 crew 가입 안함 테스트")
+    @Test
+    public void existsByUserAndCrew2() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+
+        ///when
+        boolean result = memberRepository.existsByUserAndCrew(user, crew);
+
+        //then
+        assertThat(result).isFalse();
+    }
+
 }

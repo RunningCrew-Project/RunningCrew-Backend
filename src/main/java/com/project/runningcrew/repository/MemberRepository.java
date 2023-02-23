@@ -66,4 +66,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "where rm.runningNotice = :runningNotice")
     List<Member> findAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
+
+    /**
+     * uesr 의 crew 가입 여부 반환
+     * @param user
+     * @param crew
+     * @return user 가 crew 에 가입했다면 true, 아니라면 false
+     */
+    boolean existsByUserAndCrew(User user, Crew crew);
+
 }
