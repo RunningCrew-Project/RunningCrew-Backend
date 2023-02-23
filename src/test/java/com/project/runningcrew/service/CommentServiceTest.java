@@ -36,7 +36,7 @@ class CommentServiceTest {
     @InjectMocks CommentService commentService;
 
 
-    @DisplayName("BoardComment save 테스트")
+    @DisplayName("게시글에 작성된 댓글 저장 테스트")
     @Test
     void saveCommentTest1(@Mock Member member, @Mock Board board) throws Exception {
         //given
@@ -52,7 +52,7 @@ class CommentServiceTest {
         assertThat(BoardCommentId).isSameAs(id);
     }
 
-    @DisplayName("RunningNoticeComment save 테스트")
+    @DisplayName("런닝 공지에 작성된 댓글 저장 테스트")
     @Test
     void saveCommentTest2(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
         //given
@@ -69,13 +69,7 @@ class CommentServiceTest {
     }
 
 
-    /**
-     * Comment 구현체로 BoardComment 사용함
-     * @param member
-     * @param board
-     * @throws Exception
-     */
-    @DisplayName("Comment 내용 변경 테스트 -정상 통과")
+    @DisplayName("댓글 내용 변경 테스트")
     @Test
     void changeCommentTest1(@Mock Member member, @Mock Board board) throws Exception {
         //given
@@ -93,7 +87,7 @@ class CommentServiceTest {
     }
 
 
-    @DisplayName("Comment findAllByMember 테스트")
+    @DisplayName("특정 멤버가 작성한 댓글 모두 가져오기 테스트")
     @Test
     void findAllByMemberTest(@Mock Member member, @Mock Board board) throws Exception {
         //given
@@ -113,7 +107,7 @@ class CommentServiceTest {
     }
 
 
-    @DisplayName("BoardComment findAllByBoard 테스트")
+    @DisplayName("게시글에 작성된 댓글 모두 가져오기 테스트")
     @Test
     void findAllByBoardTest(@Mock Member member, @Mock Board board) throws Exception {
         //given
@@ -133,7 +127,7 @@ class CommentServiceTest {
     }
 
 
-    @DisplayName("RunningNoticeComment findAllByRunningNotice 테스트")
+    @DisplayName("런닝 공지에 작성된 댓글 모두 가져오기 테스트")
     @Test
     void findAllByRunningNoticeTest(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
         //given
@@ -152,6 +146,43 @@ class CommentServiceTest {
         assertThat(findRunningNoticeCommentList).isEqualTo(runningNoticeCommentList);
     }
 
+
+
+    @DisplayName("게시글에 작성된 댓글 수 가져오기 테스트")
+    @Test
+    void countCommentAtBoardTest(@Mock Member member, @Mock Board board) throws Exception {
+        //given
+        List<BoardComment> boardCommentList = new ArrayList<>();
+        for (long i = 0L; i < 10; i++) {
+            BoardComment boardComment = new BoardComment(i, member, "detail", board);
+            boardCommentList.add(boardComment);
+        } // save 10 of BoardComment
+        when(boardCommentRepository.findAllByBoard(board)).thenReturn(boardCommentList);
+
+        //when
+        int count = commentService.countCommentAtBoard(board);
+
+        //then
+        assertThat(count).isEqualTo(10);
+    }
+
+    @DisplayName("런닝 공지에 작성된 댓글 수 가져오기 테스트")
+    @Test
+    void countCommentAtRunningNoticeTest(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
+        //given
+        List<RunningNoticeComment> runningNoticeCommentList = new ArrayList<>();
+        for (long i = 0L; i < 10; i++) {
+            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(i, member, "detail", runningNotice);
+            runningNoticeCommentList.add(runningNoticeComment);
+        } // save 10 of BoardComment
+        when(runningNoticeCommentRepository.findAllByRunningNotice(runningNotice)).thenReturn(runningNoticeCommentList);
+
+        //when
+        int count = commentService.countCommentAtRunningNotice(runningNotice);
+
+        //then
+        assertThat(count).isEqualTo(10);
+    }
 
 
 }
