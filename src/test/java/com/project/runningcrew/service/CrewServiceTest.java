@@ -6,6 +6,7 @@ import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.exception.duplicate.CrewNameDuplicateException;
 import com.project.runningcrew.exception.notFound.CrewNotFoundException;
 import com.project.runningcrew.repository.CrewRepository;
 import com.project.runningcrew.repository.MemberRepository;
@@ -74,9 +75,9 @@ class CrewServiceTest {
         verify(crewRepository, times(1)).findById(crewId);
     }
 
-    @DisplayName("크루 저장 테스트")
+    @DisplayName("크루 저장 성공 테스트")
     @Test
-    public void saveTest(@Mock DongArea dongArea, @Mock User user, @Mock MultipartFile multipartFile) {
+    public void saveTest1(@Mock DongArea dongArea, @Mock User user, @Mock MultipartFile multipartFile) {
         //given
         Long crewId = 1L;
         Long memberId = 2L;
@@ -87,6 +88,7 @@ class CrewServiceTest {
                 .dongArea(dongArea)
                 .build();
         Member member = new Member(memberId, user, crew, MemberRole.ROLE_LEADER);
+        when(crewRepository.existsByName(crew.getName())).thenReturn(false);
         when(crewRepository.save(crew)).thenReturn(crew);
         when(imageService.uploadImage(multipartFile, "crew")).thenReturn(crewImgUrl);
         when(memberRepository.save(any())).thenReturn(member);
@@ -97,15 +99,34 @@ class CrewServiceTest {
         //then
         assertThat(saveId).isSameAs(crewId);
         assertThat(crew.getCrewImgUrl()).isEqualTo(crewImgUrl);
+        verify(crewRepository, times(1)).existsByName(crew.getName());
         verify(crewRepository, times(1)).save(crew);
         verify(imageService, times(1)).uploadImage(multipartFile, "crew");
         verify(memberRepository, times(1)).save(any());
     }
 
-    @DisplayName("크루 수정 테스트")
+    @DisplayName("크루 저장 예외 테스트")
     @Test
-    public void updateCrewTest(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
-                               @Mock MultipartFile multipartFile) {
+    public void saveTest2(@Mock DongArea dongArea, @Mock User user, @Mock MultipartFile multipartFile) {
+        //given
+        Crew crew = Crew.builder()
+                .name("name")
+                .introduction("introduction")
+                .dongArea(dongArea)
+                .build();
+        when(crewRepository.existsByName(crew.getName())).thenReturn(true);
+
+        ///when
+        //then
+        assertThatThrownBy(() -> crewService.saveCrew(user, crew, multipartFile))
+                .isInstanceOf(CrewNameDuplicateException.class);
+        verify(crewRepository, times(1)).existsByName(crew.getName());
+    }
+
+    @DisplayName("크루 수정 성공 테스트")
+    @Test
+    public void updateCrewTest1(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
+                                @Mock MultipartFile multipartFile) {
         //given
         Long crewId = 1L;
         String newCrewImgUrl = "crewImgUrl2";
@@ -120,6 +141,7 @@ class CrewServiceTest {
                 .introduction("introduction2")
                 .dongArea(dongArea2)
                 .build();
+        when(crewRepository.existsByName(newCrew.getName())).thenReturn(false);
         doNothing().when(imageService).deleteImage(originCrew.getCrewImgUrl());
         when(imageService.uploadImage(multipartFile, "crew")).thenReturn(newCrewImgUrl);
 
@@ -131,7 +153,36 @@ class CrewServiceTest {
         assertThat(originCrew.getIntroduction()).isEqualTo(newCrew.getIntroduction());
         assertThat(originCrew.getCrewImgUrl()).isEqualTo(newCrewImgUrl);
         assertThat(originCrew.getDongArea()).isEqualTo(newCrew.getDongArea());
+        verify(crewRepository, times(1)).existsByName(newCrew.getName());
+        verify(imageService, times(1)).deleteImage(any());
         verify(imageService, times(1)).uploadImage(multipartFile, "crew");
+    }
+
+    @DisplayName("크루 수정 예외 테스트")
+    @Test
+    public void updateCrewTest2(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
+                                @Mock MultipartFile multipartFile) {
+        //given
+        Long crewId = 1L;
+        String newCrewImgUrl = "crewImgUrl2";
+        Crew originCrew = Crew.builder().id(crewId)
+                .name("name1")
+                .introduction("introduction1")
+                .crewImgUrl("crewImgUrl1")
+                .dongArea(dongArea1)
+                .build();
+        Crew newCrew = Crew.builder()
+                .name("name2")
+                .introduction("introduction2")
+                .dongArea(dongArea2)
+                .build();
+        when(crewRepository.existsByName(newCrew.getName())).thenReturn(true);
+
+        ///when
+        //then
+        assertThatThrownBy(() -> crewService.updateCrew(originCrew, newCrew, multipartFile))
+                .isInstanceOf(CrewNameDuplicateException.class);
+        verify(crewRepository, times(1)).existsByName(newCrew.getName());
     }
 
     @DisplayName("크루 삭제 테스트")
