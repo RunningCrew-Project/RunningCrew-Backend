@@ -82,5 +82,24 @@ public class CommentService {
     }
 
 
+    /**
+     * 입력된 Board 에 작성된 Comment 의 수를 반환한다.
+     * @param board
+     * @return 입력받은 Board 에 작성된 Comment 의 수
+     */
+    public int countCommentAtBoard(Board board) {
+        return boardCommentRepository.findAllByBoard(board).size();
+    }
+
+
+    /**
+     * 입력된 RunningNotice 에 작성된 Comment 의 수를 반환한다.
+     * @param runningNotice
+     * @return 입력받은 RunningNotice 에 작성된 Comment 의 수
+     */
+    public int countCommentAtRunningNotice(RunningNotice runningNotice) {
+        return runningNoticeCommentRepository.findAllByRunningNotice(runningNotice).size();
+    }
+
 
 }
