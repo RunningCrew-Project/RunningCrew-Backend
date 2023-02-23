@@ -9,6 +9,7 @@ import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.areas.DongAreaRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -204,6 +205,32 @@ class CrewRepositoryTest {
 
         //then
         assertThat(crews.size()).isSameAs(10);
+    }
+
+    @DisplayName("특정 이름을 가진 크루 존재 테스트")
+    @Test
+    public void existsByNameTest1() {
+        //given
+        String name = "crew13";
+
+        ///when
+        boolean exist = crewRepository.existsByName(name);
+
+        //then
+        assertThat(exist).isTrue();
+    }
+
+    @DisplayName("특정 이름을 가진 크루 미존재 테스트")
+    @Test
+    public void existsByNameTest2() {
+        //given
+        String name = "crew133";
+
+        ///when
+        boolean exist = crewRepository.existsByName(name);
+
+        //then
+        assertThat(exist).isFalse();
     }
 
 }

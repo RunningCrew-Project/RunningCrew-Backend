@@ -70,4 +70,11 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
     @Query(value = "select m.crew from Member m where m.user = :user")
     List<Crew> findAllByUser(@Param("user") User user);
 
+    /**
+     * 크루 이름이 name 인 크루 존재 유무 반환
+     * @param name 크루 이름
+     * @return 크루 이름이 name 인 크루가 있다면 true, 없다면 false
+     */
+    boolean existsByName(String name);
+
 }
