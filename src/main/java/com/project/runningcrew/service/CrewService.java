@@ -4,6 +4,7 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.exception.duplicate.CrewNameDuplicateException;
 import com.project.runningcrew.exception.notFound.CrewNotFoundException;
 import com.project.runningcrew.repository.CrewRepository;
 import com.project.runningcrew.repository.MemberRepository;
@@ -42,9 +43,13 @@ public class CrewService {
      * @param crew 저장할 Crew
      * @param multipartFile Crew 의 이미지
      * @return Crew 에 부여된 id
+     * @throws CrewNameDuplicateException 입력받은 Crew 의 이름을 가진 크루가 이미 존재할 때
      */
     @Transactional
     public Long saveCrew(User user, Crew crew, MultipartFile multipartFile) {
+        if (crewRepository.existsByName(crew.getName())) {
+            throw new CrewNameDuplicateException();
+        }
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         crew.updateCrewImgUrl(imageUrl);
         Crew savedCrew = crewRepository.save(crew);
@@ -57,10 +62,14 @@ public class CrewService {
      * @param originCrew 기존 Crew
      * @param newCrew 변경된 Crew
      * @param multipartFile 변경된 Crew 이미지
-지    */
+     * @throws CrewNameDuplicateException 변경된 Crew 의 이름을 가진 크루가 이미 존재할 때
+     */
     @Transactional
     public void updateCrew(Crew originCrew, Crew newCrew, MultipartFile multipartFile) {
         if (!originCrew.getName().equals(newCrew.getName())) {
+            if (crewRepository.existsByName(newCrew.getName())) {
+                throw new CrewNameDuplicateException();
+            }
             originCrew.updateName(newCrew.getName());
         }
         if (!originCrew.getIntroduction().equals(newCrew.getIntroduction())) {
