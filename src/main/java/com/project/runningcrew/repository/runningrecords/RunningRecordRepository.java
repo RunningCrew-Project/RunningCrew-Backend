@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface RunningRecordRepository extends JpaRepository<RunningRecord, Long>, SimpleRunningRecordDtoRepository {
+public interface RunningRecordRepository extends JpaRepository<RunningRecord, Long> {
 
     /**
      * 특정 user 의 RunningRecord 들을 페이징 하여 반환
