@@ -47,7 +47,9 @@ class RunningRecordRepositoryTest {
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                .title("personal")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
@@ -84,7 +86,9 @@ class RunningRecordRepositoryTest {
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                .title("personal")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
@@ -112,7 +116,9 @@ class RunningRecordRepositoryTest {
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                .title("personal")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
@@ -139,20 +145,17 @@ class RunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                .title("crew")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
                 .user(user)
-                .crew(crew)
-                .runningNotice(runningNotice)
                 .build();
 
         List<Gps> gpsList = List.of(
@@ -182,20 +185,17 @@ class RunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                .title("crew")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
                 .user(user)
-                .crew(crew)
-                .runningNotice(runningNotice)
                 .build();
         runningRecordRepository.save(crewRunningRecord);
 
@@ -215,20 +215,17 @@ class RunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                .title("crew")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
                 .user(user)
-                .crew(crew)
-                .runningNotice(runningNotice)
                 .build();
         runningRecordRepository.save(crewRunningRecord);
 
@@ -248,29 +245,27 @@ class RunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
 
         for (int i = 0; i < 10; i++) {
-            RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, i);
-
             CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                    .title("crew")
                     .startDateTime(LocalDateTime.of(2023, 3, 1 + i, 15, 0))
+                    .location("location")
                     .runningDistance(3.1)
                     .runningTime(1000)
                     .runningFace(1000)
                     .calories(300)
                     .running_detail(String.valueOf(i))
                     .user(user)
-                    .crew(crew)
-                    .runningNotice(runningNotice)
                     .build();
             runningRecordRepository.save(crewRunningRecord);
         }
 
         for (int i = 10; i < 20; i++) {
             PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                    .title("personal")
                     .startDateTime(LocalDateTime.of(2023, 3, 10 + i, 15, 0))
+                    .location("location")
                     .runningDistance(3.1)
                     .runningTime(1000)
                     .runningFace(1000)
@@ -301,29 +296,27 @@ class RunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
 
         for (int i = 0; i < 10; i++) {
-            RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, i);
-
             CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                    .title("crew")
                     .startDateTime(LocalDateTime.of(2023, 3, 1 + i, 15, 0))
+                    .location("location")
                     .runningDistance(3.1)
                     .runningTime(1000)
                     .runningFace(1000)
                     .calories(300)
                     .running_detail(String.valueOf(i))
                     .user(user)
-                    .crew(crew)
-                    .runningNotice(runningNotice)
                     .build();
             runningRecordRepository.save(crewRunningRecord);
         }
 
         for (int i = 10; i < 20; i++) {
             PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                    .title("personal")
                     .startDateTime(LocalDateTime.of(2023, 3, 10 + i, 15, 0))
+                    .location("location")
                     .runningDistance(3.1)
                     .runningTime(1000)
                     .runningFace(1000)
@@ -363,7 +356,9 @@ class RunningRecordRepositoryTest {
 
         for (int i = 0; i < 3; i++) {
             PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                    .title("personal")
                     .startDateTime(startDates.get(i))
+                    .location("location")
                     .runningDistance(3.1)
                     .runningTime(1000)
                     .runningFace(1000)
@@ -377,207 +372,6 @@ class RunningRecordRepositoryTest {
         ///when
         List<RunningRecord> personalRunningRecords = runningRecordRepository
                 .findAllByUserAndStartDateTimes(user, today, tomorrow);
-
-        //then
-        assertThat(personalRunningRecords.size()).isSameAs(2);
-    }
-
-    @DisplayName("SimpleRunningRecordDto 첫 페이지 테스트")
-    @Test
-    public void findSimpleRunningRecordDtoByUserTest1() {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
-        User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        PageRequest pageRequest = PageRequest.of(0, 8);
-
-        for (int i = 0; i < 10; i++) {
-            RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, i);
-
-            CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
-                    .startDateTime(LocalDateTime.of(2023, 3, 1 + i, 15, 0))
-                    .runningDistance(3.1)
-                    .runningTime(1000)
-                    .runningFace(1000)
-                    .calories(300)
-                    .running_detail(String.valueOf(i))
-                    .user(user)
-                    .crew(crew)
-                    .runningNotice(runningNotice)
-                    .build();
-            runningRecordRepository.save(crewRunningRecord);
-        }
-
-        for (int i = 10; i < 20; i++) {
-            PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
-                    .startDateTime(LocalDateTime.of(2023, 3, 10 + i, 15, 0))
-                    .runningDistance(3.1)
-                    .runningTime(1000)
-                    .runningFace(1000)
-                    .calories(300)
-                    .running_detail(String.valueOf(i))
-                    .user(user)
-                    .build();
-            runningRecordRepository.save(personalRunningRecord);
-        }
-
-        ///when
-        Slice<SimpleRunningRecordDto> result = runningRecordRepository.findSimpleRunningRecordDtoByUser(user, pageRequest);
-
-        //then
-        assertThat(result.getNumber()).isSameAs(0);
-        assertThat(result.getSize()).isSameAs(8);
-        assertThat(result.getNumberOfElements()).isSameAs(8);
-        assertThat(result.hasPrevious()).isFalse();
-        assertThat(result.hasNext()).isTrue();
-        assertThat(result.isFirst()).isTrue();
-        assertThat(result.isLast()).isFalse();
-    }
-
-    @DisplayName("SimpleRunningRecordDto 중간 페이지 테스트")
-    @Test
-    public void findSimpleRunningRecordDtoByUserTest2() {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
-        User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        PageRequest pageRequest = PageRequest.of(1, 8);
-
-        for (int i = 0; i < 10; i++) {
-            RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, i);
-
-            CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
-                    .startDateTime(LocalDateTime.of(2023, 3, 1 + i, 15, 0))
-                    .runningDistance(3.1)
-                    .runningTime(1000)
-                    .runningFace(1000)
-                    .calories(300)
-                    .running_detail(String.valueOf(i))
-                    .user(user)
-                    .crew(crew)
-                    .runningNotice(runningNotice)
-                    .build();
-            runningRecordRepository.save(crewRunningRecord);
-        }
-
-        for (int i = 10; i < 20; i++) {
-            PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
-                    .startDateTime(LocalDateTime.of(2023, 3, 10 + i, 15, 0))
-                    .runningDistance(3.1)
-                    .runningTime(1000)
-                    .runningFace(1000)
-                    .calories(300)
-                    .running_detail(String.valueOf(i))
-                    .user(user)
-                    .build();
-            runningRecordRepository.save(personalRunningRecord);
-        }
-
-        ///when
-        Slice<SimpleRunningRecordDto> result = runningRecordRepository.findSimpleRunningRecordDtoByUser(user, pageRequest);
-
-        //then
-        assertThat(result.getNumber()).isSameAs(1);
-        assertThat(result.getSize()).isSameAs(8);
-        assertThat(result.getNumberOfElements()).isSameAs(8);
-        assertThat(result.hasPrevious()).isTrue();
-        assertThat(result.hasNext()).isTrue();
-        assertThat(result.isFirst()).isFalse();
-        assertThat(result.isLast()).isFalse();
-    }
-
-    @DisplayName("SimpleRunningRecordDto 마지막 페이지 테스트")
-    @Test
-    public void findSimpleRunningRecordDtoByUserTest3() {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
-        User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        PageRequest pageRequest = PageRequest.of(2, 8);
-
-        for (int i = 0; i < 10; i++) {
-            RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, i);
-
-            CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
-                    .startDateTime(LocalDateTime.of(2023, 3, 1 + i, 15, 0))
-                    .runningDistance(3.1)
-                    .runningTime(1000)
-                    .runningFace(1000)
-                    .calories(300)
-                    .running_detail(String.valueOf(i))
-                    .user(user)
-                    .crew(crew)
-                    .runningNotice(runningNotice)
-                    .build();
-            runningRecordRepository.save(crewRunningRecord);
-        }
-
-        for (int i = 10; i < 20; i++) {
-            PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
-                    .startDateTime(LocalDateTime.of(2023, 3, 10 + i, 15, 0))
-                    .runningDistance(3.1)
-                    .runningTime(1000)
-                    .runningFace(1000)
-                    .calories(300)
-                    .running_detail(String.valueOf(i))
-                    .user(user)
-                    .build();
-            runningRecordRepository.save(personalRunningRecord);
-        }
-
-        ///when
-        Slice<SimpleRunningRecordDto> result = runningRecordRepository.findSimpleRunningRecordDtoByUser(user, pageRequest);
-
-        //then
-        assertThat(result.getNumber()).isSameAs(2);
-        assertThat(result.getSize()).isSameAs(8);
-        assertThat(result.getNumberOfElements()).isSameAs(4);
-        assertThat(result.hasPrevious()).isTrue();
-        assertThat(result.hasNext()).isFalse();
-        assertThat(result.isFirst()).isFalse();
-        assertThat(result.isLast()).isTrue();
-    }
-
-    @DisplayName("SimpleRunningRecordDto DateTime 으로 가져오기 테스트")
-    @Test
-    public void findSimpleRunningRecordDtoByByUserAndStartDateTimesTest() {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
-        User user = testEntityFactory.getUser(dongArea, 0);
-        List<LocalDateTime> startDates = List.of(
-                LocalDateTime.of(2023, 3, 13, 0, 0),
-                LocalDateTime.of(2023, 3, 13, 11, 20),
-                LocalDateTime.of(2023, 3, 14, 0, 0));
-        LocalDateTime today = LocalDateTime.of(2023, 3, 13, 0, 0);
-        LocalDateTime tomorrow = today.plusDays(1);
-
-        for (int i = 0; i < 3; i++) {
-            PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
-                    .startDateTime(startDates.get(i))
-                    .runningDistance(3.1)
-                    .runningTime(1000)
-                    .runningFace(1000)
-                    .calories(300)
-                    .running_detail(String.valueOf(i))
-                    .user(user)
-                    .build();
-            runningRecordRepository.save(personalRunningRecord);
-        }
-
-        ///when
-        List<SimpleRunningRecordDto> personalRunningRecords = runningRecordRepository
-                .findSimpleRunningRecordDtoByByUserAndStartDateTimes(user, today, tomorrow);
 
         //then
         assertThat(personalRunningRecords.size()).isSameAs(2);

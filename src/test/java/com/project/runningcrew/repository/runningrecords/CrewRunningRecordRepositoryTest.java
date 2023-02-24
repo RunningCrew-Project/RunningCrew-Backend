@@ -39,20 +39,17 @@ class CrewRunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                .title("crew")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
                 .user(user)
-                .crew(crew)
-                .runningNotice(runningNotice)
                 .build();
 
         ///when
@@ -70,20 +67,17 @@ class CrewRunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                .title("crew")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
                 .user(user)
-                .crew(crew)
-                .runningNotice(runningNotice)
                 .build();
         crewRunningRecordRepository.save(crewRunningRecord);
 
@@ -103,20 +97,17 @@ class CrewRunningRecordRepositoryTest {
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
-        Crew crew = testEntityFactory.getCrew(dongArea, 0);
-        Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
 
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                .title("crew")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
                 .user(user)
-                .crew(crew)
-                .runningNotice(runningNotice)
                 .build();
         crewRunningRecordRepository.save(crewRunningRecord);
 

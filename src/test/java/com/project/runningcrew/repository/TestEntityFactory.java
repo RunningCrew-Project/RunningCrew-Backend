@@ -109,7 +109,9 @@ public class TestEntityFactory {
 
     public PersonalRunningRecord getPersonalRunningRecord(User user, int num) {
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                .title("personal")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)

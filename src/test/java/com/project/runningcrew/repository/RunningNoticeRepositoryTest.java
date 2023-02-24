@@ -77,17 +77,18 @@ class RunningNoticeRepositoryTest {
         return memberRepository.save(member);
     }
 
-    public RunningRecord testRunningRecord(User user, Crew crew) {
+    public RunningRecord testRunningRecord(User user) {
         int num = 1;
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
+                .title("crew")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
                 .running_detail("")
                 .user(user)
-                .crew(crew)
                 .build();
 
         return crewRunningRecordRepository.save(crewRunningRecord);

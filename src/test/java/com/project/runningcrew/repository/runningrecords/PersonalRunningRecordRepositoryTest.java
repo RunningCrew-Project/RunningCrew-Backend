@@ -37,7 +37,9 @@ class PersonalRunningRecordRepositoryTest {
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                .title("personal")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
@@ -62,7 +64,9 @@ class PersonalRunningRecordRepositoryTest {
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                .title("personal")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
@@ -90,7 +94,9 @@ class PersonalRunningRecordRepositoryTest {
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                .title("personal")
                 .startDateTime(LocalDateTime.of(2023, 2, 11, 15, 0))
+                .location("location")
                 .runningDistance(3.1)
                 .runningTime(1000)
                 .runningFace(1000)
