@@ -5,6 +5,7 @@ import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +35,17 @@ public class MemberService {
     }
 
     /**
-     * 입력받은 Member 를 저장하고, Member 에 부여된 id 를 반환한다.
+     * 입력받은 Member 의 가입여부를 확인하고, 가입하지 않았다면 저장하후 Member 에 부여된 id 를 반환한다.
      *
      * @param member 저장할 Member
      * @return Member 에 부여된 id
+     * @throws MemberAlreadyExistsException user 가 crew 에 이미 가입했을 때
      */
     @Transactional
     public Long saveMember(Member member) {
+        if (memberRepository.existsByUserAndCrew(member.getUser(), member.getCrew())) {
+            throw new MemberAlreadyExistsException();
+        }
         return memberRepository.save(member).getId();
     }
 

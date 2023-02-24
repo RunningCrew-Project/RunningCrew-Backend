@@ -5,6 +5,7 @@ import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -60,12 +61,13 @@ class MemberServiceTest {
         verify(memberRepository, times(1)).findById(memberId);
     }
 
-    @DisplayName("멤버 저장 테스트")
+    @DisplayName("멤버 저장 성공 테스트")
     @Test
-    public void saveTest(@Mock User user, @Mock Crew crew) {
+    public void saveTest1(@Mock User user, @Mock Crew crew) {
         //given
         Long memberId = 1L;
         Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
+        when(memberRepository.existsByUserAndCrew(user, crew)).thenReturn(false);
         when(memberRepository.save(member)).thenReturn(member);
 
         ///when
@@ -73,7 +75,23 @@ class MemberServiceTest {
 
         //then
         assertThat(findMemberId).isSameAs(memberId);
+        verify(memberRepository, times(1)).existsByUserAndCrew(user, crew);
         verify(memberRepository, times(1)).save(member);
+    }
+
+    @DisplayName("멤버 저장 예외 테스트")
+    @Test
+    public void saveTest2(@Mock User user, @Mock Crew crew) {
+        //given
+        Long memberId = 1L;
+        Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
+        when(memberRepository.existsByUserAndCrew(user, crew)).thenReturn(true);
+
+        ///when
+        //then
+        assertThatThrownBy(() -> memberService.saveMember(member))
+                .isInstanceOf(MemberAlreadyExistsException.class);
+        verify(memberRepository, times(1)).existsByUserAndCrew(user, crew);
     }
 
     @DisplayName("멤버 삭제 테스트")
