@@ -1,13 +1,9 @@
 package com.project.runningcrew.repository.runningrecords;
 
-import com.project.runningcrew.dto.SimpleRunningRecordDto;
-import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.Gps;
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.runningrecords.CrewRunningRecord;
 import com.project.runningcrew.repository.TestEntityFactory;
 import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
@@ -375,6 +371,26 @@ class RunningRecordRepositoryTest {
 
         //then
         assertThat(personalRunningRecords.size()).isSameAs(2);
+    }
+    
+    @DisplayName("user 의 모든 RunningRecord 삭제")
+    @Test
+    public void deleteAllByUserTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        for (int i = 0; i < 10; i++) {
+            testEntityFactory.getPersonalRunningRecord(user, i);
+        }
+
+        ///when
+        runningRecordRepository.deleteAllByUser(user);
+        
+        //then
+        List<RunningRecord> runningRecords = runningRecordRepository.findAllByUser(user);
+        assertThat(runningRecords.isEmpty()).isTrue();
     }
 
 }
