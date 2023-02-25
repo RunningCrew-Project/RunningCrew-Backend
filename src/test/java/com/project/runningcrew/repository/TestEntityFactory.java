@@ -97,7 +97,7 @@ public class TestEntityFactory {
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                 .runningPersonnel(4)
-                .status(RunningStatus.WAIT)
+                .status(RunningStatus.READY)
                 .build();
         return runningNoticeRepository.save(runningNotice);
     }

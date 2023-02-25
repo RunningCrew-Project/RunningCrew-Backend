@@ -29,8 +29,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
 class RunningNoticeRepositoryTest {
@@ -112,7 +110,7 @@ class RunningNoticeRepositoryTest {
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                 .runningPersonnel(4)
-                .status(RunningStatus.WAIT)
+                .status(RunningStatus.READY)
                 .build();
 
         //when
@@ -141,7 +139,7 @@ class RunningNoticeRepositoryTest {
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                 .runningPersonnel(4)
-                .status(RunningStatus.WAIT)
+                .status(RunningStatus.READY)
                 .build();
         RunningNotice savedRunningNotice = runningNoticeRepository.save(runningNotice);
 
@@ -172,7 +170,7 @@ class RunningNoticeRepositoryTest {
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                 .runningPersonnel(4)
-                .status(RunningStatus.WAIT)
+                .status(RunningStatus.READY)
                 .build();
         RunningNotice savedRunningNotice = runningNoticeRepository.save(runningNotice);
 
@@ -206,7 +204,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         );
 
@@ -217,7 +215,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         );
 
@@ -228,7 +226,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         );
 
@@ -262,7 +260,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         );
 
@@ -273,7 +271,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         );
 
@@ -284,7 +282,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         );
         PageRequest pageRequest = PageRequest.of(0, 15); // size = 15
@@ -334,7 +332,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // title 에 포함
 
@@ -345,7 +343,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // detail 에 포함
 
@@ -356,7 +354,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 미포함
 
@@ -389,7 +387,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // title 에 포함
 
@@ -400,7 +398,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // detail 에 포함
 
@@ -411,7 +409,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 미포함
 
@@ -450,7 +448,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 2, 11, 0, 1))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 23/02/11, 00시 01분
 
@@ -461,7 +459,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 2, 11, 23, 59))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 23/02/11, 23시 59분
 
@@ -472,7 +470,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 23/02/12, 00시 01분
 
@@ -502,7 +500,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.REGULAR)
                         .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 0))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 23/02/12, 00시 00분
 
@@ -513,7 +511,7 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 2, 11, 23, 59))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 23/02/11, 23시 59분
 
@@ -524,12 +522,12 @@ class RunningNoticeRepositoryTest {
                         .noticeType(NoticeType.INSTANT)
                         .runningDateTime(LocalDateTime.of(2023, 2, 11, 0, 1))
                         .runningPersonnel(4)
-                        .status(RunningStatus.WAIT)
+                        .status(RunningStatus.READY)
                         .build()
         ); // 23/02/11, 00시 01분
 
         //when
-        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByCrewAndStatus(RunningStatus.WAIT, member.getCrew());
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository.findAllByCrewAndStatus(RunningStatus.READY, member.getCrew());
 
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(3);

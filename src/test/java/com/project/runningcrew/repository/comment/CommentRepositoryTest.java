@@ -18,7 +18,6 @@ import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.repository.*;
 import com.project.runningcrew.repository.boards.BoardRepository;
-import com.project.runningcrew.repository.comment.CommentRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,7 +88,7 @@ class CommentRepositoryTest {
                 .noticeType(NoticeType.INSTANT)
                 .runningDateTime(LocalDateTime.now())
                 .runningPersonnel(100)
-                .status(RunningStatus.WAIT)
+                .status(RunningStatus.READY)
                 .build();
         return runningNoticeRepository.save(runningNotice);
     }
