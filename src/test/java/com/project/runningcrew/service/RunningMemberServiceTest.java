@@ -35,8 +35,8 @@ class RunningMemberServiceTest {
         //given
         Long runningMemberId = 1L;
         RunningMember runningMember = new RunningMember(runningMemberId, runningNotice, member);
-        when(runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice))
-                .thenReturn(Optional.empty());
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice))
+                .thenReturn(false);
         when(runningMemberRepository.save(any())).thenReturn(runningMember);
 
         ///when
@@ -44,7 +44,7 @@ class RunningMemberServiceTest {
 
         //then
         assertThat(saveId).isSameAs(runningMemberId);
-        verify(runningMemberRepository, times(1)).findByMemberAndRunningNotice(member, runningNotice);
+        verify(runningMemberRepository, times(1)).existsByMemberAndRunningNotice(member, runningNotice);
         verify(runningMemberRepository, times(1)).save(any());
     }
 
@@ -52,15 +52,14 @@ class RunningMemberServiceTest {
     @Test
     public void saveRunningMemberTest2(@Mock Member member, @Mock RunningNotice runningNotice) {
         //given
-        RunningMember runningMember = new RunningMember(runningNotice, member);
-        when(runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice))
-                .thenReturn(Optional.of(runningMember));
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice))
+                .thenReturn(true);
 
         ///when
         //then
         assertThatThrownBy(() -> runningMemberService.saveRunningMember(member, runningNotice))
                 .isInstanceOf(RunningMemberAlreadyExistsException.class);
-        verify(runningMemberRepository, times(1)).findByMemberAndRunningNotice(member, runningNotice);
+        verify(runningMemberRepository, times(1)).existsByMemberAndRunningNotice(member, runningNotice);
     }
 
     @DisplayName("런닝 참여 취소 성공 테스트")
@@ -107,6 +106,36 @@ class RunningMemberServiceTest {
         //then
         assertThat(result).isSameAs(count);
         verify(runningMemberRepository, times(1)).countAllByRunningNotice(runningNotice);
+    }
+
+    @DisplayName("멤버의 런닝공지 참여 true 테스트")
+    @Test
+    public void existsByMemberAndRunningNoticeTest1(@Mock Member member, @Mock RunningNotice runningNotice) {
+        //given
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice)).thenReturn(true);
+
+        ///when
+        boolean result = runningMemberService.existsByMemberAndRunningNotice(member, runningNotice);
+
+        //then
+        assertThat(result).isTrue();
+        verify(runningMemberRepository, times(1))
+                .existsByMemberAndRunningNotice(member, runningNotice);
+    }
+
+    @DisplayName("멤버의 런닝공지 참여 false 테스트")
+    @Test
+    public void existsByMemberAndRunningNoticeTest2(@Mock Member member, @Mock RunningNotice runningNotice) {
+        //given
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice)).thenReturn(false);
+
+        ///when
+        boolean result = runningMemberService.existsByMemberAndRunningNotice(member, runningNotice);
+
+        //then
+        assertThat(result).isFalse();
+        verify(runningMemberRepository, times(1))
+                .existsByMemberAndRunningNotice(member, runningNotice);
     }
 
 }
