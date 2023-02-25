@@ -260,4 +260,17 @@ class RunningRecordServiceTest {
                 .findAllByUserAndStartDateTimes(any(), any(), any());
     }
 
+    @DisplayName("유저의 모든 RunningRecord 삭제")
+    @Test
+    public void deleteAllByUserTest(@Mock User user) {
+        //given
+        doNothing().when(runningRecordRepository).deleteAllByUser(user);
+
+        ///when
+        runningRecordService.deleteAllByUser(user);
+
+        //then
+        verify(runningRecordRepository,times(1)).deleteAllByUser(user);
+    }
+
 }

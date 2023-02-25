@@ -1,6 +1,5 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.dto.SimpleRunningRecordDto;
 import com.project.runningcrew.entity.images.RunningRecordImage;
 import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.User;
@@ -84,28 +83,11 @@ public class RunningRecordService {
     }
 
     /**
-     * 입력받은 User 의 SimpleRunningRecordDto 의 Slice 를 반환
-     *
-     * @param user     찾는 SimpleRunningRecordDto 의 User
-     * @param pageable
-     * @return SimpleRunningRecordDto 의 Slice
+     * 특정 user 의 모든 RunningRecord 를 삭제한다.
+     * @param user RunningRecord 를 삭제할 user
      */
-    public Slice<SimpleRunningRecordDto> findSimpleRunningRecordDtoByUser(User user, Pageable pageable) {
-        return runningRecordRepository.findSimpleRunningRecordDtoByUser(user, pageable);
-    }
-
-    /**
-     * 입력받은 User 가 LocalDate 에 런닝을 시작한 모든 SimpleRunningRecordDto 를 반환
-     *
-     * @param user      찾는 RunningRecord 의 User
-     * @param localDate 런닝을 시작한 날
-     * @return 런닝을 시작한 날이 LocalDate 인 User 의 모든 SimpleRunningRecordDto
-     */
-    public List<SimpleRunningRecordDto> findSimpleRunningRecordDtoByUserAndStartDate(User user,
-                                                                                     LocalDate localDate) {
-        LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0, 0));
-        LocalDateTime nextDateTime = dateTime.plusDays(1);
-        return runningRecordRepository.findSimpleRunningRecordDtoByByUserAndStartDateTimes(user, dateTime, nextDateTime);
+    public void deleteAllByUser(User user) {
+        runningRecordRepository.deleteAllByUser(user);
     }
 
 }

@@ -4,7 +4,6 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.boards.ReviewBoard;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
@@ -16,7 +15,6 @@ import com.project.runningcrew.repository.CrewRepository;
 import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.repository.TestEntityFactory;
 import com.project.runningcrew.repository.UserRepository;
-import com.project.runningcrew.repository.runningrecords.CrewRunningRecordRepository;
 import com.project.runningcrew.repository.runningrecords.PersonalRunningRecordRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -41,12 +39,18 @@ class ReviewBoardRepositoryTest {
     /**
      * 본 테스트의 RunningRecord 의 구현체로 PersonalRunningRecord 를 사용함.
      */
-    @Autowired UserRepository userRepository;
-    @Autowired CrewRepository crewRepository;
-    @Autowired MemberRepository memberRepository;
-    @Autowired PersonalRunningRecordRepository personalRunningRecordRepository;
-    @Autowired ReviewBoardRepository reviewBoardRepository;
-    @Autowired TestEntityFactory testEntityFactory;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    CrewRepository crewRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    PersonalRunningRecordRepository personalRunningRecordRepository;
+    @Autowired
+    ReviewBoardRepository reviewBoardRepository;
+    @Autowired
+    TestEntityFactory testEntityFactory;
 
 
     public User testUser(DongArea dongArea, int num) {
@@ -54,7 +58,7 @@ class ReviewBoardRepositoryTest {
                 .email("email@email.com" + num)
                 .password("password123!")
                 .name("name")
-                .nickname("nickname"+ num)
+                .nickname("nickname" + num)
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
@@ -69,7 +73,7 @@ class ReviewBoardRepositoryTest {
 
     public Crew testCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder()
-                .name("name"+ num)
+                .name("name" + num)
                 .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
@@ -84,14 +88,16 @@ class ReviewBoardRepositoryTest {
 
     public PersonalRunningRecord testPersonalRunningRecord(User user, int num) {
         PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
-                        .startDateTime(LocalDateTime.now())
-                        .runningDistance(100)
-                        .runningTime(100)
-                        .runningFace(100)
-                        .calories(100)
-                        .running_detail("running_detail")
-                        .user(user)
-                        .build();
+                .title("personal")
+                .startDateTime(LocalDateTime.now())
+                .location("location")
+                .runningDistance(100)
+                .runningTime(100)
+                .runningFace(100)
+                .calories(100)
+                .running_detail("running_detail")
+                .user(user)
+                .build();
         return personalRunningRecord;
     }
 
@@ -119,7 +125,6 @@ class ReviewBoardRepositoryTest {
     }
 
 
-
     @DisplayName("ReviewBoard findById 테스트")
     @Test
     void findByIdTest() throws Exception {
@@ -143,7 +148,6 @@ class ReviewBoardRepositoryTest {
         Assertions.assertThat(findReviewBoardOpt).isNotEmpty();
         Assertions.assertThat(findReviewBoardOpt).hasValue(savedReviewBoard);
     }
-
 
 
     @DisplayName("ReviewBoard delete 테스트")
@@ -170,8 +174,6 @@ class ReviewBoardRepositoryTest {
     }
 
 
-
-
     @DisplayName("특정 crew 의 ReviewBoard 페이징 출력 테스트")
     @Test
     void findReviewBoardByCrew() throws Exception {
@@ -185,12 +187,15 @@ class ReviewBoardRepositoryTest {
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()
+                        .title("personal")
                         .startDateTime(LocalDateTime.now())
+                        .location("location")
                         .runningDistance(100)
                         .runningTime(100)
                         .runningFace(100)
                         .calories(100)
                         .running_detail("running_detail")
+                        .user(user)
                         .build()
         );
 

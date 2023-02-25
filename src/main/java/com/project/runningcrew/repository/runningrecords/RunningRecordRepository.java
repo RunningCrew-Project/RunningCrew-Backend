@@ -5,6 +5,7 @@ import com.project.runningcrew.entity.users.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface RunningRecordRepository extends JpaRepository<RunningRecord, Long>, SimpleRunningRecordDtoRepository {
+public interface RunningRecordRepository extends JpaRepository<RunningRecord, Long> {
 
     /**
      * 특정 user 의 RunningRecord 들을 페이징 하여 반환
@@ -42,5 +43,14 @@ public interface RunningRecordRepository extends JpaRepository<RunningRecord, Lo
     List<RunningRecord> findAllByUserAndStartDateTimes(@Param("user") User user,
                                                        @Param("start") LocalDateTime start,
                                                        @Param("end") LocalDateTime end);
+
+
+    /**
+     * 특정 user 의 모든 RunningRecord 를 삭제한다.
+     * @param user RunningRecord 를 삭제할 user
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from RunningRecord r where r.user = :user")
+    void deleteAllByUser(@Param("user") User user);
 
 }

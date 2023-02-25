@@ -15,10 +15,11 @@ import java.time.LocalDateTime;
 public class PersonalRunningRecord extends RunningRecord{
 
     @Builder
-    public PersonalRunningRecord(Long id, LocalDateTime startDateTime, double runningDistance,
-                                 int runningTime, int runningFace, int calories,
-                                 String running_detail, User user) {
-        super(id, startDateTime, runningDistance, runningTime, runningFace, calories, running_detail, user);
+    public PersonalRunningRecord(Long id, String title, LocalDateTime startDateTime, String location,
+                                 double runningDistance, int runningTime, int runningFace,
+                                 int calories, String running_detail, User user) {
+        super(id, title, startDateTime, location, runningDistance, runningTime, runningFace,
+                calories, running_detail, user);
     }
 
 }
