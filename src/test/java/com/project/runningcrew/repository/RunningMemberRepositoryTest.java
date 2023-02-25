@@ -185,6 +185,47 @@ class RunningMemberRepositoryTest {
         }
     }
 
+    @DisplayName("Member 와 RunningNotice 에 해당하는 RunningMember 반환 성공 테스트")
+    @Test
+    public void findByMemberAndRunningNoticeTest1() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningMember runningMember = new RunningMember(runningNotice, member);
+        runningMemberRepository.save(runningMember);
+
+        ///when
+        Optional<RunningMember> optRunningMember = runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice);
+
+        //then
+        assertThat(optRunningMember).isNotEmpty();
+        assertThat(optRunningMember).hasValue(runningMember);
+    }
+
+    @DisplayName("Member 와 RunningNotice 에 해당하는 RunningMember 반환 실패 테스트")
+    @Test
+    public void findByMemberAndRunningNoticeTest2() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+
+        ///when
+        Optional<RunningMember> optRunningMember = runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice);
+
+        //then
+        assertThat(optRunningMember).isEmpty();
+    }
+
     @DisplayName("Member 의 RunningNotice 참여 테스트")
     @Test
     public void existsByMemberAndRunningNoticeTest1() {
