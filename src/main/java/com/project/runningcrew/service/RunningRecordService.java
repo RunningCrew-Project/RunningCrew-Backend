@@ -82,4 +82,12 @@ public class RunningRecordService {
         return runningRecordRepository.findAllByUserAndStartDateTimes(user, dateTime, nextDateTime);
     }
 
+    /**
+     * 특정 user 의 모든 RunningRecord 를 삭제한다.
+     * @param user RunningRecord 를 삭제할 user
+     */
+    public void deleteAllByUser(User user) {
+        runningRecordRepository.deleteAllByUser(user);
+    }
+
 }
