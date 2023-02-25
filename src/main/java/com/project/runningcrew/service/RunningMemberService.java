@@ -32,9 +32,8 @@ public class RunningMemberService {
      */
     @Transactional
     public Long saveRunningMember(Member member, RunningNotice runningNotice) {
-        Optional<RunningMember> optRunningMember = runningMemberRepository
-                .findByMemberAndRunningNotice(member, runningNotice);
-        if (optRunningMember.isPresent()) {
+        boolean isExist = runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice);
+        if (isExist) {
             throw new RunningMemberAlreadyExistsException();
         }
         RunningMember runningMember = new RunningMember(runningNotice, member);
@@ -64,6 +63,17 @@ public class RunningMemberService {
      */
     public Long countAllByRunningNotice(RunningNotice runningNotice) {
         return runningMemberRepository.countAllByRunningNotice(runningNotice);
+    }
+
+    /**
+     * memeber 의 runningNotice 참여 여부를 반환한다.
+     *
+     * @param member
+     * @param runningNotice
+     * @return runningNotice 에 member 가 참여했다면 true, 참여하지 않았다면 false
+     */
+    public boolean existsByMemberAndRunningNotice(Member member, RunningNotice runningNotice) {
+        return runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice);
     }
 
 }

@@ -14,6 +14,7 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
 
     /**
      * member 를 포함하는 모든 RunningMember 반환
+     *
      * @param member
      * @return member 를 포함된 모든 RunningMember 의 list
      */
@@ -21,6 +22,7 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
 
     /**
      * runningNotice 를 포함하는 모든 RunningMember 의 개수 반환
+     *
      * @param runningNotice
      * @return runningNotice 를 포함하는 모든 RunningMember 의 개수
      */
@@ -28,6 +30,7 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
 
     /**
      * runningNotice 를 포함하는 모든 RunningMember 반환
+     *
      * @param runningNotice
      * @return runningNotice 를 포함하는 모든 RunningMember 의 list
      */
@@ -35,10 +38,20 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
 
     /**
      * Member 와 RunningNotice 를 포함하는 RunningMember 반환
+     *
      * @param member
      * @param runningNotice
-     * @return  Member 와 RunningNotice 를 포함하는 RunningMember 반환. 없다면 Option.empty() 반환
+     * @return Member 와 RunningNotice 를 포함하는 RunningMember 반환. 없다면 Option.empty() 반환
      */
     Optional<RunningMember> findByMemberAndRunningNotice(Member member, RunningNotice runningNotice);
+
+    /**
+     * Member 의 RunningNotice 참여여부 반환
+     *
+     * @param member
+     * @param runningNotice
+     * @return member 가 runningNotice 에 참여했다면 true, 아니라면 false
+     */
+    boolean existsByMemberAndRunningNotice(Member member, RunningNotice runningNotice);
 
 }
