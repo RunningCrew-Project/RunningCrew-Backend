@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -442,11 +443,12 @@ class RunningNoticeRepositoryTest {
         ); // 미포함
 
         //when
-        Slice<RunningNotice> slice = runningNoticeRepository.findSliceAllByCrewAndKeyWord(keyword, member.getCrew());
-        List<RunningNotice> content = slice.getContent();
+        PageRequest pageRequest = PageRequest.of(0, 5, Sort.by("createdDate").descending());
+        Slice<RunningNotice> slice = runningNoticeRepository
+                .findSliceAllByCrewAndKeyWord(keyword, member.getCrew(),pageRequest);
 
         //then
-        Assertions.assertThat(content.size()).isEqualTo(2);
+        Assertions.assertThat(slice.getSize()).isEqualTo(5);
         Assertions.assertThat(slice.getNumber()).isEqualTo(0);
         Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(2);
         Assertions.assertThat(slice.isFirst()).isTrue();

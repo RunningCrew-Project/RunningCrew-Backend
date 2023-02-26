@@ -51,7 +51,7 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
      * @return slice of RunningNotice
      */
     @Query("select rn from RunningNotice rn where rn.member.crew = :crew and (rn.title like %:keyword% or rn.detail like %:keyword%)")
-    Slice<RunningNotice> findSliceAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew);
+    Slice<RunningNotice> findSliceAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew, Pageable pageable);
 
 
     /**
