@@ -1,6 +1,7 @@
 package com.project.runningcrew.repository;
 
 import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.entity.RunningMember;
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
@@ -34,12 +35,18 @@ import java.util.Optional;
 class RunningNoticeRepositoryTest {
 
 
-    @Autowired UserRepository userRepository;
-    @Autowired CrewRepository crewRepository;
-    @Autowired MemberRepository memberRepository;
-    @Autowired CrewRunningRecordRepository crewRunningRecordRepository;
-    @Autowired RunningNoticeRepository runningNoticeRepository;
-    @Autowired TestEntityFactory testEntityFactory;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    CrewRepository crewRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    CrewRunningRecordRepository crewRunningRecordRepository;
+    @Autowired
+    RunningNoticeRepository runningNoticeRepository;
+    @Autowired
+    TestEntityFactory testEntityFactory;
 
 
     public User testUser(DongArea dongArea, int num) {
@@ -47,7 +54,7 @@ class RunningNoticeRepositoryTest {
                 .email("email@email.com" + num)
                 .password("password123!")
                 .name("name")
-                .nickname("nickname"+ num)
+                .nickname("nickname" + num)
                 .imgUrl("imgUrl")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
@@ -62,7 +69,7 @@ class RunningNoticeRepositoryTest {
 
     public Crew testCrew(DongArea dongArea, int num) {
         Crew crew = Crew.builder()
-                .name("name"+ num)
+                .name("name" + num)
                 .dongArea(dongArea)
                 .introduction("introduction")
                 .crewImgUrl("crewImgUrl")
@@ -121,7 +128,6 @@ class RunningNoticeRepositoryTest {
     }
 
 
-
     @DisplayName("RunningNotice findById 테스트")
     @Test
     void findByIdTest() throws Exception {
@@ -152,7 +158,6 @@ class RunningNoticeRepositoryTest {
     }
 
 
-
     @DisplayName("RunningNotice delete 테스트")
     @Test
     void deleteTest() throws Exception {
@@ -181,7 +186,6 @@ class RunningNoticeRepositoryTest {
         //then
         Assertions.assertThat(findRunningNoticeOpt).isEmpty();
     }
-
 
 
     @DisplayName("특정 Member 가 작성한 RunningNotice 출력 테스트")
@@ -240,6 +244,35 @@ class RunningNoticeRepositoryTest {
 
     }
 
+    @DisplayName("크루의 모든 런닝공지 반환 테스트")
+    @Test
+    public void findAllByCrewTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+
+        for (int i = 0; i < 10; i++) {
+            RunningNotice runningNotice = RunningNotice.builder().title("title")
+                    .detail("detail")
+                    .member(member)
+                    .noticeType(NoticeType.REGULAR)
+                    .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 0))
+                    .runningPersonnel(4)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNoticeRepository.save(runningNotice);
+        }
+
+        ///when
+        List<RunningNotice> runningNotices = runningNoticeRepository.findAllByCrew(crew);
+
+        //then
+        Assertions.assertThat(runningNotices.size()).isSameAs(10);
+    }
 
 
     @DisplayName("각 NoticeType 에 해당하는 RunningNotice 페이징 출력 테스트")
@@ -298,20 +331,18 @@ class RunningNoticeRepositoryTest {
         Assertions.assertThat(contentA.size()).isEqualTo(1);
         Assertions.assertThat(contentB.size()).isEqualTo(2);
 
-            // slice A Test
+        // slice A Test
         Assertions.assertThat(findRunningNoticeSliceA.getNumber()).isEqualTo(0);
         Assertions.assertThat(findRunningNoticeSliceA.getNumberOfElements()).isEqualTo(1);
         Assertions.assertThat(findRunningNoticeSliceA.isFirst()).isTrue();
         Assertions.assertThat(findRunningNoticeSliceA.hasNext()).isFalse();
 
-            // slice B Test
+        // slice B Test
         Assertions.assertThat(findRunningNoticeSliceB.getNumber()).isEqualTo(0);
         Assertions.assertThat(findRunningNoticeSliceB.getNumberOfElements()).isEqualTo(2);
         Assertions.assertThat(findRunningNoticeSliceB.isFirst()).isTrue();
         Assertions.assertThat(findRunningNoticeSliceB.hasNext()).isFalse();
     }
-
-
 
 
     @DisplayName("특정 키워드 포함 RunningNotice 출력 테스트")
@@ -364,9 +395,6 @@ class RunningNoticeRepositoryTest {
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
     }
-
-
-
 
 
     @DisplayName("특정 키워드 포함 RunningNotice 출력 테스트 paging 적용")
@@ -426,14 +454,13 @@ class RunningNoticeRepositoryTest {
     }
 
 
-
     @DisplayName("특정 날에 시작하는 런닝의 RunningNotice 출력 테스트")
     @Test
     void findAllByCrewAndRunningDateTest() throws Exception {
         //given
 
         LocalDateTime today = LocalDateTime.of(2023, 2, 11, 0, 0);
-        LocalDateTime tomorrow = LocalDateTime.of(2023, 2,12, 0, 0);
+        LocalDateTime tomorrow = LocalDateTime.of(2023, 2, 12, 0, 0);
 
         SidoArea sidoArea = testEntityFactory.getSidoArea(1);
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
@@ -480,7 +507,6 @@ class RunningNoticeRepositoryTest {
         //then
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
     }
-
 
 
     @DisplayName("특정 Crew 의 RunningNotice 를 status 에 따라 RunningDate 순으로 출력 테스트")
@@ -536,6 +562,43 @@ class RunningNoticeRepositoryTest {
         Assertions.assertThat(findRunningNoticeList.get(2)).isEqualTo(runningNotice1);
         // 정렬 확인
 
+    }
+
+    @DisplayName("특정 유저가 신청한 특정 상태의 모든 러닝 공지 반환 테스트")
+    @Test
+    public void findAllByUserAndStatusTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+
+        for (int i = 1; i < 11; i++) {
+            User tempUser = testUser(dongArea, i);
+            Crew tempCrew = testCrew(dongArea, i);
+            Member tempMember = testMember(tempUser, tempCrew);
+            RunningNotice runningNotice = RunningNotice.builder().title("title")
+                    .detail("detail")
+                    .member(tempMember)
+                    .noticeType(NoticeType.REGULAR)
+                    .runningDateTime(LocalDateTime.of(2023, 2, 12, 0, 0))
+                    .runningPersonnel(4)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNoticeRepository.save(runningNotice);
+            RunningMember runningMember = testEntityFactory.getRunningMember(runningNotice, member);
+        }
+
+        ///when
+        List<RunningNotice> runningNotices = runningNoticeRepository.findAllByUserAndStatus(user, RunningStatus.READY);
+
+        //then
+        Assertions.assertThat(runningNotices.size()).isSameAs(10);
+        for (RunningNotice runningNotice : runningNotices) {
+            Assertions.assertThat(runningNotice.getStatus()).isSameAs(RunningStatus.READY);
+        }
     }
 
 }
