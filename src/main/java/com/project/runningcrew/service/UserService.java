@@ -46,6 +46,14 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
+
+
+    // findByEmail User return
+
+
+
+
+
     /**
      * 입력받은 User 이미지와 User 를 저장하고 User 의 id 를 반환한다.
      * @param user 저장할 user
@@ -53,6 +61,15 @@ public class UserService {
      * @return user id
      */
     public Long saveUser(User user, MultipartFile multipartFile) {
+
+        if(duplicateEmail(user.getEmail())) {
+            throw new UserEmailDuplicateException();
+        }
+        if(duplicateNickname(user.getNickname())) {
+            throw new UserNickNameDuplicateException();
+        }
+        // 통과 못하면 예외 날아감.
+
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         user.updateImgUrl(imageUrl);
         User savedUser = userRepository.save(user);
@@ -82,50 +99,33 @@ public class UserService {
 
     /**
      * 입력된 User 와 그에 매핑된 Member, RunningRecord 를 삭제한다.
-     * @param user
+     * @param user 삭제할 user
      */
     public void deleteUser(User user) {
 
-        // 1. user 와 매핑된 RunningRecord all delete
-        List<RunningRecord> findRunningRecordList = runningRecordRepository.findAllByUser(user);
-        for (RunningRecord runningRecord : findRunningRecordList) {
-            runningRecordRepository.delete(runningRecord);
-        }
-
-        // 2. user 와 매핑된 member all delete
-        List<Member> findMemberList = memberRepository.findAllByUser(user);
-        for (Member member : findMemberList) {
-            memberService.deleteMember(member);
-        }
-
-        // 3. user delete
+        /**
+         * 추후 작성 예정
+         */
         userRepository.delete(user);
     }
 
 
+
+
     /**
-     * 입력받은 email 로 가입된 계정이 있는지 확인한다. 이미 가입된 email 이라면 UserEmailDuplicateException 을 throw 한다.
-     * @param email
-     * @throws UserEmailDuplicateException
+     * 입력받은 email 로 가입된 계정이 있는지 확인한다.
+     * @param email 확인할 email
      */
-    public void duplicateEmail(String email) throws UserEmailDuplicateException {
-        List<User> userOfEmailList = userRepository.findAllByEmail(email);
-        if(!userOfEmailList.isEmpty()) {
-            throw new UserEmailDuplicateException();
-        }
+    public boolean duplicateEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     /**
-     * 입력받은 nickname 으로 가입된 계정이 있는지 확인한다. 이미 사용중인 nickname 이라면 UserNickNameDuplicateException 을 throw 한다.
-     * @param nickname
-     * @throws UserNickNameDuplicateException
+     * 입력받은 nickname 으로 가입된 계정이 있는지 확인한다.
+     * @param nickname 확인할 nickname
      */
-
-    public void duplicateNickname(String nickname) throws UserNickNameDuplicateException {
-        List<User> userOfNicknameList = userRepository.findAllByNickname(nickname);
-        if (!userOfNicknameList.isEmpty()) {
-            throw new UserNickNameDuplicateException();
-        }
+    public boolean duplicateNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
     }
 
 
