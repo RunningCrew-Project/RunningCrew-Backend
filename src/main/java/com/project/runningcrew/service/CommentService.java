@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -99,6 +100,35 @@ public class CommentService {
      */
     public int countCommentAtRunningNotice(RunningNotice runningNotice) {
         return runningNoticeCommentRepository.findAllByRunningNotice(runningNotice).size();
+    }
+
+
+    /**
+     * Board 리스트를 받아 commentCount 리스트를 반환한다.
+     * @param boardList 입력받은 Board 의 List
+     * @return commentCountList
+     */
+    public List<Integer> commentCountListByBoardList(List<Board> boardList) {
+        List<Integer> commentCountList = new ArrayList<>();
+        for (Board board : boardList) {
+            int element = boardCommentRepository.findAllByBoard(board).size();
+            commentCountList.add(element);
+        }
+        return commentCountList;
+    }
+
+    /**
+     * RunningNotice 리스트를 받아 commentCount 리스트를 반환한다.
+     * @param runningNoticeList 입력받은 RunningNotice 의 List
+     * @return commentCountList
+     */
+    public List<Integer> commentCountListByRunningNoticeList(List<RunningNotice> runningNoticeList) {
+        List<Integer> commentCountList = new ArrayList<>();
+        for (RunningNotice runningNotice : runningNoticeList) {
+            int element = runningNoticeCommentRepository.findAllByRunningNotice(runningNotice).size();
+            commentCountList.add(element);
+        }
+        return commentCountList;
     }
 
 
