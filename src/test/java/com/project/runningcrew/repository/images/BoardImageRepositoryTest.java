@@ -122,4 +122,29 @@ class BoardImageRepositoryTest {
         }
     }
 
+    @DisplayName("Board 에 포함된 모든 BoardImage 삭제")
+    @Test
+    public void deleteAllByBoardTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea,0);
+        Member member = testEntityFactory.getMember(user, crew);
+        FreeBoard freeBoard = testEntityFactory.getFreeBoard(member, 0);
+
+        for (int i = 0; i < 10; i++) {
+            BoardImage boardImage = new BoardImage("boardImage" + i, freeBoard);
+            boardImageRepository.save(boardImage);
+        }
+
+        ///when
+        boardImageRepository.deleteAllByBoard(freeBoard);
+
+        //then
+        List<BoardImage> images = boardImageRepository.findAllByBoard(freeBoard);
+        assertThat(images.isEmpty()).isTrue();
+    }
+
 }
