@@ -86,6 +86,7 @@ public class RunningRecordService {
      * 특정 user 의 모든 RunningRecord 를 삭제한다.
      * @param user RunningRecord 를 삭제할 user
      */
+    @Transactional
     public void deleteAllByUser(User user) {
         runningRecordRepository.deleteAllByUser(user);
     }
