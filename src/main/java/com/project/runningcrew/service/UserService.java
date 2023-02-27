@@ -46,6 +46,14 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
+
+
+    // findByEmail User return
+
+
+
+
+
     /**
      * 입력받은 User 이미지와 User 를 저장하고 User 의 id 를 반환한다.
      * @param user 저장할 user
@@ -98,7 +106,6 @@ public class UserService {
         /**
          * 추후 작성 예정
          */
-
         userRepository.delete(user);
     }
 
