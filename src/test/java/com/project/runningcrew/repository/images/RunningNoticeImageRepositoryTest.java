@@ -95,7 +95,7 @@ class RunningNoticeImageRepositoryTest {
         assertThat(optRunningNoticeImage).isEmpty();
     }
 
-    @DisplayName("RunningNoticeImage findAllByRunningNotic 테스트")
+    @DisplayName("RunningNoticeImage findAllByRunningNotice 테스트")
     @Test
     void findAllByRunningNoticeTest() {
         //given
@@ -107,7 +107,7 @@ class RunningNoticeImageRepositoryTest {
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
         for (int i = 0; i < 10; i++) {
-            RunningNoticeImage runningNoticeImage = new RunningNoticeImage("boardImage" + i, runningNotice);
+            RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage" + i, runningNotice);
             runningNoticeImageRepository.save(runningNoticeImage);
         }
 
@@ -119,6 +119,30 @@ class RunningNoticeImageRepositoryTest {
         for (RunningNoticeImage runningNoticeImage : runningNoticeImagesImages) {
             assertThat(runningNoticeImage.getRunningNotice()).isEqualTo(runningNotice);
         }
+    }
+
+    @DisplayName("RunningNotice 에 포함된 모든 RunningNoticeImage 삭제")
+    @Test
+    public void deleteAllByRunningNoticeTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        for (int i = 0; i < 10; i++) {
+            RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage" + i, runningNotice);
+            runningNoticeImageRepository.save(runningNoticeImage);
+        }
+
+        ///when
+        runningNoticeImageRepository.deleteAllByRunningNotice(runningNotice);
+
+        //then
+        List<RunningNoticeImage> images = runningNoticeImageRepository.findAllByRunningNotice(runningNotice);
+        assertThat(images.isEmpty()).isTrue();
     }
 
 }
