@@ -9,6 +9,7 @@ import com.project.runningcrew.repository.boards.BoardRepository;
 import com.project.runningcrew.repository.images.BoardImageRepository;
 import com.project.runningcrew.service.images.ImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,8 +97,8 @@ public class BoardService {
      * @param member 작성자 member
      * @return 입력받은 Member 가 작성한 모든 Board List
      */
-    public List<Board> findBoardByMember(Member member) {
-        return boardRepository.findAllByMember(member);
+    public Slice<Board> findBoardByMember(Member member, Pageable pageable) {
+        return boardRepository.findByMember(member, pageable);
     }
 
     /**

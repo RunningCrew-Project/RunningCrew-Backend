@@ -200,4 +200,30 @@ class RecruitAnswerRepositoryTest {
     }
 
 
+    @DisplayName("유저가 작성한 크루가입 답변 삭제하기")
+    @Test
+    void deleteByUserAndCrewTest() throws Exception {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+
+        User user = testUser(dongArea);
+        Crew crew = testCrew(dongArea);
+        recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 1));
+        recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 2));
+        recruitAnswerRepository.save(new RecruitAnswer(user, crew, "answer", 3));
+
+        //when
+        List<RecruitAnswer> findBeforeList = recruitAnswerRepository.findAllByUserAndCrew(user, crew);
+        Assertions.assertThat(findBeforeList.size()).isEqualTo(3);
+
+        recruitAnswerRepository.deleteByUserAndCrew(user, crew);
+        List<RecruitAnswer> findAfterList = recruitAnswerRepository.findAllByUserAndCrew(user, crew);
+
+        //then
+        Assertions.assertThat(findAfterList.size()).isEqualTo(0);
+    }
+
+
 }
