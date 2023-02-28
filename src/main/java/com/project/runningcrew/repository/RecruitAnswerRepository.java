@@ -4,6 +4,7 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.RecruitAnswer;
 import com.project.runningcrew.entity.users.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -26,8 +27,9 @@ public interface RecruitAnswerRepository extends JpaRepository<RecruitAnswer, Lo
      * @param user
      * @param crew
      */
+    @Modifying
     @Query("delete from RecruitAnswer ra where ra.user = :user and ra.crew = :crew")
-    void deleteAllByUserAndCrew(@Param("user") User user, @Param("crew") Crew crew);
+    void deleteByUserAndCrew(@Param("user") User user, @Param("crew") Crew crew);
 
 
 
