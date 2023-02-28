@@ -185,4 +185,46 @@ class CommentServiceTest {
     }
 
 
+    @DisplayName("게시물 리스트를 받아 댓글 수 리스트를 반환하는 테스트")
+    @Test
+    void commentCountListByBoardListTest(@Mock Member member, @Mock Board board) throws Exception {
+        //given
+        List<Integer> commentCountList = new ArrayList<>(); // 게시물 리스트
+        List<BoardComment> boardCommentList = new ArrayList<>(); // 댓글 수 리스트
+
+        for (long i = 0L; i < 10; i++) {
+            BoardComment boardComment = new BoardComment(i, member, "detail", board);
+            boardCommentList.add(boardComment);
+        } // save 10 of BoardComment
+
+        //when
+        commentCountList.add(boardCommentList.size());
+
+        //then
+        assertThat(commentCountList.size()).isEqualTo(1);
+        assertThat(commentCountList.get(0)).isEqualTo(10);
+
+    }
+
+
+    @DisplayName("런닝 공지 리스트를 받아 댓글 수 리스트를 반환하는 테스트")
+    @Test
+    void commentCountListByRunningNoticeListTest(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
+        //given
+        List<Integer> commentCountList = new ArrayList<>();
+        List<RunningNoticeComment> runningNoticeCommentList = new ArrayList<>();
+        for (long i = 0L; i < 10; i++) {
+            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(i, member, "detail", runningNotice);
+            runningNoticeCommentList.add(runningNoticeComment);
+        } // save
+
+        //when
+        commentCountList.add(runningNoticeCommentList.size());
+
+        //then
+        assertThat(commentCountList.size()).isEqualTo(1);
+        assertThat(commentCountList.get(0)).isEqualTo(10);
+    }
+
+
 }

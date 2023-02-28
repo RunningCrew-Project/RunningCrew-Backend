@@ -23,7 +23,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -101,11 +103,13 @@ class BoardRepositoryTest {
         SidoArea sidoArea = testEntityFactory.getSidoArea(1);
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
-        User userA = testUser(dongArea, 1);
-        User userB = testUser(dongArea, 2);
+
+        User user = testUser(dongArea, 1);
+        User user2 = testUser(dongArea, 2);
+
         Crew crew = testCrew(dongArea, 1);
-        Member memberA = testMember(userA, crew);
-        Member memberB = testMember(userB, crew);
+        Member member = testMember(user, crew); // user(1), crew(1)
+        Member member2 = testMember(user2, crew);
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()
@@ -114,25 +118,39 @@ class BoardRepositoryTest {
                         .runningTime(100)
                         .runningFace(100)
                         .calories(100)
+                        .title("title")
                         .running_detail("running_detail")
+                        .user(member.getUser())
                         .build()
         );
 
-        FreeBoard freeBoardA = freeBoardRepository.save(
-                new FreeBoard(memberA, "title", "content")
+        FreeBoard freeBoard = freeBoardRepository.save(
+                new FreeBoard(member, "title", "content")
         );
 
-        ReviewBoard reviewBoardA = reviewBoardRepository.save(
-                new ReviewBoard(memberA, "title", "content", personalRunningRecord)
+        FreeBoard freeBoard2 = freeBoardRepository.save(
+                new FreeBoard(member, "title", "content")
         );
 
-        //when
-        List<Board> findReviewBoardListA = boardRepository.findAllByMember(memberA);
-        List<Board> findReviewBoardListB = boardRepository.findAllByMember(memberB);
+        ReviewBoard reviewBoard = reviewBoardRepository.save(
+                new ReviewBoard(member, "title", "content", personalRunningRecord)
+        );
+
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        Slice<Board> findSlice = boardRepository.findByMember(member, pageRequest);
+        Slice<Board> findSlice2 = boardRepository.findByMember(member2, pageRequest);
+
+        List<Board> content = findSlice.getContent();
+        List<Board> content2 = findSlice2.getContent();
 
         //then
-        Assertions.assertThat(findReviewBoardListA.size()).isEqualTo(2);
-        Assertions.assertThat(findReviewBoardListB.size()).isEqualTo(0);
+        Assertions.assertThat(content.size()).isEqualTo(3);
+        Assertions.assertThat(content2.size()).isEqualTo(0);
+
+        Assertions.assertThat(findSlice.isFirst()).isTrue();
+        Assertions.assertThat(findSlice2.isFirst()).isTrue();
+        Assertions.assertThat(findSlice.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(findSlice2.getNumberOfElements()).isEqualTo(0);
     }
 
 
@@ -144,9 +162,11 @@ class BoardRepositoryTest {
         SidoArea sidoArea = testEntityFactory.getSidoArea(1);
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+
         User user = testUser(dongArea, 1);
         Crew crew = testCrew(dongArea, 1);
-        Member member = testMember(user, crew); // user(1), crew(1)
+        Member member = testMember(user, crew);
+
 
         PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
                 PersonalRunningRecord.builder()
@@ -155,6 +175,7 @@ class BoardRepositoryTest {
                         .runningTime(100)
                         .runningFace(100)
                         .calories(100)
+                        .title("title")
                         .running_detail("running_detail")
                         .user(member.getUser())
                         .build()
@@ -173,7 +194,7 @@ class BoardRepositoryTest {
         ); // ReviewBoard, keyword title 포함
 
         //when
-        List<Board> findBoardList = boardRepository.findListAllByCrewAndKeyWord(keyword, member.getCrew());
+        List<Board> findBoardList = boardRepository.findListAllByCrewAndKeyWord(keyword, crew);
         //then
         Assertions.assertThat(findBoardList.size()).isEqualTo(2);
     }
@@ -201,6 +222,7 @@ class BoardRepositoryTest {
                         .runningTime(100)
                         .runningFace(100)
                         .calories(100)
+                        .title("title")
                         .running_detail("running_detail")
                         .user(member.getUser())
                         .build()
@@ -219,7 +241,7 @@ class BoardRepositoryTest {
         ); // ReviewBoard, keyword title 포함
 
         //when
-        Slice<Board> slice = boardRepository.findSliceAllByCrewAndKeyWord(keyword, member.getCrew());
+        Slice<Board> slice = boardRepository.findSliceAllByCrewAndKeyWord(keyword,crew);
         List<Board> content = slice.getContent();
 
         //then
