@@ -149,7 +149,7 @@ class RunningNoticeServiceTest {
                 .member(member)
                 .noticeType(NoticeType.REGULAR)
                 .runningDateTime(LocalDateTime.of(2023, 2, 26, 20, 0))
-                .runningPersonnel(20)
+                .runningPersonnel(10)
                 .status(RunningStatus.READY)
                 .build();
 

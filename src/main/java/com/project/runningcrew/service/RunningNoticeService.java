@@ -66,9 +66,6 @@ public class RunningNoticeService {
         if (!originRunningNotice.getRunningDateTime().equals(newRunningNotice.getRunningDateTime())) {
             originRunningNotice.updateRunningTime(newRunningNotice.getRunningDateTime());
         }
-        if (originRunningNotice.getRunningPersonnel() != newRunningNotice.getRunningPersonnel()) {
-            originRunningNotice.updateRunningPersonnel(newRunningNotice.getRunningPersonnel());
-        }
 
         for (MultipartFile multipartFile : addFiles) {
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
