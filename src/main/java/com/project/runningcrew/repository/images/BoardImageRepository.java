@@ -30,4 +30,13 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
     @Query("delete from BoardImage b where b.board = :board")
     void deleteAllByBoard(@Param("board") Board board);
 
+    /**
+     * boardId 의 리스트에 포함된 boardId 를 가진 BoardImage 반환
+     *
+     * @param boardIds Board 의 id 를 가진 리스트
+     * @return Board 의 id 가 boardIds 에 포함된 모든 BoardImage.
+     */
+    @Query("select b from BoardImage b where b.board.id in (:boardIds)")
+    List<BoardImage> findImagesByBoardIds(@Param("boardIds") List<Long> boardIds);
+
 }
