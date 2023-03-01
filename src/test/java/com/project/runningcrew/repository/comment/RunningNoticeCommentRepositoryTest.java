@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -129,7 +130,44 @@ class RunningNoticeCommentRepositoryTest {
     }
 
 
+    @DisplayName("RunningNotice id 리스트를 받아 commentCount 리스트를 반환하는 테스트")
+    @Test
+    void countByRunningNoticeIdTest() throws Exception {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
 
+        User user1 = testUser(dongArea, 1);
+        User user2 = testUser(dongArea, 2);
+
+        Crew crew1 = testCrew(dongArea, 1);
+        Crew crew2 = testCrew(dongArea, 2);
+
+        Member memberA = testMember(user1, crew1); // user(1), crew(1)
+        Member memberB = testMember(user2, crew2); // user(2), crew(2)
+        RunningNotice testRunningNoticeA = testRunningNotice(memberA);
+        RunningNotice testRunningNoticeB = testRunningNotice(memberB);
+
+        RunningNoticeComment comment_1 =
+                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
+        RunningNoticeComment comment_2 =
+                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
+        RunningNoticeComment comment_3 =
+                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeB));
+
+        List<Long> runningNoticeIdList = new ArrayList<>();
+        runningNoticeIdList.add(testRunningNoticeA.getId());
+        runningNoticeIdList.add(testRunningNoticeB.getId());
+
+        //when
+        List<Integer> commentCountList = runningNoticeCommentRepository.countByRunningNoticeId(runningNoticeIdList);
+
+        //then
+        Assertions.assertThat(commentCountList.size()).isEqualTo(2);
+        Assertions.assertThat(commentCountList.get(0)).isEqualTo(2);
+        Assertions.assertThat(commentCountList.get(1)).isEqualTo(1);
+    }
 
 
 

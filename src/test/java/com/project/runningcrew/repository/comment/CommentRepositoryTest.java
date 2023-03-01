@@ -23,6 +23,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -96,7 +98,7 @@ class CommentRepositoryTest {
 
 
 
-    @DisplayName("특정 MemberId 를 가진 Comment 출력 테스트")
+    @DisplayName("특정 MemberId 를 가진 Comment 출력 테스트 - 페이징 적용")
     @Test
     void findAllByMemberIdTest() throws Exception {
         //given
@@ -122,18 +124,20 @@ class CommentRepositoryTest {
 
         BoardComment comment_1 = commentRepository.save(new BoardComment(memberA, "detail", testFreeBoard));
         RunningNoticeComment comment_2 = commentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNotice));
-            // memberA
-
         RunningNoticeComment comment_3 = commentRepository.save(new RunningNoticeComment(memberB, "detail", testRunningNotice));
-            // memberB
 
         //when
-        List<Comment> findCommentListA = commentRepository.findAllByMember(memberA);
-        List<Comment> findCommentListB = commentRepository.findAllByMember(memberB);
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        Slice<Comment> findCommentListA = commentRepository.findAllByMember(memberA, pageRequest);
+        Slice<Comment> findCommentListB = commentRepository.findAllByMember(memberB, pageRequest);
+
+        List<Comment> contentA = findCommentListA.getContent();
+        List<Comment> contentB = findCommentListB.getContent();
 
         //then
-        Assertions.assertThat(findCommentListA.size()).isEqualTo(2);
-        Assertions.assertThat(findCommentListB.size()).isEqualTo(1);
+        Assertions.assertThat(contentA.size()).isEqualTo(2);
+        Assertions.assertThat(contentB.size()).isEqualTo(1);
+
     }
 
 

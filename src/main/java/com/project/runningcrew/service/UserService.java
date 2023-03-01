@@ -89,6 +89,18 @@ public class UserService {
         if(!originUser.getDongArea().equals(newUser.getDongArea())) {
             originUser.updateDongArea(newUser.getDongArea());
         } // dongArea
+        if(originUser.getHeight() != newUser.getHeight()) {
+            originUser.updateHeight(newUser.getHeight());
+        } // height
+        if(originUser.getWeight() != newUser.getWeight()) {
+            originUser.updateWeight(newUser.getWeight());
+        } // weight
+        if(!originUser.getBirthday().equals(newUser.getBirthday())) {
+            originUser.updateBirthday(newUser.getBirthday());
+        } // birthday
+        if (!originUser.getSex().equals(newUser.getSex())) {
+            originUser.updateSex(newUser.getSex());
+        } // sex
         if(!multipartFile.isEmpty()) {
             imageService.deleteImage(originUser.getImgUrl());
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
