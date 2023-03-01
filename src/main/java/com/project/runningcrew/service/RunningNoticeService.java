@@ -88,7 +88,7 @@ public class RunningNoticeService {
 
     @Transactional
     public void deleteRunningNotice(RunningNotice runningNotice) {
-        //TODO 이미지 모두 삭제
+        runningNoticeImageRepository.deleteAllByRunningNotice(runningNotice);
         //TODO 댓글 모두 삭제
         runningNoticeRepository.delete(runningNotice);
     }
@@ -115,8 +115,8 @@ public class RunningNoticeService {
         return runningNoticeRepository.findAllByCrewAndRunningDate(dateTime, nextDateTime, crew);
     }
 
-    public List<RunningNotice> findAllByMember(Member member) {
-        return runningNoticeRepository.findAllByMember(member);
+    public Slice<RunningNotice> findByMember(Member member, Pageable pageable) {
+        return runningNoticeRepository.findAllByMember(member, pageable);
     }
 
 }

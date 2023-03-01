@@ -31,6 +31,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 @Transactional
 class RunningNoticeRepositoryTest {
@@ -189,7 +191,7 @@ class RunningNoticeRepositoryTest {
     }
 
 
-    @DisplayName("특정 Member 가 작성한 RunningNotice 출력 테스트")
+    @DisplayName("특정 Member 가 작성한 RunningNotice 페이징 테스트")
     @Test
     void findAllByMemberTest() throws Exception {
         //given
@@ -236,13 +238,24 @@ class RunningNoticeRepositoryTest {
         );
 
         //when
-        List<RunningNotice> findRunningNoticeListA = runningNoticeRepository.findAllByMember(memberA);
-        List<RunningNotice> findRunningNoticeListB = runningNoticeRepository.findAllByMember(memberB);
+        PageRequest pageRequest = PageRequest.of(0, 5);
+        Slice<RunningNotice> findRunningNoticeListA = runningNoticeRepository.findAllByMember(memberA, pageRequest);
+        Slice<RunningNotice> findRunningNoticeListB = runningNoticeRepository.findAllByMember(memberB, pageRequest);
 
         //then
-        Assertions.assertThat(findRunningNoticeListA.size()).isEqualTo(2);
-        Assertions.assertThat(findRunningNoticeListB.size()).isEqualTo(1);
+        assertThat(findRunningNoticeListA.getNumber()).isSameAs(0);
+        assertThat(findRunningNoticeListA.getSize()).isSameAs(5);
+        assertThat(findRunningNoticeListA.getNumberOfElements()).isSameAs(2);
+        assertThat(findRunningNoticeListA.hasPrevious()).isFalse();
+        assertThat(findRunningNoticeListA.hasNext()).isFalse();
+        assertThat(findRunningNoticeListA.isFirst()).isTrue();
 
+        assertThat(findRunningNoticeListB.getSize()).isSameAs(5);
+        assertThat(findRunningNoticeListB.getNumber()).isSameAs(0);
+        assertThat(findRunningNoticeListB.getNumberOfElements()).isSameAs(1);
+        assertThat(findRunningNoticeListB.hasPrevious()).isFalse();
+        assertThat(findRunningNoticeListB.hasNext()).isFalse();
+        assertThat(findRunningNoticeListB.isFirst()).isTrue();
     }
 
     @DisplayName("크루의 모든 런닝공지 반환 테스트")
