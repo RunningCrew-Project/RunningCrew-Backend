@@ -88,7 +88,7 @@ public class RunningNoticeService {
 
     @Transactional
     public void deleteRunningNotice(RunningNotice runningNotice) {
-        //TODO 이미지 모두 삭제
+        runningNoticeImageRepository.deleteAllByRunningNotice(runningNotice);
         //TODO 댓글 모두 삭제
         runningNoticeRepository.delete(runningNotice);
     }
