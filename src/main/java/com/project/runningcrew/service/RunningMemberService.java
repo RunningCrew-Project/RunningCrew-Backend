@@ -3,6 +3,8 @@ package com.project.runningcrew.service;
 import com.project.runningcrew.entity.RunningMember;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
+import com.project.runningcrew.exception.RunningDateTimeException;
+import com.project.runningcrew.exception.RunningPersonnelException;
 import com.project.runningcrew.exception.alreadyExist.RunningMemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.RunningMemberNotFoundException;
 import com.project.runningcrew.repository.RunningMemberRepository;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -28,14 +31,27 @@ public class RunningMemberService {
      * @param member
      * @param runningNotice
      * @return 생성된 runningMember 의 id
+     * @throws RunningDateTimeException 런닝시간 이후에 신청했을 때
+     * @throws RunningPersonnelException 런닝 인원이 가득찼을 때
      * @throws RunningMemberAlreadyExistsException runningNotice 에 member 가 이미 참여했을 때
      */
     @Transactional
     public Long saveRunningMember(Member member, RunningNotice runningNotice) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(runningNotice.getRunningDateTime())) {
+            throw new RunningDateTimeException();
+        }
+
+        Long memberCount = runningMemberRepository.countAllByRunningNotice(runningNotice);
+        if (memberCount >= runningNotice.getRunningPersonnel()) {
+            throw new RunningPersonnelException();
+        }
+
         boolean isExist = runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice);
         if (isExist) {
             throw new RunningMemberAlreadyExistsException();
         }
+
         RunningMember runningMember = new RunningMember(runningNotice, member);
         return runningMemberRepository.save(runningMember).getId();
     }
