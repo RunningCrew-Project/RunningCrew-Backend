@@ -66,13 +66,32 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "where rm.runningNotice = :runningNotice")
     List<Member> findAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
-
     /**
      * uesr 의 crew 가입 여부 반환
+     *
      * @param user
      * @param crew
      * @return user 가 crew 에 가입했다면 true, 아니라면 false
      */
     boolean existsByUserAndCrew(User user, Crew crew);
+
+    /**
+     * 특정 user 와 crew 의 값을 가지는 Member 반환. 없다면 Optional.empty() 반환
+     *
+     * @param user
+     * @param crew
+     * @return 특정 user 와 crew 의 값을 가지는 Member. 없다면 Optional.empty()
+     */
+    Optional<Member> findByUserAndCrew(User user, Crew crew);
+
+    /**
+     * crewId 의 리스트에 포함된 id 를 가지는 Crew 들의 멤버수를 반환
+     * 
+     * @param crewIds Crew 의 id 가 담긴 리스트
+     * @return crewId 와 Crew 의 멤버수가 담긴 Object[] 의 리스트. Object[0] 에는 crewId,
+     * Object[1] 에는 Crew 의 멤버수
+     */
+    @Query("select m.crew.id, count(m) from Member m where m.crew.id in (:crewIds) group by m.crew")
+    List<Object[]> countAllByCrewIds(@Param("crewIds") List<Long> crewIds);
 
 }
