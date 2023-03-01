@@ -3,6 +3,7 @@ package com.project.runningcrew.repository.comment;
 import com.project.runningcrew.entity.comment.Comment;
 import com.project.runningcrew.entity.members.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -15,7 +16,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return List of Comment
      */
     List<Comment> findAllByMember(Member member);
-
-
-
 }

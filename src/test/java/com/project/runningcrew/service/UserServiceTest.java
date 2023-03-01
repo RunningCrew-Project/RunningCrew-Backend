@@ -2,6 +2,7 @@ package com.project.runningcrew.service;
 
 import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.users.LoginType;
+import com.project.runningcrew.entity.users.Sex;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.duplicate.UserEmailDuplicateException;
 import com.project.runningcrew.exception.duplicate.UserNickNameDuplicateException;
@@ -19,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,26 +118,44 @@ class UserServiceTest {
     }
 
     @DisplayName("유저 저장하기 테스트 - 이메일 중복 예외 발생")
-    @Test
-    void duplicateEmailTest(@Mock DongArea dongArea, @Mock MultipartFile multipartFile) throws Exception {
-        //given
-        User user = User.builder()
-                .dongArea(dongArea)
-                .email("only_one_time")
-                .build();
+        @Test
+        void duplicateEmailTest(@Mock DongArea dongArea, @Mock MultipartFile multipartFile) throws Exception {
+            //given
+            User user = User.builder()
+                    .dongArea(dongArea)
+                    .email("only_one_time")
+                    .build();
 
-        when(userService.duplicateEmail(user.getEmail())).thenReturn(true);
+            when(userService.duplicateEmail(user.getEmail())).thenReturn(true);
 
-        //when
-        //then
-        assertThatThrownBy(() -> userService.saveUser(user, multipartFile))
-                .isInstanceOf(UserEmailDuplicateException.class);
+            //when
+            //then
+            assertThatThrownBy(() -> userService.saveUser(user, multipartFile))
+                    .isInstanceOf(UserEmailDuplicateException.class);
     }
 
     @DisplayName("유저 변경하기 테스트")
     @Test
-    void updateUserTest() throws Exception {
+    void updateUserTest(@Mock DongArea dongArea, @Mock MultipartFile multipartFile) throws Exception {
         //given
+        User originUser = User.builder()
+                .dongArea(dongArea)
+                .nickname("before_nickname")
+                .birthday(LocalDate.of(1998, 8, 6))
+                .height(180)
+                .weight(80)
+                .sex(Sex.MAN)
+                .build();
+
+        User newUser = User.builder()
+                .dongArea(dongArea)
+                .nickname("after_nickname")
+                .birthday(LocalDate.of(2023, 2, 28))
+                .height(170)
+                .weight(70)
+                .sex(Sex.WOMAN)
+                .build();
+
 
         //when
 
