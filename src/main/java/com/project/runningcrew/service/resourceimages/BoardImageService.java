@@ -31,7 +31,8 @@ public class BoardImageService {
 
     /**
      * boardId 의 리스트를 받아, boardId 와 BoardImage 의 Map 을 반환한다. boardId 에 포함된 BoardImage 가
-     * 있다면 BoardImage 중 하나를 가지고, boardId 에 포함된 BoardImage 가 없다면 null 을 가진다.
+     * 있다면 BoardImage 중 하나를 가지고, boardId 에 포함된 BoardImage 가 없다면 defaultImageUrl 을 가진
+     * BoardImage 를 가진다.
      *
      * @param boardIds Board 의 id 를 가진 리스트
      * @return boardId 와 boardId 에 포함된 BoardImage 의 Map. 포함된 BoardImage 가 없다면 null 이 포함됨
