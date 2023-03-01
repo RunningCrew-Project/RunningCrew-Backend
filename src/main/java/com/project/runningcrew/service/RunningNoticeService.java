@@ -115,8 +115,8 @@ public class RunningNoticeService {
         return runningNoticeRepository.findAllByCrewAndRunningDate(dateTime, nextDateTime, crew);
     }
 
-    public List<RunningNotice> findAllByMember(Member member) {
-        return runningNoticeRepository.findAllByMember(member);
+    public Slice<RunningNotice> findByMember(Member member, Pageable pageable) {
+        return runningNoticeRepository.findAllByMember(member, pageable);
     }
 
 }

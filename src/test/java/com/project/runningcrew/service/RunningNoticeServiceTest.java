@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -394,12 +393,12 @@ class RunningNoticeServiceTest {
                 crew);
     }
 
-    @DisplayName("특정 멤버가 작성한 모든 런닝공지 반환 테스트")
+    @DisplayName("특정 멤버가 작성한 모든 런닝공지 페이징 테스트")
     @Test
     public void findAllByMemberTest(@Mock Member member) {
         //given
         List<RunningNotice> runningNotices = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 7; i++) {
             RunningNotice runningNotice = RunningNotice.builder()
                     .title("title" + i)
                     .detail("detail" + i)
@@ -411,17 +410,24 @@ class RunningNoticeServiceTest {
                     .build();
             runningNotices.add(runningNotice);
         }
-        when(runningNoticeRepository.findAllByMember(member)).thenReturn(runningNotices);
+        PageRequest pageRequest = PageRequest.of(0, 7);
+        SliceImpl<RunningNotice> runningNoticeSlice = new SliceImpl<>(runningNotices, pageRequest, true);
+        when(runningNoticeRepository.findAllByMember(member, pageRequest)).thenReturn(runningNoticeSlice);
 
         ///when
-        List<RunningNotice> result = runningNoticeService.findAllByMember(member);
+        Slice<RunningNotice> result = runningNoticeService.findByMember(member, pageRequest);
 
         //then
         for (RunningNotice runningNotice : result) {
             assertThat(runningNotice.getMember()).isEqualTo(member);
         }
-        verify(runningNoticeRepository, times(1)).findAllByMember(member);
-
+        assertThat(result.getNumber()).isSameAs(0);
+        assertThat(result.getSize()).isSameAs(7);
+        assertThat(result.getNumberOfElements()).isSameAs(7);
+        assertThat(result.hasPrevious()).isFalse();
+        assertThat(result.hasNext()).isTrue();
+        assertThat(result.isFirst()).isTrue();
+        verify(runningNoticeRepository, times(1)).findAllByMember(member, pageRequest);
     }
 
 }

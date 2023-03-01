@@ -60,7 +60,7 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
      * @param member
      * @return list of RunningNotice
      */
-    List<RunningNotice> findAllByMember(Member member);
+    Slice<RunningNotice> findAllByMember(Member member, Pageable pageable);
 
     /**
      * 특정 Crew 의 모든 런닝 공지를 반환한다.
