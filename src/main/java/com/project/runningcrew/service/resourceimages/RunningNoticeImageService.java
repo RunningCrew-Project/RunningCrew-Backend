@@ -36,7 +36,8 @@ public class RunningNoticeImageService {
      * runningNoticeId 에 포함된 RunningNoticeImage 가 없다면 defaultImageUrl 을 가진 RunningNoticeImage 를 가진다.
      *
      * @param runningNoticeIds Board 의 id 를 가진 리스트
-     * @return runningNoticeId 와 runningNoticeId 에 포함된 BoardImage 의 Map. 포함된 BoardImage 가 없다면 null 이 포함됨
+     * @return runningNoticeId 와 runningNoticeId 에 포함된 RunningNoticeImage 의 Map.
+     * 포함된 RunningNoticeImage 가 없다면 defaultImageUrl 을 가진 RunningNoticeImage
      */
     public Map<Long, RunningNoticeImage> findFirstImages(List<Long> runningNoticeIds) {
         Map<Long, RunningNoticeImage> maps = new HashMap<>();

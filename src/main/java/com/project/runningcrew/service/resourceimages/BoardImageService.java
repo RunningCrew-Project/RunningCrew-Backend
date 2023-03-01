@@ -35,7 +35,8 @@ public class BoardImageService {
      * BoardImage 를 가진다.
      *
      * @param boardIds Board 의 id 를 가진 리스트
-     * @return boardId 와 boardId 에 포함된 BoardImage 의 Map. 포함된 BoardImage 가 없다면 null 이 포함됨
+     * @return boardId 와 boardId 에 포함된 BoardImage 의 Map. 포함된 BoardImage 가 없다면
+     * defaultImageUrl 을 가진 BoardImage
      */
     public Map<Long, BoardImage> findFirstImages(List<Long> boardIds) {
         Map<Long, BoardImage> maps = new HashMap<>();

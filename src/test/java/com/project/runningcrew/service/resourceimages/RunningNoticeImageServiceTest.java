@@ -53,7 +53,7 @@ class RunningNoticeImageServiceTest {
     @Test
     public void findFirstImagesTest(@Mock Member member) {
         //given
-        List<Long> boardIds = List.of(1L, 2L, 3L);
+        List<Long> runningNoticeIds = List.of(1L, 2L, 3L);
         List<RunningNoticeImage> runningNoticeImages = new ArrayList<>();
         RunningNotice runningNotice1 = RunningNotice.builder()
                 .id(1L)
@@ -83,17 +83,17 @@ class RunningNoticeImageServiceTest {
             RunningNoticeImage runningNoticeImage = new RunningNoticeImage("image" + i, runningNotice3);
             runningNoticeImages.add(runningNoticeImage);
         }
-        when(runningNoticeImageRepository.findImagesByRunningNoticeIds(boardIds))
+        when(runningNoticeImageRepository.findImagesByRunningNoticeIds(runningNoticeIds))
                 .thenReturn(runningNoticeImages);
 
         ///when
-        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(boardIds);
+        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
 
         //then
         assertThat(firstImages.get(1L).getRunningNotice().getId()).isSameAs(1L);
         assertThat(firstImages.get(2L).getFileName()).isEqualTo("defaultImageUrl");
         assertThat(firstImages.get(3L).getRunningNotice().getId()).isSameAs(3L);
-        verify(runningNoticeImageRepository, times(1)).findImagesByRunningNoticeIds(boardIds);
+        verify(runningNoticeImageRepository, times(1)).findImagesByRunningNoticeIds(runningNoticeIds);
     }
 
 }
