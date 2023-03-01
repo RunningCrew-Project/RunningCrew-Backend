@@ -30,4 +30,13 @@ public interface RunningNoticeImageRepository extends JpaRepository<RunningNotic
     @Query("delete from RunningNoticeImage r where r.runningNotice = :runningNotice")
     void deleteAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
+    /**
+     * runningNoticeId 의 리스트에 포함된 runningNoticeId 를 가진 RunningRecordImage 반환
+     *
+     * @param runningNoticeIds RunningRecord 의 id 를 가진 리스트
+     * @return RunningNotice 의 id 가 runningNoticeIds 에 포함된 모든 RunningNoticeImage.
+     */
+    @Query("select r from RunningNoticeImage r where r.runningNotice.id in (:runningNoticeIds)")
+    List<RunningNoticeImage> findImagesByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
+
 }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -143,6 +144,60 @@ class RunningNoticeImageRepositoryTest {
         //then
         List<RunningNoticeImage> images = runningNoticeImageRepository.findAllByRunningNotice(runningNotice);
         assertThat(images.isEmpty()).isTrue();
+    }
+
+    @DisplayName("runningNoticeId 의 리스트에 포함된 runningNoticeId 를 가진 RunningNoticeImage 반환 테스트")
+    @Test
+    public void findImagesByRunningNoticeIdsTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+
+        RunningNotice runningNotice0 = testEntityFactory.getRunningNotice(member, 0);
+        for (int i = 0; i < 3; i++) {
+            RunningNoticeImage runningNoticeImage =
+                    new RunningNoticeImage("runningNoticeImage" + i, runningNotice0);
+            runningNoticeImageRepository.save(runningNoticeImage);
+        }
+
+        RunningNotice runningNotice1 = testEntityFactory.getRunningNotice(member, 1);
+        for (int i = 0; i < 4; i++) {
+            RunningNoticeImage runningNoticeImage =
+                    new RunningNoticeImage("runningNoticeImage" + i, runningNotice1);
+            runningNoticeImageRepository.save(runningNoticeImage);
+        }
+
+        RunningNotice runningNotice2 = testEntityFactory.getRunningNotice(member, 2);
+        for (int i = 0; i < 5; i++) {
+            RunningNoticeImage runningNoticeImage =
+                    new RunningNoticeImage("runningNoticeImage" + i, runningNotice2);
+            runningNoticeImageRepository.save(runningNoticeImage);
+        }
+
+        List<Long> runningNoticeIds = List.of(
+                runningNotice0.getId(), runningNotice1.getId(), runningNotice2.getId());
+
+        ///when
+        List<RunningNoticeImage> images = runningNoticeImageRepository.findImagesByRunningNoticeIds(runningNoticeIds);
+
+        //then
+        List<RunningNoticeImage> images0 = images.stream()
+                .filter(runningNoticeImage -> runningNoticeImage.getRunningNotice().equals(runningNotice0))
+                .collect(Collectors.toList());
+        List<RunningNoticeImage> images1 = images.stream()
+                .filter(runningNoticeImage -> runningNoticeImage.getRunningNotice().equals(runningNotice1))
+                .collect(Collectors.toList());
+        List<RunningNoticeImage> images2 = images.stream()
+                .filter(runningNoticeImage -> runningNoticeImage.getRunningNotice().equals(runningNotice2))
+                .collect(Collectors.toList());
+        assertThat(images.size()).isSameAs(12);
+        assertThat(images0.size()).isSameAs(3);
+        assertThat(images1.size()).isSameAs(4);
+        assertThat(images2.size()).isSameAs(5);
     }
 
 }
