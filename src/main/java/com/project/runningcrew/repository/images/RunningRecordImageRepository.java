@@ -30,4 +30,13 @@ public interface RunningRecordImageRepository extends JpaRepository<RunningRecor
     @Query("delete from RunningRecordImage r where r.runningRecord = :runningRecord")
     void deleteAllByRunningRecord(@Param("runningRecord") RunningRecord runningRecord);
 
+    /**
+     * runningRecordId 의 리스트에 포함된 runningRecordId 를 가진 RunningRecordImage 반환
+     *
+     * @param runningRecordIds RunningRecord 의 id 를 가진 리스트
+     * @return RunningRecord 의 id 가 runningRecordIds 에 포함된 모든 RunningRecordImage.
+     */
+    @Query("select r from RunningRecordImage r where r.runningRecord.id in (:runningRecordIds)")
+    List<RunningRecordImage> findImagesByRunningRecordIds(@Param("runningRecordIds") List<Long> runningRecordIds);
+
 }
