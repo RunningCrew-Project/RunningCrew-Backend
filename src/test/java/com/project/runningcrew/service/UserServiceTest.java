@@ -44,7 +44,7 @@ class UserServiceTest {
 
 
 
-    @DisplayName("아이디로 유저 가져오기 테스트")
+    @DisplayName("아이디로 유저 가져오기 테스트 - 성공")
     @Test
     void findByIdTest() throws Exception {
         //given
@@ -60,7 +60,6 @@ class UserServiceTest {
         verify(userRepository, times(1)).findById(userId);
     }
 
-
     @DisplayName("아이디로 유저 가져오기 테스트 - 예외발생")
     @Test
     void findByIdTest2() throws Exception {
@@ -73,6 +72,35 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.findById(userId))
                 .isInstanceOf(UserNotFoundException.class);
         verify(userRepository, times(1)).findById(userId);
+    }
+
+    @DisplayName("이메일로 유저 가져오기 테스트 - 성공")
+    @Test
+    void findByEmailTest() throws Exception {
+        //given
+        String userEmail = "email";
+        User user = User.builder().build();
+        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
+
+        //when
+        User findUser = userService.findByEmail(userEmail);
+
+        //then
+        assertThat(findUser).isEqualTo(user);
+    }
+
+    @DisplayName("이메일로 유저 가져오기 테스트 - 예외발생")
+    @Test
+    void findByEmailTest2() throws Exception {
+        //given
+        String userEmail = "email";
+        User user = User.builder().build();
+        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.empty());
+
+        //when
+        //then
+        assertThatThrownBy(() -> userService.findByEmail(userEmail))
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @DisplayName("유저 저장하기 테스트 - 성공")
@@ -134,13 +162,16 @@ class UserServiceTest {
                     .isInstanceOf(UserEmailDuplicateException.class);
     }
 
-    @DisplayName("유저 변경하기 테스트")
+    @DisplayName("유저 변경하기 테스트 - 성공")
     @Test
-    void updateUserTest(@Mock DongArea dongArea, @Mock MultipartFile multipartFile) throws Exception {
+    void updateUserTest(@Mock DongArea dongArea1, @Mock DongArea dongArea2, @Mock MultipartFile multipartFile) throws Exception {
         //given
+        String newUserImgUrl = "newUserImgUrl";
+
         User originUser = User.builder()
-                .dongArea(dongArea)
+                .dongArea(dongArea1)
                 .nickname("before_nickname")
+                .imgUrl("originUserImgUrl")
                 .birthday(LocalDate.of(1998, 8, 6))
                 .height(180)
                 .weight(80)
@@ -148,7 +179,7 @@ class UserServiceTest {
                 .build();
 
         User newUser = User.builder()
-                .dongArea(dongArea)
+                .dongArea(dongArea2)
                 .nickname("after_nickname")
                 .birthday(LocalDate.of(2023, 2, 28))
                 .height(170)
@@ -156,14 +187,58 @@ class UserServiceTest {
                 .sex(Sex.WOMAN)
                 .build();
 
+        when(userRepository.existsByNickname(newUser.getNickname())).thenReturn(false);
+        doNothing().when(imageService).deleteImage(originUser.getImgUrl());
+        when(imageService.uploadImage(multipartFile, "user")).thenReturn(newUserImgUrl);
 
         //when
+        userService.updateUser(originUser, newUser, multipartFile);
 
         //then
+        assertThat(originUser.getImgUrl()).isEqualTo(newUserImgUrl);
+        assertThat(originUser.getNickname()).isEqualTo(newUser.getNickname());
+        assertThat(originUser.getDongArea()).isEqualTo(newUser.getDongArea());
+        assertThat(originUser.getBirthday()).isEqualTo(newUser.getBirthday());
+        assertThat(originUser.getWeight()).isEqualTo(newUser.getWeight());
+        assertThat(originUser.getHeight()).isEqualTo(newUser.getHeight());
 
     }
 
+    @DisplayName("유저 변경하기 테스트 - 닉네임 중복 예외 발생")
+    @Test
+    void updateUserTest2(@Mock DongArea dongArea1, @Mock DongArea dongArea2, @Mock MultipartFile multipartFile) throws Exception {
+        //given
+        String newUserImgUrl = "newUserImgUrl";
 
+        User originUser = User.builder()
+                .dongArea(dongArea1)
+                .nickname("nickname1")
+                .imgUrl("originUserImgUrl")
+                .birthday(LocalDate.of(1998, 8, 6))
+                .height(180)
+                .weight(80)
+                .sex(Sex.MAN)
+                .build();
+
+        User newUser = User.builder()
+                .dongArea(dongArea2)
+                .nickname("nickname2")
+                .birthday(LocalDate.of(2023, 2, 28))
+                .height(170)
+                .weight(70)
+                .sex(Sex.WOMAN)
+                .build();
+
+        when(userRepository.existsByNickname(newUser.getNickname())).thenReturn(true);
+        //doNothing().when(imageService).deleteImage(originUser.getImgUrl());
+        //when(imageService.uploadImage(multipartFile, "user")).thenReturn(newUserImgUrl);
+
+        //when
+        //then
+        assertThatThrownBy(() -> userService.updateUser(originUser, newUser, multipartFile))
+                .isInstanceOf(UserNickNameDuplicateException.class);
+
+    }
 
     @DisplayName("유저 삭제하기 테스트")
     @Test

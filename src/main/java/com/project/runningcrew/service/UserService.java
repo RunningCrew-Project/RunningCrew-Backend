@@ -1,17 +1,11 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.runningrecords.RunningRecord;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.duplicate.UserEmailDuplicateException;
 import com.project.runningcrew.exception.duplicate.UserNickNameDuplicateException;
 import com.project.runningcrew.repository.MemberRepository;
-import com.project.runningcrew.repository.RunningNoticeRepository;
 import com.project.runningcrew.repository.UserRepository;
-import com.project.runningcrew.repository.boards.BoardRepository;
-import com.project.runningcrew.repository.comment.CommentRepository;
-import com.project.runningcrew.repository.runningrecords.PersonalRunningRecordRepository;
 import com.project.runningcrew.repository.runningrecords.RunningRecordRepository;
 import com.project.runningcrew.service.images.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -46,13 +40,15 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
-
-
-    // findByEmail User return
-
-
-
-
+    /**
+     * 입력받은 email 을 가진 User 를 찾아 반환한다. 존재하지 않는다면 UserNotFoundException 을 throw 한다.
+     * @param email 찾는 User 의 email
+     * @return 입력받은 email 로 가입한 User
+     * @throws UserNotFoundException
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    }
 
     /**
      * 입력받은 User 이미지와 User 를 저장하고 User 의 id 를 반환한다.
@@ -84,8 +80,12 @@ public class UserService {
      */
     public void updateUser(User originUser, User newUser, MultipartFile multipartFile) {
         if(!originUser.getNickname().equals(newUser.getNickname())) {
-            originUser.updateNickname(newUser.getNickname());
-        } // nickname
+            if(duplicateNickname(newUser.getNickname())) {
+                throw new UserNickNameDuplicateException();
+            } else {
+                originUser.updateNickname(newUser.getNickname());
+            }
+        } // nickname 중복체크 -> 변경
         if(!originUser.getDongArea().equals(newUser.getDongArea())) {
             originUser.updateDongArea(newUser.getDongArea());
         } // dongArea
