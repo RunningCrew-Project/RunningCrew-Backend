@@ -61,10 +61,16 @@ public class RunningMemberService {
      *
      * @param member
      * @param runningNotice
+     * @throws RunningDateTimeException 런닝시간 이후에 취소했을 때
      * @throws RunningMemberNotFoundException runningNotice 에 member 가 참여하지 않았을 때
      */
     @Transactional
     public void deleteRunningMember(Member member, RunningNotice runningNotice) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(runningNotice.getRunningDateTime())) {
+            throw new RunningDateTimeException();
+        }
+        
         RunningMember runningMember = runningMemberRepository
                 .findByMemberAndRunningNotice(member, runningNotice)
                 .orElseThrow(RunningMemberNotFoundException::new);
