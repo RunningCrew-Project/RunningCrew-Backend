@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Table(name = "recruit_answers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecruitAnswer extends BaseEntity{
+public class    RecruitAnswer extends BaseEntity{
 
     @Id
     @GeneratedValue

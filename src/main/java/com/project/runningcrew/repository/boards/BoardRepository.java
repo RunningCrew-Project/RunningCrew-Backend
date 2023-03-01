@@ -4,6 +4,7 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.boards.Board;
 import com.project.runningcrew.entity.members.Member;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +20,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
      * @param member
      * @return list of Board
      */
-    List<Board> findAllByMember(Member member);
+    Slice<Board> findByMember(Member member, Pageable pageable);
 
 
     /**

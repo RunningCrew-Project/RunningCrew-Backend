@@ -4,6 +4,7 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.RecruitAnswer;
 import com.project.runningcrew.entity.users.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,11 +23,28 @@ public interface RecruitAnswerRepository extends JpaRepository<RecruitAnswer, Lo
 
 
     /**
+     * 특정 user 가 작성한 RecruitAnswer 를 삭제한다.
+     * @param user
+     * @param crew
+     */
+    @Modifying
+    @Query("delete from RecruitAnswer ra where ra.user = :user and ra.crew = :crew")
+    void deleteByUserAndCrew(@Param("user") User user, @Param("crew") Crew crew);
+
+
+
+    /**
      * 특정 Crew 의 RecruitAnswer 을 작성한 User 반환
      * @param crew
      * @return
      */
     @Query("select distinct(ra.user) from RecruitAnswer ra where ra.crew = :crew")
     List<User> findUserByCrew(@Param("crew") Crew crew);
+
+
+
+
+
+
 
 }
