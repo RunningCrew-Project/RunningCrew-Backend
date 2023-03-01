@@ -1,7 +1,9 @@
 package com.project.runningcrew.service.resourceimages;
 
 import com.project.runningcrew.entity.boards.Board;
+import com.project.runningcrew.entity.boards.FreeBoard;
 import com.project.runningcrew.entity.images.BoardImage;
+import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.repository.images.BoardImageRepository;
 import com.project.runningcrew.service.resourceimages.BoardImageService;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -42,6 +45,34 @@ class BoardImageServiceTest {
         //then
         assertThat(result.size()).isSameAs(10);
         verify(boardImageRepository, times(1)).findAllByBoard(board);
+    }
+
+    @DisplayName("boardId 리스트를 받아 boardId 와 BoardImage 의 Map 반환 테스트")
+    @Test
+    public void findFirstImagesTest(@Mock Member member) {
+        //given
+        List<Long> boardIds = List.of(1L, 2L, 3L);
+        List<BoardImage> boardImages = new ArrayList<>();
+        FreeBoard freeBoard1 = new FreeBoard(1L, member, "title", "detail");
+        for (int i = 0; i < 3; i++) {
+            BoardImage boardImage = new BoardImage("image" + i, freeBoard1);
+            boardImages.add(boardImage);
+        }
+        FreeBoard freeBoard3 = new FreeBoard(3L, member, "title", "detail");
+        for (int i = 0; i < 2; i++) {
+            BoardImage boardImage = new BoardImage("image" + i, freeBoard3);
+            boardImages.add(boardImage);
+        }
+        when(boardImageRepository.findImagesByBoardIds(boardIds)).thenReturn(boardImages);
+
+        ///when
+        Map<Long, BoardImage> firstImages = boardImageService.findFirstImages(boardIds);
+
+        //then
+        assertThat(firstImages.get(1L).getBoard().getId()).isSameAs(1L);
+        assertThat(firstImages.get(2L).getFileName()).isEqualTo("defaultImageUrl");
+        assertThat(firstImages.get(3L).getBoard().getId()).isSameAs(3L);
+        verify(boardImageRepository, times(1)).findImagesByBoardIds(boardIds);
     }
 
 }
