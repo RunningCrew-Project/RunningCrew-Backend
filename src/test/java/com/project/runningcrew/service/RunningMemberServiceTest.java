@@ -47,7 +47,7 @@ class RunningMemberServiceTest {
                 .noticeType(NoticeType.INSTANT)
                 .runningDateTime(LocalDateTime.now().plusDays(1))
                 .runningPersonnel(10)
-                .status(RunningStatus.START)
+                .status(RunningStatus.READY)
                 .build();
         RunningMember runningMember = new RunningMember(runningMemberId, runningNotice, member);
         when(runningMemberRepository.countAllByRunningNotice(runningNotice)).thenReturn(5L);
@@ -77,7 +77,7 @@ class RunningMemberServiceTest {
                 .noticeType(NoticeType.INSTANT)
                 .runningDateTime(LocalDateTime.now().minusDays(1))
                 .runningPersonnel(10)
-                .status(RunningStatus.START)
+                .status(RunningStatus.READY)
                 .build();
 
         ///when
@@ -99,7 +99,7 @@ class RunningMemberServiceTest {
                 .noticeType(NoticeType.INSTANT)
                 .runningDateTime(LocalDateTime.now().plusDays(1))
                 .runningPersonnel(10)
-                .status(RunningStatus.START)
+                .status(RunningStatus.READY)
                 .build();
         when(runningMemberRepository.countAllByRunningNotice(runningNotice)).thenReturn(11L);
 
@@ -123,7 +123,7 @@ class RunningMemberServiceTest {
                 .noticeType(NoticeType.INSTANT)
                 .runningDateTime(LocalDateTime.now().plusDays(1))
                 .runningPersonnel(10)
-                .status(RunningStatus.START)
+                .status(RunningStatus.READY)
                 .build();
         when(runningMemberRepository.countAllByRunningNotice(runningNotice)).thenReturn(8L);
         when(runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice))

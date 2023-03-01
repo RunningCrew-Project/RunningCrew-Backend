@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -266,6 +268,84 @@ class MemberRepositoryTest {
 
         //then
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("user 와 crew 가진 member 존재 테스트")
+    @Test
+    public void findByUserAndCrewTest1() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+
+        ///when
+        Optional<Member> optMember = memberRepository.findByUserAndCrew(user, crew);
+
+        //then
+        assertThat(optMember).isNotEmpty();
+        assertThat(optMember).hasValue(member);
+    }
+
+    @DisplayName("user 와 crew 가진 member 존재 안함 테스트")
+    @Test
+    public void findByUserAndCrewTest2() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+
+        ///when
+        Optional<Member> optMember = memberRepository.findByUserAndCrew(user, crew);
+
+        //then
+        assertThat(optMember).isEmpty();
+    }
+
+    @DisplayName("crewId 의 리스트에 담긴 id 를 가지는 크루들의 멤버수 반환 테스트")
+    @Test
+    public void countAllByCrewIdsTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+
+        Crew crew0 = testEntityFactory.getCrew(dongArea, 0);
+        for (int i = 0; i < 10; i++) {
+            User user = testEntityFactory.getUser(dongArea, i);
+            Member member = new Member(user, crew0, MemberRole.ROLE_NORMAL);
+            memberRepository.save(member);
+        }
+
+        Crew crew1 = testEntityFactory.getCrew(dongArea, 1);
+        for (int i = 10; i < 30; i++) {
+            User user = testEntityFactory.getUser(dongArea, i);
+            Member member = new Member(user, crew1, MemberRole.ROLE_NORMAL);
+            memberRepository.save(member);
+        }
+
+        Crew crew2 = testEntityFactory.getCrew(dongArea, 2);
+        for (int i = 30; i < 60; i++) {
+            User user = testEntityFactory.getUser(dongArea, i);
+            Member member = new Member(user, crew2, MemberRole.ROLE_NORMAL);
+            memberRepository.save(member);
+        }
+
+        List<Long> crewIds = List.of(crew0.getId(), crew1.getId(), crew2.getId());
+
+        ///when
+        List<Object[]> memberCounts = memberRepository.countAllByCrewIds(crewIds);
+
+        //then
+        Map<Long, Long> commentMaps = memberCounts.stream()
+                .collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
+        assertThat(commentMaps.get(crew0.getId())).isSameAs(10L);
+        assertThat(commentMaps.get(crew1.getId())).isSameAs(20L);
+        assertThat(commentMaps.get(crew2.getId())).isSameAs(30L);
     }
 
 }

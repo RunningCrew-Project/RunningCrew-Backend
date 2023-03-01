@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -106,7 +107,7 @@ class MemberServiceTest {
         memberService.deleteMember(member);
 
         //then
-        verify(memberRepository,times(1)).delete(member);
+        verify(memberRepository, times(1)).delete(member);
     }
 
     @DisplayName("멤버의 role 리더로 변경 테스트")
@@ -255,6 +256,56 @@ class MemberServiceTest {
         //then
         assertThat(memberList.size()).isSameAs(10);
         verify(memberRepository, times(1)).findAllByRunningNotice(runningNotice);
+    }
+
+    @DisplayName("특정 유저와 특정 크루에 해당하는 멤버 반환 테스트")
+    @Test
+    public void findByUserAndCrewTest1(@Mock User user, @Mock Crew crew) {
+        //given
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
+        when(memberRepository.findByUserAndCrew(user, crew)).thenReturn(Optional.of(member));
+
+        ///when
+        Member findMember = memberService.findByUserAndCrew(user, crew);
+
+        //then
+        assertThat(findMember).isEqualTo(member);
+        verify(memberRepository, times(1)).findByUserAndCrew(user, crew);
+    }
+
+    @DisplayName("특정 유저와 특정 크루에 해당하는 멤버 예외 테스트")
+    @Test
+    public void findByUserAndCrewTest2(@Mock User user, @Mock Crew crew) {
+        //given
+        when(memberRepository.findByUserAndCrew(user, crew)).thenReturn(Optional.empty());
+
+        ///when
+        //then
+        assertThatThrownBy(() -> memberService.findByUserAndCrew(user, crew))
+                .isInstanceOf(MemberNotFoundException.class);
+        verify(memberRepository, times(1)).findByUserAndCrew(user, crew);
+    }
+
+    @DisplayName("크루 id 리스트를 받아 크루 id 와 크루 멤버수의 map 반환")
+    @Test
+    public void countAllByCrewIdsTest() {
+        //given
+        List<Long> crewIds = List.of(1L, 2L, 3L);
+        List<Object[]> crewMemberList = List.of(
+                new Object[]{1L, 10L},
+                new Object[]{2L, 20L},
+                new Object[]{3L, 30L}
+        );
+        when(memberRepository.countAllByCrewIds(crewIds)).thenReturn(crewMemberList);
+
+        ///when
+        Map<Long, Long> crewMemberMap = memberService.countAllByCrewIds(crewIds);
+
+        //then
+        assertThat(crewMemberMap.get(1L)).isSameAs(10L);
+        assertThat(crewMemberMap.get(2L)).isSameAs(20L);
+        assertThat(crewMemberMap.get(3L)).isSameAs(30L);
+        verify(memberRepository, times(1)).countAllByCrewIds(crewIds);
     }
 
 }
