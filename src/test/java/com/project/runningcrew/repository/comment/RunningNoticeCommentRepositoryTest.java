@@ -26,8 +26,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
 class RunningNoticeCommentRepositoryTest {
@@ -84,7 +82,7 @@ class RunningNoticeCommentRepositoryTest {
                 .noticeType(NoticeType.INSTANT)
                 .runningDateTime(LocalDateTime.now())
                 .runningPersonnel(100)
-                .status(RunningStatus.WAIT)
+                .status(RunningStatus.READY)
                 .build();
         return runningNoticeRepository.save(runningNotice);
     }
