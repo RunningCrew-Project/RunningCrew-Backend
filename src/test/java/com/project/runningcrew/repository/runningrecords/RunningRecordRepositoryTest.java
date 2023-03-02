@@ -337,7 +337,7 @@ class RunningRecordRepositoryTest {
 
     @DisplayName("findAllByUserAndStartDateTimes 테스트")
     @Test
-    public void findAllByByStartDateTest() {
+    public void findAllByByUserAndStartDateTimesTest() {
         //given
         SidoArea sidoArea = testEntityFactory.getSidoArea(0);
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
@@ -391,6 +391,79 @@ class RunningRecordRepositoryTest {
         //then
         List<RunningRecord> runningRecords = runningRecordRepository.findAllByUser(user);
         assertThat(runningRecords.isEmpty()).isTrue();
+    }
+
+    @DisplayName("특정 기간동안 수행한 user 의 모든 런닝의 달린 거리의 합")
+    @Test
+    public void getSumOfRunningDistanceByUserAndStartDateTimesTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        List<Double> runningDistances = List.of(1.5, 2.5, 3.5);
+        List<LocalDateTime> startDateTimes = List.of(
+                LocalDateTime.of(2023, 3, 13, 0, 0),
+                LocalDateTime.of(2023, 3, 13, 11, 20),
+                LocalDateTime.of(2023, 3, 14, 0, 0));
+        for (int i = 0; i < 3; i++) {
+            PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                    .title("personal")
+                    .startDateTime(startDateTimes.get(i))
+                    .location("location")
+                    .runningDistance(runningDistances.get(i))
+                    .runningTime(1000)
+                    .runningFace(1000)
+                    .calories(300)
+                    .running_detail(String.valueOf(i))
+                    .user(user)
+                    .build();
+            runningRecordRepository.save(personalRunningRecord);
+        }
+
+        ///when
+        Double sum = runningRecordRepository.getSumOfRunningDistanceByUserAndStartDateTimes(user,
+                LocalDateTime.of(2023, 3, 13, 0, 0),
+                LocalDateTime.of(2023, 3, 14, 0, 0));
+
+        //then
+        assertThat(sum).isEqualTo(4.0);
+    }
+
+    @DisplayName("특정 기간동안 수행한 user 의 모든 런닝의 런닝 시간의 합")
+    @Test
+    public void getSumOfRunningTimeByUserAndStartDateTimesTest() {
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        List<Integer> runningTimes = List.of(2000, 2500, 3000);
+        List<LocalDateTime> startDateTimes = List.of(
+                LocalDateTime.of(2023, 3, 13, 0, 0),
+                LocalDateTime.of(2023, 3, 13, 11, 20),
+                LocalDateTime.of(2023, 3, 14, 0, 0));
+        for (int i = 0; i < 3; i++) {
+            PersonalRunningRecord personalRunningRecord = PersonalRunningRecord.builder()
+                    .title("personal")
+                    .startDateTime(startDateTimes.get(i))
+                    .location("location")
+                    .runningDistance(2.5)
+                    .runningTime(runningTimes.get(i))
+                    .runningFace(1000)
+                    .calories(300)
+                    .running_detail(String.valueOf(i))
+                    .user(user)
+                    .build();
+            runningRecordRepository.save(personalRunningRecord);
+        }
+
+        ///when
+        Integer sum = runningRecordRepository.getSumOfRunningTimeByUserAndStartDateTimes(user,
+                LocalDateTime.of(2023, 3, 13, 0, 0),
+                LocalDateTime.of(2023, 3, 14, 0, 0));
+
+        //then
+        assertThat(sum).isEqualTo(4500);
     }
 
 }
