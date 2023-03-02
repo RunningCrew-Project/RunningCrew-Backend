@@ -273,4 +273,41 @@ class RunningRecordServiceTest {
         verify(runningRecordRepository,times(1)).deleteAllByUser(user);
     }
 
+    @DisplayName("특정 년도 특정 달에 시행한 유저의 모든 RunningRecord 의 런닝 거리의 합 테스트")
+    @Test
+    public void getSumOfRunningDistanceOfMonthTest(@Mock User user) {
+        //given
+        Double sum = Double.valueOf(5.1);
+        LocalDateTime start = LocalDateTime.of(2023, 2, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2023, 3, 1, 0, 0);
+        when(runningRecordRepository.getSumOfRunningDistanceByUserAndStartDateTimes(user, start, end))
+                .thenReturn(sum);
+
+        ///when
+        Double result = runningRecordService.getSumOfRunningDistanceOfMonth(user, 2023, 2);
+
+        //then
+        assertThat(result).isEqualTo(sum);
+        verify(runningRecordRepository, times(1))
+                .getSumOfRunningDistanceByUserAndStartDateTimes(user, start, end);
+    }
+
+    @DisplayName("특정 년도 특정 달에 시행한 유저의 모든 RunningRecord 의 런닝 시간의 합 테스트")
+    @Test
+    public void getSumOfRunningTimeOfMonthTest(@Mock User user) {
+        Integer sum = Integer.valueOf(6500);
+        LocalDateTime start = LocalDateTime.of(2023, 2, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2023, 3, 1, 0, 0);
+        when(runningRecordRepository.getSumOfRunningTimeByUserAndStartDateTimes(user, start, end))
+                .thenReturn(sum);
+
+        ///when
+        Integer result = runningRecordService.getSumOfRunningTimeOfMonth(user, 2023, 2);
+
+        //then
+        assertThat(result).isEqualTo(sum);
+        verify(runningRecordRepository, times(1))
+                .getSumOfRunningTimeByUserAndStartDateTimes(user, start, end);
+    }
+
 }
