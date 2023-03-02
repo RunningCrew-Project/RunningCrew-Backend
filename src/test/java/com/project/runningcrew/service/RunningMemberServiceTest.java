@@ -166,7 +166,7 @@ class RunningMemberServiceTest {
                 .noticeType(NoticeType.INSTANT)
                 .runningDateTime(LocalDateTime.now().minusDays(1))
                 .runningPersonnel(10)
-                .status(RunningStatus.START)
+                .status(RunningStatus.READY)
                 .build();
 
         ///when
