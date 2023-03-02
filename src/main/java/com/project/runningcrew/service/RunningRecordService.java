@@ -84,10 +84,42 @@ public class RunningRecordService {
 
     /**
      * 특정 user 의 모든 RunningRecord 를 삭제한다.
+     *
      * @param user RunningRecord 를 삭제할 user
      */
     public void deleteAllByUser(User user) {
         runningRecordRepository.deleteAllByUser(user);
+    }
+
+
+    /**
+     * 입력받은 user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 거리의 합
+     * 
+     * @param user
+     * @param year 찾는 년도
+     * @param month 찾는 월
+     * @return  user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 거리의 합
+     */
+    public Double getSumOfRunningDistanceOfMonth(User user, int year, int month) {
+        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime end = start.plusMonths(1);
+
+        return runningRecordRepository.getSumOfRunningDistanceByUserAndStartDateTimes(user, start, end);
+    }
+
+    /**
+     * 입력받은 user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 시간의 합
+     *
+     * @param user
+     * @param year 찾는 년도
+     * @param month 찾는 월
+     * @return  user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 시간의 합
+     */
+    public Integer getSumOfRunningTimeOfMonth(User user, int year, int month) {
+        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime end = start.plusMonths(1);
+
+        return runningRecordRepository.getSumOfRunningTimeByUserAndStartDateTimes(user, start, end);
     }
 
 }
