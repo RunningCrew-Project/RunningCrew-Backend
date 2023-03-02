@@ -28,10 +28,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -90,6 +92,7 @@ class BoardCommentRepositoryTest {
                 .runningTime(1000)
                 .runningFace(1000)
                 .calories(300)
+                .title("title")
                 .running_detail("")
                 .user(user)
                 .build();
@@ -127,6 +130,41 @@ class BoardCommentRepositoryTest {
         //then
         Assertions.assertThat(findBoardCommentListA.size()).isEqualTo(2);
         Assertions.assertThat(findBoardCommentListB.size()).isEqualTo(1);
+    }
+
+
+    @DisplayName("Board id 리스트를 받아 commentCount 리스트를 반환하는 테스트")
+    @Test
+    void countByBoardIdTest() throws Exception {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member createMember = testMember(user, crew); // user(1), crew(1)
+        FreeBoard testFreeBoard =
+                boardRepository.save(new FreeBoard(createMember, "title", "content"));
+        ReviewBoard testReviewBoard =
+                boardRepository.save(new ReviewBoard(createMember, "title", "content", testPersonalRunningRecord(createMember.getUser())));
+
+        BoardComment comment_1 = boardCommentRepository.save(new BoardComment(createMember, "detail", testFreeBoard));
+        BoardComment comment_2 = boardCommentRepository.save(new BoardComment(createMember, "detail", testFreeBoard));
+        BoardComment comment_3 = boardCommentRepository.save(new BoardComment(createMember, "detail", testReviewBoard));
+
+        List<Long> boardIdList = new ArrayList<>();
+        boardIdList.add(testFreeBoard.getId());
+        boardIdList.add(testReviewBoard.getId());
+
+        //when
+        List<Integer> commentCountList = boardCommentRepository.countByBoardId(boardIdList);
+
+        //then
+        Assertions.assertThat(commentCountList.size()).isEqualTo(2);
+        Assertions.assertThat(commentCountList.get(0)).isEqualTo(2);
+        Assertions.assertThat(commentCountList.get(1)).isEqualTo(1);
+
     }
 
 

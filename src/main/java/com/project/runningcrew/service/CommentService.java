@@ -10,6 +10,8 @@ import com.project.runningcrew.repository.comment.BoardCommentRepository;
 import com.project.runningcrew.repository.comment.CommentRepository;
 import com.project.runningcrew.repository.comment.RunningNoticeCommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,12 +58,13 @@ public class CommentService {
     }
 
     /**
-     * 입력된 Member 가 작성한 Comment List 를 반환한다.
+     * 입력된 Member 가 작성한 Comment Slice 를 반환한다.
      * @param member
-     * @return 입력받은 member 가 작성한 Comment list
+     * @param pageable
+     * @return 입력받은 member 가 작성한 Comment Slice
      */
-    public List<Comment> findAllByMember(Member member) {
-        return commentRepository.findAllByMember(member);
+    public Slice<Comment> findAllByMember(Member member, Pageable pageable) {
+        return commentRepository.findAllByMember(member, pageable);
     }
 
     /**
@@ -100,35 +103,6 @@ public class CommentService {
      */
     public int countCommentAtRunningNotice(RunningNotice runningNotice) {
         return runningNoticeCommentRepository.findAllByRunningNotice(runningNotice).size();
-    }
-
-
-    /**
-     * Board 리스트를 받아 commentCount 리스트를 반환한다.
-     * @param boardList 입력받은 Board 의 List
-     * @return commentCountList
-     */
-    public List<Integer> commentCountListByBoardList(List<Board> boardList) {
-        List<Integer> commentCountList = new ArrayList<>();
-        for (Board board : boardList) {
-            int element = boardCommentRepository.findAllByBoard(board).size();
-            commentCountList.add(element);
-        }
-        return commentCountList;
-    }
-
-    /**
-     * RunningNotice 리스트를 받아 commentCount 리스트를 반환한다.
-     * @param runningNoticeList 입력받은 RunningNotice 의 List
-     * @return commentCountList
-     */
-    public List<Integer> commentCountListByRunningNoticeList(List<RunningNotice> runningNoticeList) {
-        List<Integer> commentCountList = new ArrayList<>();
-        for (RunningNotice runningNotice : runningNoticeList) {
-            int element = runningNoticeCommentRepository.findAllByRunningNotice(runningNotice).size();
-            commentCountList.add(element);
-        }
-        return commentCountList;
     }
 
 

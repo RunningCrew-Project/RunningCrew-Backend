@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ public class MemberService {
      *
      * @param memberId 찾는 Member 의 id
      * @return 입력받은 id 를 가진 Member
-     * @throws
+     * @throws MemberNotFoundException 입력받은 id 를 가진 Member 가 없을 때
      */
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
@@ -141,6 +142,30 @@ public class MemberService {
      */
     public List<Member> findAllByRunningNotice(RunningNotice runningNotice) {
         return memberRepository.findAllByRunningNotice(runningNotice);
+    }
+
+    /**
+     * 특정 user 와 crew 의 값을 가지는 Member 반환. 없다면 MemberNotFoundException 을 throw 한다.
+     *
+     * @param user
+     * @param crew
+     * @return 특정 user 와 crew 의 값을 가지는 Member
+     * @throws MemberNotFoundException 특정 user 와 crew 의 값을 가지는 Member 가 없을 때
+     */
+    public Member findByUserAndCrew(User user, Crew crew) {
+        return memberRepository.findByUserAndCrew(user, crew)
+                .orElseThrow(MemberNotFoundException::new);
+    }
+
+    /**
+     * Crew id 의 리스트를 받아, key 가 Crew 의 id 이고 value 가 Crew 의 멤버수인 map 을 반환한다.
+     *
+     * @param crewIds Crew 의 id 리스트
+     * @return ey 가 Crew 의 id 이고 value 가 Crew 의 멤버수인 map
+     */
+    public Map<Long, Long> countAllByCrewIds(List<Long> crewIds) {
+       return memberRepository.countAllByCrewIds(crewIds).stream()
+               .collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
     }
 
 }
