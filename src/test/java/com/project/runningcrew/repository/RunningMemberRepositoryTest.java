@@ -266,4 +266,33 @@ class RunningMemberRepositoryTest {
         assertThat(result).isFalse();
     }
 
+    @DisplayName("RunningNotice 에 포함된 모든 RunningMember 삭제 테스트")
+    @Test
+    public void deleteAllByRunningNoticeTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningMember runningMember = new RunningMember(runningNotice, member);
+        runningMemberRepository.save(runningMember);
+
+        for (int i = 1; i < 10; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningMember tempRunningMember = new RunningMember(runningNotice, tempMember);
+            runningMemberRepository.save(tempRunningMember);
+        }
+
+        ///when
+        runningMemberRepository.deleteAllByRunningNotice(runningNotice);
+
+        //then
+        List<RunningMember> runningMembers = runningMemberRepository.findAllByRunningNotice(runningNotice);
+        assertThat(runningMembers).isEmpty();
+    }
+
 }

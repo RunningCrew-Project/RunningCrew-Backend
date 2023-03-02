@@ -4,6 +4,9 @@ import com.project.runningcrew.entity.RunningMember;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -53,5 +56,15 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
      * @return member 가 runningNotice 에 참여했다면 true, 아니라면 false
      */
     boolean existsByMemberAndRunningNotice(Member member, RunningNotice runningNotice);
+
+
+    /**
+     * RunningNotice 를 포함하는 모든 RunningMember 삭제
+     *
+     * @param runningNotice
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("delete from RunningMember r where r.runningNotice = :runningNotice")
+    void deleteAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
 }
