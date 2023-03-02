@@ -9,7 +9,9 @@ import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.runningnotices.RunningStatus;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.exception.notFound.RunningNoticeNotFoundException;
+import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.repository.RunningMemberRepository;
 import com.project.runningcrew.repository.RunningNoticeRepository;
 import com.project.runningcrew.repository.images.RunningNoticeImageRepository;
@@ -49,6 +51,9 @@ class RunningNoticeServiceTest {
 
     @Mock
     private RunningMemberRepository runningMemberRepository;
+
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private RunningNoticeService runningNoticeService;
@@ -177,9 +182,9 @@ class RunningNoticeServiceTest {
         verify(runningNoticeImageRepository, times(deleteImages.size())).delete(any());
     }
 
-    @DisplayName("런닝공지 상태 수정 테스트")
+    @DisplayName("런닝공지 상태 Done 으로 수정 테스트")
     @Test
-    public void updateRunningStatusTest(@Mock Member member) {
+    public void updateRunningStatusDoneTest(@Mock Member member) {
         //given
         RunningNotice runningNotice = RunningNotice.builder()
                 .title("title")
@@ -190,9 +195,10 @@ class RunningNoticeServiceTest {
                 .runningPersonnel(10)
                 .status(RunningStatus.READY)
                 .build();
+        doNothing().when(runningMemberRepository).deleteAllByRunningNotice(runningNotice);
 
         ///when
-        runningNoticeService.updateRunningStatus(runningNotice);
+        runningNoticeService.updateRunningStatusDone(runningNotice);
 
         //then
         assertThat(runningNotice.getStatus()).isSameAs(RunningStatus.DONE);
@@ -429,5 +435,138 @@ class RunningNoticeServiceTest {
         assertThat(result.isFirst()).isTrue();
         verify(runningNoticeRepository, times(1)).findAllByMember(member, pageRequest);
     }
+
+    @DisplayName("특정 유저의 크루 런닝 시작 가능 테스트")
+    @Test
+    public void checkRunningNoticeTest1(@Mock User user1, @Mock User user2, @Mock Crew crew) {
+        //given
+        Member member1 = new Member(user1, crew, MemberRole.ROLE_NORMAL);
+        Member member2 = new Member(user2, crew, MemberRole.ROLE_NORMAL);
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member1)
+                .noticeType(NoticeType.REGULAR)
+                .runningDateTime(LocalDateTime.now().plusMinutes(15))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
+        when(memberRepository.findByUserAndCrew(user2, crew)).thenReturn(Optional.of(member2));
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member2, runningNotice)).thenReturn(true);
+
+        ///when
+        boolean result = runningNoticeService.checkRunningNotice(user2, runningNotice);
+
+        //then
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("특정 유저의 크루 런닝 시작 불가능 테스트. 멤버 없음")
+    @Test
+    public void checkRunningNoticeTest2(@Mock User user1, @Mock User user2, @Mock Crew crew) {
+        //given
+        Member member1 = new Member(user1, crew, MemberRole.ROLE_NORMAL);
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member1)
+                .noticeType(NoticeType.REGULAR)
+                .runningDateTime(LocalDateTime.of(2023, 2, 26, 18, 0))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
+        when(memberRepository.findByUserAndCrew(user2, crew)).thenReturn(Optional.empty());
+
+        ///when
+        //then
+        assertThatThrownBy(() -> runningNoticeService.checkRunningNotice(user2, runningNotice))
+                .isInstanceOf(MemberNotFoundException.class);
+        verify(memberRepository, times(1)).findByUserAndCrew(user2, crew);
+    }
+
+    @DisplayName("특정 유저의 크루 런닝 시작 불가능 테스트. 런닝 참가 안함")
+    @Test
+    public void checkRunningNoticeTest3(@Mock User user1, @Mock User user2, @Mock Crew crew) {
+        //given
+        Member member1 = new Member(user1, crew, MemberRole.ROLE_NORMAL);
+        Member member2 = new Member(user2, crew, MemberRole.ROLE_NORMAL);
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member1)
+                .noticeType(NoticeType.REGULAR)
+                .runningDateTime(LocalDateTime.of(2023, 2, 26, 18, 0))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
+        when(memberRepository.findByUserAndCrew(user2, crew)).thenReturn(Optional.of(member2));
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member2, runningNotice)).thenReturn(false);
+
+        ///when
+        boolean result = runningNoticeService.checkRunningNotice(user2, runningNotice);
+
+        //then
+        assertThat(result).isFalse();
+        verify(memberRepository, times(1)).findByUserAndCrew(user2, crew);
+        verify(runningMemberRepository, times(1))
+                .existsByMemberAndRunningNotice(member2, runningNotice);
+    }
+
+    @DisplayName("특정 유저의 크루 런닝 시작 불가능 테스트. 완료된 런닝 공지")
+    @Test
+    public void checkRunningNoticeTest4(@Mock User user1, @Mock User user2, @Mock Crew crew) {
+        //given
+        Member member1 = new Member(user1, crew, MemberRole.ROLE_NORMAL);
+        Member member2 = new Member(user2, crew, MemberRole.ROLE_NORMAL);
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member1)
+                .noticeType(NoticeType.REGULAR)
+                .runningDateTime(LocalDateTime.of(2023, 2, 26, 18, 0))
+                .runningPersonnel(10)
+                .status(RunningStatus.DONE)
+                .build();
+        when(memberRepository.findByUserAndCrew(user2, crew)).thenReturn(Optional.of(member2));
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member2, runningNotice)).thenReturn(true);
+
+        ///when
+        boolean result = runningNoticeService.checkRunningNotice(user2, runningNotice);
+
+        //then
+        assertThat(result).isFalse();
+        verify(memberRepository, times(1)).findByUserAndCrew(user2, crew);
+        verify(runningMemberRepository, times(1))
+                .existsByMemberAndRunningNotice(member2, runningNotice);
+    }
+
+    @DisplayName("특정 유저의 크루 런닝 시작 불가능 테스트. 런닝 시간 이전")
+    @Test
+    public void checkRunningNoticeTest5(@Mock User user1, @Mock User user2, @Mock Crew crew) {
+        //given
+        Member member1 = new Member(user1, crew, MemberRole.ROLE_NORMAL);
+        Member member2 = new Member(user2, crew, MemberRole.ROLE_NORMAL);
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member1)
+                .noticeType(NoticeType.REGULAR)
+                .runningDateTime(LocalDateTime.now().plusMinutes(16))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
+        when(memberRepository.findByUserAndCrew(user2, crew)).thenReturn(Optional.of(member2));
+        when(runningMemberRepository.existsByMemberAndRunningNotice(member2, runningNotice)).thenReturn(true);
+
+        ///when
+        boolean result = runningNoticeService.checkRunningNotice(user2, runningNotice);
+
+        //then
+        assertThat(result).isFalse();
+        verify(memberRepository, times(1)).findByUserAndCrew(user2, crew);
+        verify(runningMemberRepository, times(1))
+                .existsByMemberAndRunningNotice(member2, runningNotice);
+    }
+
 
 }
