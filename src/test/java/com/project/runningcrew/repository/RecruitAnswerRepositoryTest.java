@@ -225,5 +225,16 @@ class RecruitAnswerRepositoryTest {
         Assertions.assertThat(findAfterList.size()).isEqualTo(0);
     }
 
+    @DisplayName("크루에 가입신청 한 유저 리스트 반환")
+    @Test
+    void nameTest() throws Exception {
+        //given
+
+        //when
+
+        //then
+
+    }
+
 
 }

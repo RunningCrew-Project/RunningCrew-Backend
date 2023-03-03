@@ -32,7 +32,6 @@ public interface RecruitAnswerRepository extends JpaRepository<RecruitAnswer, Lo
     void deleteByUserAndCrew(@Param("user") User user, @Param("crew") Crew crew);
 
 
-
     /**
      * 특정 Crew 의 RecruitAnswer 을 작성한 User 반환
      * @param crew
@@ -40,8 +39,6 @@ public interface RecruitAnswerRepository extends JpaRepository<RecruitAnswer, Lo
      */
     @Query("select distinct(ra.user) from RecruitAnswer ra where ra.crew = :crew")
     List<User> findUserByCrew(@Param("crew") Crew crew);
-
-
 
 
 
