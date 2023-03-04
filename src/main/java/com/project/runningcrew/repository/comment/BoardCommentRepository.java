@@ -3,6 +3,7 @@ package com.project.runningcrew.repository.comment;
 import com.project.runningcrew.entity.boards.Board;
 import com.project.runningcrew.entity.comment.BoardComment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,5 +19,17 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
      */
     @Query("select count(bc) from BoardComment bc where bc.board.id in (:boardId) group by bc.board.id")
     List<Integer> countByBoardId(@Param("boardId") List<Long> boardId);
+
+
+    /**
+     * 입력받은 Board 에 작성된 댓글을 모두 삭제한다.
+     * @param board 댓글을 삭제할 board
+     */
+    @Modifying
+    @Query("delete from BoardComment bc where bc.board = :board")
+    void deleteCommentAtBoard(@Param("board") Board board);
+
+
+
 
 }
