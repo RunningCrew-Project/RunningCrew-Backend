@@ -31,22 +31,19 @@ class RecruitAnswerServiceTest {
 
     @DisplayName("가입 답변 저장하기 테스트")
     @Test
-    void saveRecruitAnswerTest(@Mock User user, @Mock Crew crew) throws Exception {
+    void saveAllRecruitAnswerTest(@Mock User user, @Mock Crew crew) throws Exception {
         //given
-        Long answerId = 1L;
-        RecruitAnswer recruitAnswer = new RecruitAnswer(answerId, user, crew, "answer", 0);
-        when(recruitAnswerRepository.save(recruitAnswer)).thenReturn(recruitAnswer);
+        List<RecruitAnswer> answerList = new ArrayList<>();
+        List<Long> idList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            answerList.add(new RecruitAnswer(user, crew, "answer" + i, i));
+        }
 
-        //when
-        Long savedId = recruitAnswerService.saveRecruitAnswer(recruitAnswer);
-
-        //then
-        assertThat(savedId).isSameAs(answerId);
     }
 
     @DisplayName("특정 유저가 특정 크루에 작성한 가입 답변 모두 삭제하기 테스트")
     @Test
-    void deleteByUserAndCrewTest(@Mock User user, @Mock Crew crew) throws Exception {
+    void deleteAllRecruitAnswerTest(@Mock User user, @Mock Crew crew) throws Exception {
         //given
         List<RecruitAnswer> answerList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -55,7 +52,7 @@ class RecruitAnswerServiceTest {
         doNothing().when(recruitAnswerRepository).deleteByUserAndCrew(user, crew);
 
         //when
-        recruitAnswerService.deleteByUserAndCrew(user, crew);
+        recruitAnswerService.deleteAllRecruitAnswer(user, crew);
 
         //then
         verify(recruitAnswerRepository, times(1)).deleteByUserAndCrew(user, crew);

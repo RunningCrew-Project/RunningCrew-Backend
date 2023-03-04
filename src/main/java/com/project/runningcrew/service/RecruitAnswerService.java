@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,14 +18,17 @@ public class RecruitAnswerService {
 
     private final RecruitAnswerRepository recruitAnswerRepository;
 
-
     /**
-     * 작성된 recruitAnswer 값을 받아 저장하고 id 값을 반환한다.
-     * @param answer 작성된 recruitAnswer
-     * @return 저장된 recruitAnswer 의 id 값
+     * recruitAnswer 의 리스트를 받아 모두 저장한다.
+     * @param answers 저장할 답변 리스트
+     * @return 저장된 recruitAnswer 의 id 값 리스트
      */
-    public Long saveRecruitAnswer(RecruitAnswer answer) {
-        return recruitAnswerRepository.save(answer).getId();
+    public List<Long> saveAllRecruitAnswer(List<RecruitAnswer> answers) {
+        List<Long> idList = new ArrayList<>();
+        for (RecruitAnswer answer : answers) {
+            idList.add(recruitAnswerRepository.save(answer).getId());
+        }
+        return idList;
     }
 
     /**
@@ -32,7 +36,7 @@ public class RecruitAnswerService {
      * @param user recruitAnswer 의 user
      * @param crew recruitAnswer 의 crew
      */
-    public void deleteByUserAndCrew(User user, Crew crew) {
+    public void deleteAllRecruitAnswer(User user, Crew crew) {
         recruitAnswerRepository.deleteByUserAndCrew(user, crew);
     }
 
@@ -51,11 +55,6 @@ public class RecruitAnswerService {
     public List<User> findUserByCrew(Crew crew)  {
         return recruitAnswerRepository.findUserByCrew(crew);
     }
-
-
-
-
-
 
 
 

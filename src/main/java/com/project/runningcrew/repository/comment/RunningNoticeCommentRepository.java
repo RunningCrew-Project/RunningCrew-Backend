@@ -3,6 +3,7 @@ package com.project.runningcrew.repository.comment;
 import com.project.runningcrew.entity.comment.RunningNoticeComment;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,5 +20,15 @@ public interface RunningNoticeCommentRepository extends JpaRepository<RunningNot
      */
     @Query("select count(rc) from RunningNoticeComment rc where rc.runningNotice.id in (:runningNoticeId) group by rc.runningNotice.id")
     List<Integer> countByRunningNoticeId(@Param("runningNoticeId") List<Long> runningNoticeId);
+
+
+    /**
+     * 입력받은 runningNotice 에 작성된 댓글을 모두 삭제한다.
+     * @param runningNotice 댓글을 모두 삭제할 runningNotice
+     */
+    @Modifying
+    @Query("delete from RunningNoticeComment rc where rc.runningNotice = :runningNotice")
+    void deleteCommentAtRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
+
 
 }

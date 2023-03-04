@@ -28,6 +28,8 @@ public class CommentService {
     private final RunningNoticeCommentRepository runningNoticeCommentRepository;
 
 
+
+
     /**
      * 입력된 Comment 를 저장한다.
      * @param comment
@@ -49,13 +51,57 @@ public class CommentService {
         }
     }
 
+
+
+
+
+
+
+
+
+
     /**
-     * 입력된 Comment 를 삭제한다.
+     * delete
+     */
+
+
+
+    /**
+     * 하나의 Comment 를 삭제한다.
      * @param comment
      */
     public void deleteComment(Comment comment) {
         commentRepository.delete(comment);
     }
+
+
+    /**
+     * 입력받은 Board 에 작성된 BoardComment 를 모두 삭제한다.
+     * @param board 댓글을 삭제할 Board
+     */
+    public void deleteCommentAtBoard(Board board) {
+        boardCommentRepository.deleteCommentAtBoard(board);
+    }
+
+
+    /**
+     * 입력받은 RunningNotice 에 작성된 RunningNoticeComment 를 모두 삭제한다.
+     * @param runningNotice 댓글을 삭제할 RunningNotice
+     */
+    public void deleteCommentAtRunningNotice(RunningNotice runningNotice) {
+        runningNoticeCommentRepository.deleteCommentAtRunningNotice(runningNotice);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 입력된 Member 가 작성한 Comment Slice 를 반환한다.
@@ -86,6 +132,20 @@ public class CommentService {
     }
 
 
+
+
+
+
+
+
+
+
+    /**
+     * 하나의 Board 에 작성된 Comment 와
+     * 하나의 RunningNotice 에 작성된 Comment 의 갯수를 반환하는 메소드들
+     */
+
+
     /**
      * 입력된 Board 에 작성된 Comment 의 수를 반환한다.
      * @param board
@@ -104,6 +164,41 @@ public class CommentService {
     public int countCommentAtRunningNotice(RunningNotice runningNotice) {
         return runningNoticeCommentRepository.findAllByRunningNotice(runningNotice).size();
     }
+
+
+
+
+
+
+
+
+
+    /**
+     * 입력받은 Board 와 RunningNotice 의 idList 값으로
+     * commentCountList 값을 반환하는 메소드들
+     */
+
+
+    /**
+     * 입력받은 runningNoticeIdList 정보로 commentCountList 를 만들어 반환한다.
+     * @param idList
+     * @return commentCountList
+     */
+    public List<Integer> countByRunningNoticeIdList(List<Long> idList) {
+        return runningNoticeCommentRepository.countByRunningNoticeId(idList);
+    }
+
+    /**
+     * 입력받은 boardIdList 정보로 commentCountList 를 만들어 반환한다.
+     * @param idList
+     * @return commentCountList
+     */
+    public List<Integer> countByBoardIdList(List<Long> idList) {
+        return boardCommentRepository.countByBoardId(idList);
+    }
+
+
+
 
 
 }

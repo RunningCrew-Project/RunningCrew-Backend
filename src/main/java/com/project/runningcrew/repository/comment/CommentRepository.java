@@ -18,4 +18,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return slice of Comment
      */
     Slice<Comment> findAllByMember(Member member, Pageable pageable);
+
+
+
+    // board 에 작성된 모든 comment 삭제하기 (쿼리 하나)
+
+    // RunningNotice 에 작성된 모든 comment 삭제하기 (쿼리 하나)
+
 }
