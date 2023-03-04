@@ -106,14 +106,13 @@ public class RunningNoticeService {
     }
 
     /**
-     * RunningNotice 의 status 를 Done 으로 변경하고, RunningNotice 에 포함된 모든 RunningMember 들을 삭제
+     * RunningNotice 의 status 를 Done 으로 변경한다.
      *
      * @param runningNotice status 를 변경할 RunningNotice
      */
     @Transactional
     public void updateRunningStatusDone(RunningNotice runningNotice) {
         runningNotice.updateStatus(RunningStatus.DONE);
-        runningMemberRepository.deleteAllByRunningNotice(runningNotice);
     }
 
     /**
