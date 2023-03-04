@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SidoAreaRepository extends JpaRepository<SidoArea, Long> {
@@ -14,5 +15,13 @@ public interface SidoAreaRepository extends JpaRepository<SidoArea, Long> {
      * @return 모든 SidoArea 들이 담긴 name 순으로 오름차순 정렬된 list
      */
     List<SidoArea> findAllByOrderByNameAsc();
+
+    /**
+     * 특정 name 을 가진 SidoArea 를 찾아 반환
+     *
+     * @param name : 찾는 SidoArea 의 name
+     * @return 특정 name 을 가진 SidoArea. 없다면 Optional.empty()
+     */
+    Optional<SidoArea> findByName(String name);
 
 }
