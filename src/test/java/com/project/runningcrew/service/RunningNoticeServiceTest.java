@@ -199,7 +199,6 @@ class RunningNoticeServiceTest {
                 .runningPersonnel(10)
                 .status(RunningStatus.READY)
                 .build();
-        doNothing().when(runningMemberRepository).deleteAllByRunningNotice(runningNotice);
 
         ///when
         runningNoticeService.updateRunningStatusDone(runningNotice);
