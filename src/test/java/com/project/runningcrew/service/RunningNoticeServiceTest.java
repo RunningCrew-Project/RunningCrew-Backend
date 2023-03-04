@@ -14,6 +14,7 @@ import com.project.runningcrew.exception.notFound.RunningNoticeNotFoundException
 import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.repository.RunningMemberRepository;
 import com.project.runningcrew.repository.RunningNoticeRepository;
+import com.project.runningcrew.repository.comment.RunningNoticeCommentRepository;
 import com.project.runningcrew.repository.images.RunningNoticeImageRepository;
 import com.project.runningcrew.service.images.ImageService;
 import org.junit.jupiter.api.DisplayName;
@@ -41,19 +42,22 @@ import static org.mockito.Mockito.*;
 class RunningNoticeServiceTest {
 
     @Mock
-    private RunningNoticeRepository runningNoticeRepository;
+    RunningNoticeRepository runningNoticeRepository;
 
     @Mock
-    private ImageService imageService;
+    ImageService imageService;
 
     @Mock
-    private RunningNoticeImageRepository runningNoticeImageRepository;
+    RunningNoticeImageRepository runningNoticeImageRepository;
 
     @Mock
-    private RunningMemberRepository runningMemberRepository;
+    RunningMemberRepository runningMemberRepository;
 
     @Mock
-    private MemberRepository memberRepository;
+    MemberRepository memberRepository;
+
+    @Mock
+    RunningNoticeCommentRepository runningNoticeCommentRepository;
 
     @InjectMocks
     private RunningNoticeService runningNoticeService;
@@ -206,12 +210,27 @@ class RunningNoticeServiceTest {
 
     @DisplayName("런닝공지 삭제 테스트")
     @Test
-    public void deleteRunningNoticeTest() {
+    public void deleteRunningNoticeTest(@Mock RunningNotice runningNotice) {
         //given
+        List<RunningNoticeImage> images = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            images.add(new RunningNoticeImage("image" + i, runningNotice));
+        }
+        when(runningNoticeImageRepository.findAllByRunningNotice(runningNotice)).thenReturn(images);
+        doNothing().when(imageService).deleteImage(any());
+        doNothing().when(runningMemberRepository).deleteAllByRunningNotice(runningNotice);
+        doNothing().when(runningNoticeCommentRepository).deleteCommentAtRunningNotice(runningNotice);
+        doNothing().when(runningNoticeRepository).delete(runningNotice);
 
         ///when
+        runningNoticeService.deleteRunningNotice(runningNotice);
 
         //then
+        verify(runningNoticeImageRepository, times(1)).findAllByRunningNotice(runningNotice);
+        verify(imageService, times(10)).deleteImage(any());
+        verify(runningMemberRepository, times(1)).deleteAllByRunningNotice(runningNotice);
+        verify(runningNoticeCommentRepository, times(1)).deleteCommentAtRunningNotice(runningNotice);
+        verify(runningNoticeRepository, times(1)).delete(runningNotice);
     }
 
     @DisplayName("정기런닝공지 페이징 테스트")

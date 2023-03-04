@@ -13,6 +13,7 @@ import com.project.runningcrew.exception.notFound.RunningNoticeNotFoundException
 import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.repository.RunningMemberRepository;
 import com.project.runningcrew.repository.RunningNoticeRepository;
+import com.project.runningcrew.repository.comment.RunningNoticeCommentRepository;
 import com.project.runningcrew.repository.images.RunningNoticeImageRepository;
 import com.project.runningcrew.service.images.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class RunningNoticeService {
     private final RunningNoticeImageRepository runningNoticeImageRepository;
     private final RunningMemberRepository runningMemberRepository;
     private final MemberRepository memberRepository;
+    private final RunningNoticeCommentRepository runningNoticeCommentRepository;
     private final String imageDirName = "runningNotice";
 
     /**
@@ -127,7 +129,7 @@ public class RunningNoticeService {
         }
         runningNoticeImageRepository.deleteAllByRunningNotice(runningNotice);
         runningMemberRepository.deleteAllByRunningNotice(runningNotice);
-        //TODO 댓글 모두 삭제
+        runningNoticeCommentRepository.deleteCommentAtRunningNotice(runningNotice);
         runningNoticeRepository.delete(runningNotice);
     }
 
