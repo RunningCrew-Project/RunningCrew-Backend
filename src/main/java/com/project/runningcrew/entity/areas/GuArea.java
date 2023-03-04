@@ -34,4 +34,12 @@ public class GuArea {
         this.sidoArea = sidoArea;
     }
 
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getSidoArea().getName());
+        sb.append(" ");
+        sb.append(this.name);
+        return sb.toString();
+    }
+
 }

@@ -34,4 +34,14 @@ public class DongArea {
         this.guArea = guArea;
     }
 
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.guArea.getSidoArea().getName());
+        sb.append(" ");
+        sb.append(this.guArea.getName());
+        sb.append(" ");
+        sb.append(this.name);
+        return sb.toString();
+    }
+
 }
