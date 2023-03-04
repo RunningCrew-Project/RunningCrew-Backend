@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -86,6 +85,37 @@ class GuAreaRepositoryTest {
 
         //then
         assertThat(guAreas.size()).isEqualTo(10);
+    }
+
+    @DisplayName("특정 시/도 에 속하고 특정 이름을 가진 GuArea 찾기 성공 테스트")
+    @Test
+    public void findBySidoAreaAndNameTest1() {
+        //given
+        String name = "동대문구";
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = new GuArea(name, sidoArea);
+        guAreaRepository.save(guArea);
+
+        ///when
+        Optional<GuArea> optionalGuArea = guAreaRepository.findBySidoAreaAndName(sidoArea, name);
+
+        //then
+        assertThat(optionalGuArea).isNotEmpty();
+        assertThat(optionalGuArea).hasValue(guArea);
+    }
+
+    @DisplayName("특정 시/도 에 속하고 특정 이름을 가진 GuArea 찾기 실패 테스트")
+    @Test
+    public void findBySidoAreaAndNameTest2() {
+        //given
+        String name = "동대문구";
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+
+        ///when
+        Optional<GuArea> optionalGuArea = guAreaRepository.findBySidoAreaAndName(sidoArea, name);
+
+        //then
+        assertThat(optionalGuArea).isEmpty();
     }
 
 }

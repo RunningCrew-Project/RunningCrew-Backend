@@ -79,4 +79,20 @@ class SidoAreaRepositoryTest {
         assertThat(sidoAreas.size()).isEqualTo(10);
     }
 
+    @DisplayName("특정 이름을 가진 시/도 찾기 테스트")
+    @Test
+    public void findByNameTest1() {
+        //given
+        String name = "서울시";
+        SidoArea sidoArea = new SidoArea(name);
+        sidoAreaRepository.save(sidoArea);
+
+        ///when
+        Optional<SidoArea> optionalSidoArea = sidoAreaRepository.findByName(name);
+
+        //then
+        assertThat(optionalSidoArea).isNotEmpty();
+        assertThat(optionalSidoArea).hasValue(sidoArea);
+    }
+
 }
