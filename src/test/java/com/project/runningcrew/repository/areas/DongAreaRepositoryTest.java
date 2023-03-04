@@ -93,9 +93,9 @@ class DongAreaRepositoryTest {
         assertThat(dongAreas.size()).isEqualTo(10);
     }
 
-    @DisplayName("DongArea findByName 테스트")
+    @DisplayName("특정 이름을 가진 DongArea 찾기 성공 테스트")
     @Test
-    public void findByNameTest() {
+    public void findByNameTest1() {
         //given
         String name = "dong";
         SidoArea sidoArea = testEntityFactory.getSidoArea(0);
@@ -109,6 +109,39 @@ class DongAreaRepositoryTest {
         //then
         assertThat(optDongArea).isNotEmpty();
         assertThat(optDongArea).hasValue(dongArea);
+    }
+
+    @DisplayName("특정 구에 속하고 특정 이름을 가진 DongArea 찾기 성공 테스트")
+    @Test
+    public void findByGuAreaAndNameTest1() {
+        //given
+        String name = "dong";
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea,0);
+        DongArea dongArea = new DongArea(name, guArea);
+        dongAreaRepository.save(dongArea);
+
+        ///when
+        Optional<DongArea> optDongArea = dongAreaRepository.findByGuAreaAndName(guArea, name);
+
+        //then
+        assertThat(optDongArea).isNotEmpty();
+        assertThat(optDongArea).hasValue(dongArea);
+    }
+
+    @DisplayName("특정 구에 속하고 특정 이름을 가진 DongArea 찾기 실패 테스트")
+    @Test
+    public void findByGuAreaAndNameTest2() {
+        //given
+        String name = "dong";
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea,0);
+
+        ///when
+        Optional<DongArea> optDongArea = dongAreaRepository.findByGuAreaAndName(guArea, name);
+
+        //then
+        assertThat(optDongArea).isEmpty();
     }
 
 }
