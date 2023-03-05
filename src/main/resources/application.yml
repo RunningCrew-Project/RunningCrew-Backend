@@ -22,4 +22,4 @@ logging.level:
 
 fcm:
   key:
-    path: running-crew-project-firebase-adminsdk-ta9q7-ee54bd164a.json
+    path: fcm/running-crew-project-firebase-adminsdk-ta9q7-fa58725efe.json
