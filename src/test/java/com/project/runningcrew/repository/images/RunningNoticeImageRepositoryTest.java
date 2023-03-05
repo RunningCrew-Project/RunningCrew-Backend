@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -42,7 +41,7 @@ class RunningNoticeImageRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
 
         ///when
@@ -62,7 +61,7 @@ class RunningNoticeImageRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
         runningNoticeImageRepository.save(runningNoticeImage);
 
@@ -84,7 +83,7 @@ class RunningNoticeImageRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage", runningNotice);
         runningNoticeImageRepository.save(runningNoticeImage);
 
@@ -106,7 +105,7 @@ class RunningNoticeImageRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         for (int i = 0; i < 10; i++) {
             RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage" + i, runningNotice);
             runningNoticeImageRepository.save(runningNoticeImage);
@@ -132,7 +131,7 @@ class RunningNoticeImageRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         for (int i = 0; i < 10; i++) {
             RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage" + i, runningNotice);
             runningNoticeImageRepository.save(runningNoticeImage);
@@ -157,21 +156,21 @@ class RunningNoticeImageRepositoryTest {
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
 
-        RunningNotice runningNotice0 = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice0 = testEntityFactory.getRegularRunningNotice(member, 0);
         for (int i = 0; i < 3; i++) {
             RunningNoticeImage runningNoticeImage =
                     new RunningNoticeImage("runningNoticeImage" + i, runningNotice0);
             runningNoticeImageRepository.save(runningNoticeImage);
         }
 
-        RunningNotice runningNotice1 = testEntityFactory.getRunningNotice(member, 1);
+        RunningNotice runningNotice1 = testEntityFactory.getRegularRunningNotice(member, 1);
         for (int i = 0; i < 4; i++) {
             RunningNoticeImage runningNoticeImage =
                     new RunningNoticeImage("runningNoticeImage" + i, runningNotice1);
             runningNoticeImageRepository.save(runningNoticeImage);
         }
 
-        RunningNotice runningNotice2 = testEntityFactory.getRunningNotice(member, 2);
+        RunningNotice runningNotice2 = testEntityFactory.getRegularRunningNotice(member, 2);
         for (int i = 0; i < 5; i++) {
             RunningNoticeImage runningNoticeImage =
                     new RunningNoticeImage("runningNoticeImage" + i, runningNotice2);

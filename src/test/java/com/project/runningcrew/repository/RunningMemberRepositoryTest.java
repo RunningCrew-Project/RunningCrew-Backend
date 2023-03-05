@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -40,7 +39,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
 
         ///when
@@ -60,7 +59,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
@@ -82,7 +81,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
@@ -104,14 +103,14 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
         for (int i = 1; i < 10; i++) {
             User tempUser = testEntityFactory.getUser(dongArea, i);
             Member tempMember = testEntityFactory.getMember(tempUser, crew);
-            RunningNotice tempRunningNotice = testEntityFactory.getRunningNotice(tempMember, i);
+            RunningNotice tempRunningNotice = testEntityFactory.getRegularRunningNotice(tempMember, i);
             RunningMember tempRunningMember = new RunningMember(tempRunningNotice, member);
             runningMemberRepository.save(tempRunningMember);
         }
@@ -136,7 +135,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
@@ -164,7 +163,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
@@ -195,7 +194,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
@@ -217,7 +216,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
 
         ///when
         Optional<RunningMember> optRunningMember = runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice);
@@ -236,7 +235,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 
@@ -257,7 +256,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
 
         ///when
         boolean result = runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice);
@@ -276,7 +275,7 @@ class RunningMemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
         RunningMember runningMember = new RunningMember(runningNotice, member);
         runningMemberRepository.save(runningMember);
 

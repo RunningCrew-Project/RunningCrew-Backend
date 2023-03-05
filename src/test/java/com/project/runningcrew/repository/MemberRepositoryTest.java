@@ -12,18 +12,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -220,7 +216,7 @@ class MemberRepositoryTest {
         User user = testEntityFactory.getUser(dongArea, 0);
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
-        RunningNotice runningNotice = testEntityFactory.getRunningNotice(member, 0);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
 
         for (int i = 1; i < 11; i++) {
             User tempUser = testEntityFactory.getUser(dongArea, i);

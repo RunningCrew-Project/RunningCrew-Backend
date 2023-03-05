@@ -6,6 +6,7 @@ import com.project.runningcrew.entity.areas.DongArea;
 import com.project.runningcrew.entity.areas.GuArea;
 import com.project.runningcrew.entity.areas.SidoArea;
 import com.project.runningcrew.entity.boards.FreeBoard;
+import com.project.runningcrew.entity.boards.NoticeBoard;
 import com.project.runningcrew.entity.members.Member;
 import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.runningnotices.NoticeType;
@@ -90,7 +91,7 @@ public class TestEntityFactory {
         return memberRepository.save(member);
     }
 
-    public RunningNotice getRunningNotice(Member member, int num) {
+    public RunningNotice getRegularRunningNotice(Member member, int num) {
         RunningNotice runningNotice = RunningNotice.builder().title("title" + num)
                 .detail("detail" + num)
                 .member(member)
@@ -102,9 +103,26 @@ public class TestEntityFactory {
         return runningNoticeRepository.save(runningNotice);
     }
 
+    public RunningNotice getInstantRunningNotice(Member member, int num) {
+        RunningNotice runningNotice = RunningNotice.builder().title("title" + num)
+                .detail("detail" + num)
+                .member(member)
+                .noticeType(NoticeType.INSTANT)
+                .runningDateTime(LocalDateTime.of(2023, 02, 11, 15, 0))
+                .runningPersonnel(4)
+                .status(RunningStatus.READY)
+                .build();
+        return runningNoticeRepository.save(runningNotice);
+    }
+
     public FreeBoard getFreeBoard(Member member, int num) {
         FreeBoard freeBoard = new FreeBoard(member, "title" + num, "content" + num);
         return boardRepository.save(freeBoard);
+    }
+
+    public NoticeBoard getNoticeBoard(Member member, int num) {
+        NoticeBoard noticeBoard = new NoticeBoard(member, "title" + num, "content" + num);
+        return boardRepository.save(noticeBoard);
     }
 
     public PersonalRunningRecord getPersonalRunningRecord(User user, int num) {
