@@ -5,6 +5,7 @@ import com.google.firebase.messaging.MulticastMessage;
 import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.boards.NoticeBoard;
 import com.project.runningcrew.entity.members.Member;
+import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.users.User;
 import com.project.runningcrew.fcm.token.entity.FcmToken;
@@ -30,6 +31,12 @@ public class FirebaseMessagingService {
     private final NotificationRepository notificationRepository;
     private final FcmTokenRepository fcmTokenRepository;
 
+    /**
+     * noticeBoard 에 대한 Notification 들을 생성하고, 알림을 요청한다.
+     *
+     * @param crew        알림을 보낼 크루
+     * @param noticeBoard 생성 알림을 보내는 NoticeBoard
+     */
     @Transactional
     public void sendNoticeBoardMessages(Crew crew, NoticeBoard noticeBoard) {
         List<Long> userIds = memberRepository.findAllByCrew(crew).stream()
@@ -50,8 +57,18 @@ public class FirebaseMessagingService {
 
     }
 
+    /**
+     * noticeType 이 REGULAR 인 RunningNotice 에 대한 Notification 들을 생성하고, 알림을 요청한다.
+     *
+     * @param crew          알림을 보낼 크루
+     * @param runningNotice 생성 알림을 보내는 RunningNotice
+     */
     @Transactional
     public void sendRegularRunningNoticeMessages(Crew crew, RunningNotice runningNotice) {
+        if (runningNotice.getNoticeType() != NoticeType.REGULAR) {
+            return;
+        }
+
         List<Long> userIds = memberRepository.findAllByCrew(crew).stream()
                 .map(Member::getUser)
                 .map(User::getId)
@@ -69,6 +86,14 @@ public class FirebaseMessagingService {
                 crew.getCrewImgUrl());
     }
 
+    /**
+     * 입력받은 토큰 리스트를 가진 기기들에게 알림을 보낸다.
+     *
+     * @param tokens 알림을 보낼 기기들의 토큰
+     * @param title  알림 제목
+     * @param body   알림 내용
+     * @param imgUrl 알림 이미지
+     */
     private void sendMessages(List<String> tokens, String title, String body, String imgUrl) {
         MulticastMessage messages = MulticastMessage.builder()
                 .setNotification(
