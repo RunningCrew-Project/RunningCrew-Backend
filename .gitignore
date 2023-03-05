@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### fcm key ###
+src/main/resources/running-crew-project-firebase-adminsdk-ta9q7-ee54bd164a.json
