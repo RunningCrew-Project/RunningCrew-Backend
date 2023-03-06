@@ -9,8 +9,10 @@ import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.runningnotices.RunningStatus;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.exception.AuthorizationException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.exception.notFound.RunningNoticeNotFoundException;
+import com.project.runningcrew.fcm.FirebaseMessagingService;
 import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.repository.RunningMemberRepository;
 import com.project.runningcrew.repository.RunningNoticeRepository;
@@ -59,10 +61,13 @@ class RunningNoticeServiceTest {
     @Mock
     RunningNoticeCommentRepository runningNoticeCommentRepository;
 
+    @Mock
+    FirebaseMessagingService firebaseMessagingService;
+
     @InjectMocks
     private RunningNoticeService runningNoticeService;
 
-    @DisplayName("id로 런닝기록 가져오기 성공 테스트")
+    @DisplayName("id로 런닝공지 가져오기 성공 테스트")
     @Test
     public void findByIdTest1(@Mock Member member) {
         //given
@@ -87,7 +92,7 @@ class RunningNoticeServiceTest {
         verify(runningNoticeRepository, times(1)).findById(runningNoticeId);
     }
 
-    @DisplayName("id로 런닝기록 가져오기 예외 테스트")
+    @DisplayName("id로 런닝공지 가져오기 예외 테스트")
     @Test
     public void findByIdTest2() {
         //given
@@ -101,11 +106,12 @@ class RunningNoticeServiceTest {
         verify(runningNoticeRepository, times(1)).findById(runningNoticeId);
     }
 
-    @DisplayName("런닝기록 저장 테스트")
+    @DisplayName("정기 런닝공지 저장 성공 테스트")
     @Test
-    public void saveRunningNoticeTest(@Mock Member member) {
+    public void saveRegularRunningNoticeTest1(@Mock User user, @Mock Crew crew) {
         //given
         Long id = 1L;
+        Member member = new Member(user, crew, MemberRole.ROLE_LEADER);
         List<MultipartFile> multipartFiles = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             multipartFiles.add(new MockMultipartFile("image", "".getBytes()));
@@ -121,6 +127,7 @@ class RunningNoticeServiceTest {
                 .status(RunningStatus.READY)
                 .build();
         RunningMember runningMember = new RunningMember(runningNotice, runningNotice.getMember());
+        doNothing().when(firebaseMessagingService).sendRegularRunningNoticeMessages(crew, runningNotice);
         when(runningNoticeRepository.save(runningNotice)).thenReturn(runningNotice);
         when(imageService.uploadImage(any(), any())).thenReturn("runningNoticeImgUrl");
         when(runningNoticeImageRepository.save(any()))
@@ -128,7 +135,73 @@ class RunningNoticeServiceTest {
         when(runningMemberRepository.save(any())).thenReturn(runningMember);
 
         ///when
-        Long runningNoticeId = runningNoticeService.saveRunningNotice(runningNotice, multipartFiles);
+        Long runningNoticeId = runningNoticeService.saveRegularRunningNotice(runningNotice, multipartFiles);
+
+        //then
+        assertThat(runningNoticeId).isSameAs(id);
+        verify(firebaseMessagingService,times(1)).sendRegularRunningNoticeMessages(crew, runningNotice);
+        verify(runningNoticeRepository, times(1)).save(any());
+        verify(imageService, times(multipartFiles.size())).uploadImage(any(), any());
+        verify(runningNoticeImageRepository, times(multipartFiles.size())).save(any());
+        verify(runningMemberRepository, times(1)).save(any());
+    }
+
+    @DisplayName("정기 런닝공지 저장 권한 예외 테스트")
+    @Test
+    public void saveRegularRunningNoticeTest2(@Mock User user, @Mock Crew crew) {
+        //given
+        Long id = 1L;
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            multipartFiles.add(new MockMultipartFile("image", "".getBytes()));
+        }
+        RunningNotice runningNotice = RunningNotice.builder()
+                .id(id)
+                .title("title")
+                .detail("detail")
+                .member(member)
+                .noticeType(NoticeType.REGULAR)
+                .runningDateTime(LocalDateTime.of(2023, 2, 26, 18, 0))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
+
+        ///when
+        //then
+        assertThatThrownBy(() -> runningNoticeService.saveRegularRunningNotice(runningNotice, multipartFiles))
+                .isInstanceOf(AuthorizationException.class);
+    }
+
+    @DisplayName("번개 런닝공지 저장 테스트")
+    @Test
+    public void saveInstantRunningNoticeTest(@Mock User user, @Mock Crew crew) {
+        //given
+        Long id = 1L;
+        Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            multipartFiles.add(new MockMultipartFile("image", "".getBytes()));
+        }
+        RunningNotice runningNotice = RunningNotice.builder()
+                .id(id)
+                .title("title")
+                .detail("detail")
+                .member(member)
+                .noticeType(NoticeType.INSTANT)
+                .runningDateTime(LocalDateTime.of(2023, 2, 26, 18, 0))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
+        RunningMember runningMember = new RunningMember(runningNotice, runningNotice.getMember());
+        when(runningNoticeRepository.save(runningNotice)).thenReturn(runningNotice);
+        when(imageService.uploadImage(any(), any())).thenReturn("runningNoticeImgUrl");
+        when(runningNoticeImageRepository.save(any()))
+                .thenReturn(new RunningNoticeImage("runningNoticeImgUrl", runningNotice));
+        when(runningMemberRepository.save(any())).thenReturn(runningMember);
+
+        ///when
+        Long runningNoticeId = runningNoticeService.saveInstantRunningNotice(runningNotice, multipartFiles);
 
         //then
         assertThat(runningNoticeId).isSameAs(id);
@@ -138,7 +211,7 @@ class RunningNoticeServiceTest {
         verify(runningMemberRepository, times(1)).save(any());
     }
 
-    @DisplayName("런닝기록 수정 테스트")
+    @DisplayName("런닝공지 수정 테스트")
     @Test
     public void updateRunningNoticeTest(@Mock Member member) {
         //given
