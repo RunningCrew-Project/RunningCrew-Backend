@@ -18,3 +18,7 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
+
+fcm:
+  key:
+    path: fcm/running-crew-project-firebase-adminsdk-ta9q7-fa58725efe.json
