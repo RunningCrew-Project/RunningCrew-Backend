@@ -18,3 +18,20 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
+
+cloud:
+  aws:
+    credentials:
+      access-key:
+      secret-key:
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket:
+    stack:
+      auto: false
+
+
+fcm:
+  key:
+    path: fcm/running-crew-project-firebase-adminsdk-ta9q7-fa58725efe.json
