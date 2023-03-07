@@ -9,7 +9,7 @@ import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.notification.entity.Notification;
-import com.project.runningcrew.repository.TestEntityFactory;
+import com.project.runningcrew.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
