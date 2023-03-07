@@ -1,6 +1,6 @@
 package com.project.runningcrew.fcm.token.repository;
 
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.fcm.token.entity.FcmToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

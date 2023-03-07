@@ -1,6 +1,6 @@
 package com.project.runningcrew.notification.service;
 
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.notification.entity.Notification;
 import com.project.runningcrew.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;

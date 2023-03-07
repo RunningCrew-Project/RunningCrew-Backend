@@ -1,8 +1,9 @@
 package com.project.runningcrew.repository.areas;
 
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.area.repository.DongAreaRepository;
 import com.project.runningcrew.repository.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

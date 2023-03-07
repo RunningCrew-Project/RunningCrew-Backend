@@ -1,6 +1,7 @@
 package com.project.runningcrew.service.images;
 
 import com.project.runningcrew.exception.ImageFileCreationException;
+import com.project.runningcrew.image.ImageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

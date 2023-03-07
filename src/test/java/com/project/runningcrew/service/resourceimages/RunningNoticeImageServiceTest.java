@@ -1,11 +1,12 @@
 package com.project.runningcrew.service.resourceimages;
 
-import com.project.runningcrew.entity.images.RunningNoticeImage;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.runningnotices.NoticeType;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.entity.runningnotices.RunningStatus;
-import com.project.runningcrew.repository.images.RunningNoticeImageRepository;
+import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.resourceimage.service.RunningNoticeImageService;
+import com.project.runningcrew.runningnotice.entity.NoticeType;
+import com.project.runningcrew.runningnotice.entity.RunningNotice;
+import com.project.runningcrew.runningnotice.entity.RunningStatus;
+import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

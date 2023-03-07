@@ -1,13 +1,14 @@
 package com.project.runningcrew.repository.images;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.boards.FreeBoard;
-import com.project.runningcrew.entity.images.BoardImage;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.board.entity.FreeBoard;
+import com.project.runningcrew.resourceimage.entity.BoardImage;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.repository.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
