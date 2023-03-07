@@ -44,6 +44,7 @@ public class ImageLocalServiceImpl implements ImageService {
      * @param fileUrl 삭제할 Image 의 경로
      * @throws ImageFileCreationException fileUrl 로 File 인스턴스 생성에 실패할 때
      */
+
     @Override
     public void deleteImage(String fileUrl) {
         File deleteFile = new File(fileUrl);
