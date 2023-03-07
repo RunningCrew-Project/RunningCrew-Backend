@@ -21,4 +21,6 @@ public interface ImageService {
      */
     public void deleteImage(String fileUrl);
 
+
+
 }
