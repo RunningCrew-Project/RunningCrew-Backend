@@ -1,17 +1,17 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.users.LoginType;
-import com.project.runningcrew.entity.users.Sex;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.member.service.MemberService;
+import com.project.runningcrew.user.entity.Sex;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.exception.duplicate.UserEmailDuplicateException;
 import com.project.runningcrew.exception.duplicate.UserNickNameDuplicateException;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
-import com.project.runningcrew.repository.MemberRepository;
-import com.project.runningcrew.repository.UserRepository;
-import com.project.runningcrew.repository.runningrecords.RunningRecordRepository;
-import com.project.runningcrew.service.images.ImageService;
-import org.assertj.core.api.Assertions;
+import com.project.runningcrew.member.repository.MemberRepository;
+import com.project.runningcrew.user.repository.UserRepository;
+import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
+import com.project.runningcrew.image.ImageService;
+import com.project.runningcrew.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +21,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,7 +34,8 @@ class UserServiceTest {
     @Mock UserRepository userRepository;
     @Mock MemberRepository memberRepository;
     @Mock RunningRecordRepository runningRecordRepository;
-    @Mock MemberService memberService;
+    @Mock
+    MemberService memberService;
     @Mock ImageService imageService;
 
     @InjectMocks

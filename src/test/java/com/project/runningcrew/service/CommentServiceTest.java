@@ -1,14 +1,15 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.entity.boards.Board;
-import com.project.runningcrew.entity.comment.BoardComment;
-import com.project.runningcrew.entity.comment.Comment;
-import com.project.runningcrew.entity.comment.RunningNoticeComment;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.repository.comment.BoardCommentRepository;
-import com.project.runningcrew.repository.comment.CommentRepository;
-import com.project.runningcrew.repository.comment.RunningNoticeCommentRepository;
+import com.project.runningcrew.comment.service.CommentService;
+import com.project.runningcrew.board.entity.Board;
+import com.project.runningcrew.comment.entity.BoardComment;
+import com.project.runningcrew.comment.entity.Comment;
+import com.project.runningcrew.comment.entity.RunningNoticeComment;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.runningnotice.entity.RunningNotice;
+import com.project.runningcrew.comment.repository.BoardCommentRepository;
+import com.project.runningcrew.comment.repository.CommentRepository;
+import com.project.runningcrew.comment.repository.RunningNoticeCommentRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +37,8 @@ class CommentServiceTest {
     @Mock BoardCommentRepository boardCommentRepository;
     @Mock RunningNoticeCommentRepository runningNoticeCommentRepository;
 
-    @InjectMocks CommentService commentService;
+    @InjectMocks
+    CommentService commentService;
 
 
     @DisplayName("게시글에 작성된 댓글 저장 테스트")

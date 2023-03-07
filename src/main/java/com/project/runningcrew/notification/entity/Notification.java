@@ -1,11 +1,11 @@
 package com.project.runningcrew.notification.entity;
 
-import com.project.runningcrew.entity.BaseEntity;
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.boards.NoticeBoard;
-import com.project.runningcrew.entity.runningnotices.NoticeType;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.common.BaseEntity;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.board.entity.NoticeBoard;
+import com.project.runningcrew.runningnotice.entity.NoticeType;
+import com.project.runningcrew.runningnotice.entity.RunningNotice;
+import com.project.runningcrew.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

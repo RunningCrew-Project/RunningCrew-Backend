@@ -1,13 +1,15 @@
 package com.project.runningcrew.repository;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.areas.DongAreaRepository;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.crew.repository.CrewRepository;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.member.repository.MemberRepository;
+import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.area.repository.DongAreaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

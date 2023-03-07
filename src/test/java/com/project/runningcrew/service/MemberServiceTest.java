@@ -1,13 +1,14 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.runningnotice.entity.RunningNotice;
+import com.project.runningcrew.member.service.MemberService;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
-import com.project.runningcrew.repository.MemberRepository;
+import com.project.runningcrew.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

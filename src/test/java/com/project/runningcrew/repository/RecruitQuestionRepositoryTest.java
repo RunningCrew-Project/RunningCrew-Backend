@@ -1,10 +1,12 @@
 package com.project.runningcrew.repository;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.RecruitQuestion;
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crew.repository.CrewRepository;
+import com.project.runningcrew.recruitquestion.entity.RecruitQuestion;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.recruitquestion.repository.RecruitQuestionRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,14 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
 class RecruitQuestionRepositoryTest {
 
-    @Autowired CrewRepository crewRepository;
-    @Autowired RecruitQuestionRepository recruitQuestionRepository;
+    @Autowired
+    CrewRepository crewRepository;
+    @Autowired
+    RecruitQuestionRepository recruitQuestionRepository;
     @Autowired TestEntityFactory testEntityFactory;
 
 
