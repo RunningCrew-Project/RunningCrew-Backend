@@ -2,7 +2,6 @@ package com.project.runningcrew.area.service;
 
 import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
-import com.project.runningcrew.area.service.GuAreaService;
 import com.project.runningcrew.exception.notFound.GuAreaNotFoundException;
 import com.project.runningcrew.exception.notFound.SidoAreaNotFoundException;
 import com.project.runningcrew.area.repository.GuAreaRepository;
@@ -34,6 +33,34 @@ class GuAreaServiceTest {
     @InjectMocks
     GuAreaService guAreaService;
 
+    @DisplayName("id 로 구 가져오기 성공 테스트")
+    @Test
+    public void findByIdTest1(@Mock SidoArea sidoArea) {
+        //given
+        Long guId = 1L;
+        GuArea guArea = new GuArea(guId, "gu", sidoArea);
+        when(guAreaRepository.findById(guId)).thenReturn(Optional.of(guArea));
+
+        ///when
+        GuArea findGuArea = guAreaService.findById(guId);
+
+        //then
+        assertThat(findGuArea).isEqualTo(guArea);
+        verify(guAreaRepository, times(1)).findById(guId);
+    }
+
+    @DisplayName("id 로 구 가져오기 예외 테스트")
+    @Test
+    public void findByIdTest2() {
+        //given
+        Long guId = 1L;
+        when(guAreaRepository.findById(guId)).thenReturn(Optional.empty());
+
+        ///when
+        //then
+        assertThatThrownBy(() -> guAreaService.findById(guId))
+                .isInstanceOf(GuAreaNotFoundException.class);
+    }
 
     @DisplayName("특정 시/도 의 모든 구 가져오기 테스트")
     @Test
