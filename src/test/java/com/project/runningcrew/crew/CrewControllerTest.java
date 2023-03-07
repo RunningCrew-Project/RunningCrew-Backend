@@ -1,9 +1,10 @@
 package com.project.runningcrew.crew;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.service.CrewService;
-import com.project.runningcrew.service.MemberService;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.crew.controller.CrewController;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 

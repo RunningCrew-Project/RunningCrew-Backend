@@ -1,7 +1,7 @@
 package com.project.runningcrew.crew.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.crew.entity.Crew;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

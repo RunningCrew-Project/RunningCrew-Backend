@@ -1,10 +1,10 @@
-package com.project.runningcrew.crew;
+package com.project.runningcrew.crew.controller;
 
 import com.project.runningcrew.crew.dto.GetCrewResponse;
-import com.project.runningcrew.entity.Crew;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
-import com.project.runningcrew.service.CrewService;
-import com.project.runningcrew.service.MemberService;
+import com.project.runningcrew.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
