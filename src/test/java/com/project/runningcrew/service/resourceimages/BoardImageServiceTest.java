@@ -1,11 +1,11 @@
 package com.project.runningcrew.service.resourceimages;
 
-import com.project.runningcrew.entity.boards.Board;
-import com.project.runningcrew.entity.boards.FreeBoard;
-import com.project.runningcrew.entity.images.BoardImage;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.repository.images.BoardImageRepository;
-import com.project.runningcrew.service.resourceimages.BoardImageService;
+import com.project.runningcrew.board.entity.Board;
+import com.project.runningcrew.board.entity.FreeBoard;
+import com.project.runningcrew.resourceimage.entity.BoardImage;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
+import com.project.runningcrew.resourceimage.service.BoardImageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

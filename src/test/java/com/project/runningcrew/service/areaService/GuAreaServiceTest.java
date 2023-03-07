@@ -1,11 +1,12 @@
 package com.project.runningcrew.service.areaService;
 
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.area.service.GuAreaService;
 import com.project.runningcrew.exception.notFound.GuAreaNotFoundException;
 import com.project.runningcrew.exception.notFound.SidoAreaNotFoundException;
-import com.project.runningcrew.repository.areas.GuAreaRepository;
-import com.project.runningcrew.repository.areas.SidoAreaRepository;
+import com.project.runningcrew.area.repository.GuAreaRepository;
+import com.project.runningcrew.area.repository.SidoAreaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

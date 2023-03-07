@@ -1,6 +1,6 @@
 package com.project.runningcrew.notification.repository;
 
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.notification.entity.Notification;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

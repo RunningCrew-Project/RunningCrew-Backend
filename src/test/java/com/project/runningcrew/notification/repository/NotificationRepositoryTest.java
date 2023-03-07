@@ -1,13 +1,13 @@
 package com.project.runningcrew.notification.repository;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.boards.NoticeBoard;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.board.entity.NoticeBoard;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.runningnotice.entity.RunningNotice;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.notification.entity.Notification;
 import com.project.runningcrew.repository.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

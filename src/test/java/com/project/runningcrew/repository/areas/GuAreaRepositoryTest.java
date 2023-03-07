@@ -1,7 +1,8 @@
 package com.project.runningcrew.repository.areas;
 
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.area.repository.GuAreaRepository;
 import com.project.runningcrew.repository.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,10 +1,10 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.RecruitAnswer;
-import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.RecruitAnswerRepository;
-import org.assertj.core.api.Assertions;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.recruitanswer.entity.RecruitAnswer;
+import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
+import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

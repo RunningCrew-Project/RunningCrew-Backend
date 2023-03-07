@@ -1,10 +1,11 @@
 package com.project.runningcrew.repository.runningrecords;
 
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.runningrecord.entity.PersonalRunningRecord;
+import com.project.runningcrew.runningrecord.repository.PersonalRunningRecordRepository;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.repository.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional

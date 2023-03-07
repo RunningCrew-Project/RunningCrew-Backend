@@ -1,7 +1,7 @@
 package com.project.runningcrew.fcm.token.entity;
 
-import com.project.runningcrew.entity.BaseEntity;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.common.BaseEntity;
+import com.project.runningcrew.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,20 +1,20 @@
 package com.project.runningcrew.repository.boards;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.boards.FreeBoard;
-import com.project.runningcrew.entity.boards.NoticeBoard;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.users.LoginType;
-import com.project.runningcrew.entity.users.Sex;
-import com.project.runningcrew.entity.users.User;
-import com.project.runningcrew.repository.CrewRepository;
-import com.project.runningcrew.repository.MemberRepository;
+import com.project.runningcrew.board.repository.NoticeBoardRepository;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.board.entity.NoticeBoard;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.user.entity.LoginType;
+import com.project.runningcrew.user.entity.Sex;
+import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.crew.repository.CrewRepository;
+import com.project.runningcrew.member.repository.MemberRepository;
 import com.project.runningcrew.repository.TestEntityFactory;
-import com.project.runningcrew.repository.UserRepository;
+import com.project.runningcrew.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
 class NoticeBoardRepositoryTest {
@@ -38,7 +36,8 @@ class NoticeBoardRepositoryTest {
     @Autowired UserRepository userRepository;
     @Autowired CrewRepository crewRepository;
     @Autowired MemberRepository memberRepository;
-    @Autowired NoticeBoardRepository noticeBoardRepository;
+    @Autowired
+    NoticeBoardRepository noticeBoardRepository;
     @Autowired TestEntityFactory testEntityFactory;
 
 

@@ -1,34 +1,30 @@
 package com.project.runningcrew.repository.comment;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.areas.DongArea;
-import com.project.runningcrew.entity.areas.GuArea;
-import com.project.runningcrew.entity.areas.SidoArea;
-import com.project.runningcrew.entity.boards.Board;
-import com.project.runningcrew.entity.boards.FreeBoard;
-import com.project.runningcrew.entity.boards.ReviewBoard;
-import com.project.runningcrew.entity.comment.BoardComment;
-import com.project.runningcrew.entity.comment.Comment;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.runningnotices.NoticeType;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.entity.runningnotices.RunningStatus;
-import com.project.runningcrew.entity.runningrecords.CrewRunningRecord;
-import com.project.runningcrew.entity.runningrecords.PersonalRunningRecord;
-import com.project.runningcrew.entity.users.LoginType;
-import com.project.runningcrew.entity.users.Sex;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.comment.repository.BoardCommentRepository;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.board.entity.FreeBoard;
+import com.project.runningcrew.board.entity.ReviewBoard;
+import com.project.runningcrew.comment.entity.BoardComment;
+import com.project.runningcrew.crew.repository.CrewRepository;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.runningrecord.entity.PersonalRunningRecord;
+import com.project.runningcrew.member.repository.MemberRepository;
+import com.project.runningcrew.user.entity.LoginType;
+import com.project.runningcrew.user.entity.Sex;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.repository.*;
-import com.project.runningcrew.repository.boards.BoardRepository;
-import com.project.runningcrew.repository.runningrecords.CrewRunningRecordRepository;
-import com.project.runningcrew.repository.runningrecords.PersonalRunningRecordRepository;
+import com.project.runningcrew.board.repository.BoardRepository;
+import com.project.runningcrew.runningrecord.repository.PersonalRunningRecordRepository;
+import com.project.runningcrew.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -36,18 +32,20 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Transactional
 class BoardCommentRepositoryTest {
 
-    @Autowired UserRepository userRepository;
-    @Autowired CrewRepository crewRepository;
-    @Autowired MemberRepository memberRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    CrewRepository crewRepository;
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired BoardRepository boardRepository;
-    @Autowired BoardCommentRepository boardCommentRepository;
+    @Autowired
+    BoardCommentRepository boardCommentRepository;
     @Autowired PersonalRunningRecordRepository personalRunningRecordRepository;
     @Autowired TestEntityFactory testEntityFactory;
 

@@ -5,7 +5,6 @@ spring:
     password:
     driver-class-name: org.h2.Driver
 
-
   jpa:
     hibernate:
       ddl-auto: create
@@ -15,9 +14,23 @@ spring:
         format_sql: true
 
 
+cloud:
+  aws:
+    credentials:
+      access-key: ${s3.accesskey}
+      secret-key: ${s3.secretkey}
+    region:
+      static: ${s3.resion}
+    s3:
+      bucket: ${s3.bucket}
+    stack:
+      auto: false
+
+
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
+
 
 
 fcm:

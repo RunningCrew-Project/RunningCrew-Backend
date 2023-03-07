@@ -1,16 +1,16 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.entity.RunningMember;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.runningnotices.NoticeType;
-import com.project.runningcrew.entity.runningnotices.RunningNotice;
-import com.project.runningcrew.entity.runningnotices.RunningStatus;
+import com.project.runningcrew.runningmember.entity.RunningMember;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.runningmember.service.RunningMemberService;
+import com.project.runningcrew.runningnotice.entity.NoticeType;
+import com.project.runningcrew.runningnotice.entity.RunningNotice;
+import com.project.runningcrew.runningnotice.entity.RunningStatus;
 import com.project.runningcrew.exception.RunningDateTimeException;
 import com.project.runningcrew.exception.RunningPersonnelException;
 import com.project.runningcrew.exception.alreadyExist.RunningMemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.RunningMemberNotFoundException;
-import com.project.runningcrew.repository.RunningMemberRepository;
-import org.assertj.core.api.Assertions;
+import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

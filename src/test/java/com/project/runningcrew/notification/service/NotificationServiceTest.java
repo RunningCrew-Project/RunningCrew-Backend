@@ -1,10 +1,10 @@
 package com.project.runningcrew.notification.service;
 
-import com.project.runningcrew.entity.Crew;
-import com.project.runningcrew.entity.boards.NoticeBoard;
-import com.project.runningcrew.entity.members.Member;
-import com.project.runningcrew.entity.members.MemberRole;
-import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.board.entity.NoticeBoard;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.notification.entity.Notification;
 import com.project.runningcrew.notification.repository.NotificationRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
