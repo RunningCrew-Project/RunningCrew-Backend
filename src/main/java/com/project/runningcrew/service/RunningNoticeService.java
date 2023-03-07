@@ -4,12 +4,15 @@ import com.project.runningcrew.entity.Crew;
 import com.project.runningcrew.entity.RunningMember;
 import com.project.runningcrew.entity.images.RunningNoticeImage;
 import com.project.runningcrew.entity.members.Member;
+import com.project.runningcrew.entity.members.MemberRole;
 import com.project.runningcrew.entity.runningnotices.NoticeType;
 import com.project.runningcrew.entity.runningnotices.RunningNotice;
 import com.project.runningcrew.entity.runningnotices.RunningStatus;
 import com.project.runningcrew.entity.users.User;
+import com.project.runningcrew.exception.AuthorizationException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.exception.notFound.RunningNoticeNotFoundException;
+import com.project.runningcrew.fcm.FirebaseMessagingService;
 import com.project.runningcrew.repository.MemberRepository;
 import com.project.runningcrew.repository.RunningMemberRepository;
 import com.project.runningcrew.repository.RunningNoticeRepository;
@@ -39,6 +42,7 @@ public class RunningNoticeService {
     private final RunningMemberRepository runningMemberRepository;
     private final MemberRepository memberRepository;
     private final RunningNoticeCommentRepository runningNoticeCommentRepository;
+    private final FirebaseMessagingService firebaseMessagingService;
     private final String imageDirName = "runningNotice";
 
     /**
@@ -54,14 +58,40 @@ public class RunningNoticeService {
     }
 
     /**
-     * 입력받은 MultipartFile 들과 RunningNotice 를 저장하고, 부여된 id 를 반환
+     * 입력받은 MultipartFile 들과 noticeType 이 REGULAR 인 RunningNotice 를 저장하고, 부여된 id 를 반환.
      *
      * @param runningNotice  저장할 RunningNotice
      * @param multipartFiles 저장할 모든 MultipartFile
      * @return RunningNotice 에 부여된 id
      */
     @Transactional
-    public Long saveRunningNotice(RunningNotice runningNotice, List<MultipartFile> multipartFiles) {
+    public Long saveRegularRunningNotice(RunningNotice runningNotice, List<MultipartFile> multipartFiles) {
+        MemberRole role = runningNotice.getMember().getRole();
+        if (!role.isManager()) {
+            throw new AuthorizationException();
+        }
+
+        RunningNotice savedRunningNotice = runningNoticeRepository.save(runningNotice);
+        firebaseMessagingService.sendRegularRunningNoticeMessages(savedRunningNotice.getMember().getCrew(), savedRunningNotice);
+        for (MultipartFile multipartFile : multipartFiles) {
+            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
+            runningNoticeImageRepository.save(new RunningNoticeImage(imageUrl, savedRunningNotice));
+        }
+
+        RunningMember runningMember = new RunningMember(runningNotice, runningNotice.getMember());
+        runningMemberRepository.save(runningMember);
+        return savedRunningNotice.getId();
+    }
+
+    /**
+     * 입력받은 MultipartFile 들과 noticeType 이 INSTANT 인 RunningNotice 를 저장하고, 부여된 id 를 반환.
+     *
+     * @param runningNotice  저장할 RunningNotice
+     * @param multipartFiles 저장할 모든 MultipartFile
+     * @return RunningNotice 에 부여된 id
+     */
+    @Transactional
+    public Long saveInstantRunningNotice(RunningNotice runningNotice, List<MultipartFile> multipartFiles) {
         RunningNotice savedRunningNotice = runningNoticeRepository.save(runningNotice);
         for (MultipartFile multipartFile : multipartFiles) {
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
