@@ -17,12 +17,12 @@ spring:
 cloud:
   aws:
     credentials:
-      access-key: ${s3.accesskey}
-      secret-key: ${s3.secretkey}
+      access-key:
+      secret-key:
     region:
-      static: ${s3.resion}
+      static: ap-northeast-2
     s3:
-      bucket: ${s3.bucket}
+      bucket:
     stack:
       auto: false
 

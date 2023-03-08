@@ -5,7 +5,7 @@ import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.fcm.token.entity.FcmToken;
-import com.project.runningcrew.repository.TestEntityFactory;
+import com.project.runningcrew.TestEntityFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

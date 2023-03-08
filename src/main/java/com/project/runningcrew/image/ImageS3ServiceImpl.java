@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.UUID;
 
 
-@Service
+//@Service
 @RequiredArgsConstructor
 public class ImageS3ServiceImpl implements ImageService{
 
