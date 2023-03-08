@@ -14,17 +14,21 @@ spring:
         format_sql: true
 
 
+
+
 cloud:
   aws:
     credentials:
-      access-key:
-      secret-key:
+      accessKey: AKIAQP4HH4EELRPC7VWE
+      secretKey: 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
+    s3:
+      bucket: s3-running-crew
     region:
       static: ap-northeast-2
-    s3:
-      bucket:
     stack:
       auto: false
+
+
 
 
 logging.level:

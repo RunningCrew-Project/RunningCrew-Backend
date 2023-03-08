@@ -1,18 +1,25 @@
-package com.project.runningcrew.user.service;
+package com.project.runningcrew.service;
 
-import com.project.runningcrew.user.entity.User;
+
+import com.project.runningcrew.exception.LoginFailException;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.duplicate.UserEmailDuplicateException;
 import com.project.runningcrew.exception.duplicate.UserNickNameDuplicateException;
-import com.project.runningcrew.member.repository.MemberRepository;
-import com.project.runningcrew.member.service.MemberService;
-import com.project.runningcrew.user.repository.UserRepository;
-import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
+import com.project.runningcrew.fcm.token.entity.FcmToken;
+import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
+
 import com.project.runningcrew.image.ImageService;
+import com.project.runningcrew.runningrecord.entity.RunningRecord;
+import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
+import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -21,12 +28,73 @@ public class UserService {
 
 
     private final UserRepository userRepository;
-    private final MemberRepository memberRepository;
+    private final FcmTokenRepository fcmTokenRepository;
     private final RunningRecordRepository runningRecordRepository;
 
     private final ImageService imageService;
-    private final MemberService memberService;
     private final String imageDirName = "user";
+
+
+
+
+
+
+    /**
+     * 로그인, 로그아웃
+     */
+
+
+    /**
+     * 로그인 정보를 확인한다(email, password, token), 로그인에 성공하면 userId 를 반환한다.
+     * @param email 로그인 email
+     * @param password 로그인 password
+     * @param token 입력받은 fcmToken 값
+     * @return userId
+     */
+    public Long logIn(String email, String password, String token) {
+
+        User loginUser = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        // 유저 존재여부 검증
+
+        if(loginUser.getPassword().equals(password)) {
+            // 비밀번호 검증 성공
+
+            if(!fcmTokenRepository.existsByUser(loginUser)) {
+                // FcmToken 정보 없는 경우
+                FcmToken fcmToken = new FcmToken(loginUser, token);
+                fcmTokenRepository.save(fcmToken);
+            }
+            return loginUser.getId();
+
+        }
+        else {
+            // 비밀번호 검증 실패
+            throw new LoginFailException();
+        }
+
+    }
+
+
+    /**
+     * 입력받은 user 를 로그아웃한다. user 의 fcmToken 을 삭제한다.
+     * @param user 로그아웃 user
+     */
+    public void logOut(User user) {
+        // Fcm token 삭제
+        FcmToken fcmToken = fcmTokenRepository.findByUser(user).get();
+        fcmTokenRepository.delete(fcmToken);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
     /**
@@ -109,18 +177,34 @@ public class UserService {
 
 
     /**
-     * 입력된 User 와 그에 매핑된 Member, RunningRecord 를 삭제한다.
+     * 입력된 User 와 그에 매핑된 userImg, RunningRecord 를 삭제한다.
      * @param user 삭제할 user
      */
     public void deleteUser(User user) {
 
-        /**
-         * 추후 작성 예정
-         */
+        // 해당 user 의 모든 runningRecord 삭제
+        List<RunningRecord> deleteRunningRecords = runningRecordRepository.findAllByUser(user);
+        runningRecordRepository.deleteAll(deleteRunningRecords);
+
+        // 해당 user 의 이미지 삭제
+        imageService.deleteImage(user.getImgUrl());
+
+        // user 삭제
         userRepository.delete(user);
     }
 
 
+
+
+
+
+
+
+
+
+    /**
+     * 중복 검증 로직
+     */
 
 
     /**
