@@ -30,8 +30,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'com.google.firebase:firebase-admin:9.1.1'
+    implementation ('org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE')
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.14'
 
 }

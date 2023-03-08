@@ -8,23 +8,31 @@ import com.project.runningcrew.exception.S3UploadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.UUID;
 
 
-//@Service
+@Service
+@Transactional
 @RequiredArgsConstructor
 public class ImageS3ServiceImpl implements ImageService{
 
-    @Value("${spring.s3.bucket}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
     private final AmazonS3 amazonS3;
     private final AmazonS3Client amazonS3Client;
 
 
+    /**
+     * MultipartFile 을 S3 스토리지에 업로드하고 url 을 반환한다.
+     * @param multipartFile 저장할 MultipartFile
+     * @param dirName 이미지를 저장할 directory
+     * @return 저장된 s3 스토리지의 url
+     */
     @Override
     public String uploadImage(MultipartFile multipartFile, String dirName) {
         if (multipartFile.isEmpty()) {
@@ -47,6 +55,10 @@ public class ImageS3ServiceImpl implements ImageService{
         return amazonS3.getUrl(bucketName, s3FileName).toString();
     }
 
+    /**
+     * s3 스토리지에 저장된 이미지를 삭제한다.
+     * @param fileUrl 삭제할 s3 스토리지의 이미지 url
+     */
     @Override
     public void deleteImage(String fileUrl) {
         boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, fileUrl);
