@@ -32,11 +32,18 @@ class RecruitAnswerServiceTest {
     @Test
     void saveAllRecruitAnswerTest(@Mock User user, @Mock Crew crew) throws Exception {
         //given
+        Long id = 1L;
         List<RecruitAnswer> answerList = new ArrayList<>();
-        List<Long> idList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            answerList.add(new RecruitAnswer(user, crew, "answer" + i, i));
-        }
+        RecruitAnswer recruitAnswer = new RecruitAnswer(id, user, crew, "answer", 0);
+        when(recruitAnswerRepository.save(recruitAnswer)).thenReturn(recruitAnswer);
+        answerList.add(recruitAnswerRepository.save(recruitAnswer));
+
+        //when
+        List<Long> savedList = recruitAnswerService.saveAllRecruitAnswer(answerList);
+
+        //then
+        assertThat(savedList.size()).isEqualTo(1);
+        assertThat(savedList.get(0)).isEqualTo(id);
 
     }
 

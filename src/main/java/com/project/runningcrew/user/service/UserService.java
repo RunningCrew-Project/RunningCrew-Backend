@@ -1,17 +1,18 @@
 package com.project.runningcrew.service;
 
-import com.project.runningcrew.entity.runningrecords.RunningRecord;
-import com.project.runningcrew.entity.users.User;
+
 import com.project.runningcrew.exception.LoginFailException;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.duplicate.UserEmailDuplicateException;
 import com.project.runningcrew.exception.duplicate.UserNickNameDuplicateException;
 import com.project.runningcrew.fcm.token.entity.FcmToken;
 import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
-import com.project.runningcrew.repository.MemberRepository;
-import com.project.runningcrew.repository.UserRepository;
-import com.project.runningcrew.repository.runningrecords.RunningRecordRepository;
-import com.project.runningcrew.service.images.ImageService;
+
+import com.project.runningcrew.image.ImageService;
+import com.project.runningcrew.runningrecord.entity.RunningRecord;
+import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
+import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

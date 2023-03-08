@@ -11,7 +11,6 @@ import com.project.runningcrew.member.repository.MemberRepository;
 import com.project.runningcrew.user.repository.UserRepository;
 import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
 import com.project.runningcrew.image.ImageService;
-import com.project.runningcrew.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,12 +33,11 @@ class UserServiceTest {
     @Mock UserRepository userRepository;
     @Mock MemberRepository memberRepository;
     @Mock RunningRecordRepository runningRecordRepository;
-    @Mock
-    MemberService memberService;
+    @Mock MemberService memberService;
     @Mock ImageService imageService;
 
     @InjectMocks
-    UserService userService;
+    com.project.runningcrew.service.UserService userService;
 
 
 
