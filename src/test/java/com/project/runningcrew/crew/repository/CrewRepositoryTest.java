@@ -1,5 +1,6 @@
 package com.project.runningcrew.crew.repository;
 
+import com.project.runningcrew.area.repository.GuAreaRepository;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
@@ -33,6 +34,9 @@ class CrewRepositoryTest {
 
     @Autowired
     DongAreaRepository dongAreaRepository;
+
+    @Autowired
+    GuAreaRepository guAreaRepository;
 
     @Autowired
     MemberRepository memberRepository;
@@ -167,7 +171,7 @@ class CrewRepositoryTest {
     }
 
     @Test
-    public void findRandomByLocationTest() {
+    public void findRandomByDongAreaId() {
         //given
         int maxNum = 5;
         String dongAreaName = "dong1";
@@ -233,6 +237,34 @@ class CrewRepositoryTest {
 
         //then
         assertThat(exist).isFalse();
+    }
+
+    @DisplayName("특정 구의 id 를 가진 크루 랜덤 반환 테스트")
+    @Test
+    public void findRandomByGuAreaIdTest() {
+        //given
+        int maxNum = 5;
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        for (int i = 50; i < 60; i++) {
+            Crew crew = Crew.builder().name("crew" + i)
+                    .introduction("introduction" + i)
+                    .crewImgUrl("crewImageUrl")
+                    .dongArea(dongArea)
+                    .build();
+            crewRepository.save(crew);
+        }
+
+        //when
+        Long guAreaId = guArea.getId();
+        List<Crew> randomCrewList = crewRepository.findRandomByGuAreaId(guAreaId, maxNum);
+
+        //then
+        assertThat(randomCrewList.size()).isSameAs(maxNum);
+        for (Crew crew : randomCrewList) {
+            assertThat(crew.getDongArea().getGuArea()).isEqualTo(guArea);
+        }
     }
 
 }

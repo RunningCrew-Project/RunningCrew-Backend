@@ -2,6 +2,7 @@ package com.project.runningcrew.area.service;
 
 import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.exception.notFound.DongAreaNotFoundException;
 import com.project.runningcrew.exception.notFound.GuAreaNotFoundException;
 import com.project.runningcrew.exception.notFound.SidoAreaNotFoundException;
 import com.project.runningcrew.area.repository.GuAreaRepository;
@@ -20,6 +21,17 @@ public class GuAreaService {
 
     private final SidoAreaRepository sidoAreaRepository;
     private final GuAreaRepository guAreaRepository;
+
+    /**
+     * 입력받은 guAreaId 를 가진 GuArea 를 반환한다. 없다면 GuAreaNotFoundException 을 throw 한다
+     *
+     * @param guAreaId 찾는 GuArea 의 id
+     * @return guAreaId 를 가진 GuArea
+     * @throws GuAreaNotFoundException guAreaId 를 가진 GuArea 가 없을 때
+     */
+    public GuArea findById(Long guAreaId) {
+        return guAreaRepository.findById(guAreaId).orElseThrow(GuAreaNotFoundException::new);
+    }
 
     /**
      * 특정 시/도 에 속한 모둔 구를 가져온다. 이때 이름순으로 오름차순 정렬되어 있다.
