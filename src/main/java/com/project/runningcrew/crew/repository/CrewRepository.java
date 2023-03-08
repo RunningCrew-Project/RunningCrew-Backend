@@ -16,6 +16,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
 
     /**
      * name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 반환
+     *
      * @param keyword
      * @return name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 의 list
      */
@@ -28,6 +29,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
 
     /**
      * name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 의 개수 반환
+     *
      * @param keyword
      * @return name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 의 개수
      */
@@ -40,6 +42,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
 
     /**
      * name 또는 introduction 또는 area 에 keyword 가 포함된 crew 들을 페이징하여 반환
+     *
      * @param pageable
      * @param keyword
      * @return 페이징 조건에 맞는 name 또는 introduction 또는 area 에 keyword 가 포함된 crew
@@ -54,16 +57,31 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
 
     /**
      * 특정 dongArea 에 포함되는 랜덤한 crew 들을 최대 maxsize 개 반환
+     *
      * @param dongAreaId dongArea 의 id
-     * @param maxSize 반환할 crew 의 최대 개수
+     * @param maxSize    반환할 crew 의 최대 개수
      * @return dongArea 에 포함되는 랜덤한 crew 들이 최대 maxsize 개 담긴 list
      */
-    @Query(value = "select * from crews where crews.dong_area_id = :dongAreaId" +
-            " order by random() limit :maxSize", nativeQuery = true)
+    @Query(value = "select * from crews where crews.dong_area_id = :dongAreaId " +
+            "order by random() limit :maxSize", nativeQuery = true)
     List<Crew> findRandomByDongAreaId(@Param("dongAreaId") Long dongAreaId, @Param("maxSize") int maxSize);
 
     /**
+     * 특정 guArea 에 포함되는 랜덤한 crew 들을 최대 maxsize 개 반환
+     *
+     * @param guAreaId guArea 의 id
+     * @param maxSize  반환할 crew 의 최대 개수
+     * @return dongArea 에 포함되는 랜덤한 crew 들이 최대 maxsize 개 담긴 list
+     */
+    @Query(value = "select * from crews as c " +
+            "inner join dong_areas as d on d.dong_area_id = c.dong_area_id " +
+            "where d.gu_areas_id = :guAreaId " +
+            "order by random() limit :maxSize", nativeQuery = true)
+    List<Crew> findRandomByGuAreaId(@Param("guAreaId") Long guAreaId, @Param("maxSize") int maxSize);
+
+    /**
      * 입력받은 User 가 속한 모든 Crew 를 반환
+     *
      * @param user
      * @return User 가 속한 모든 Crew
      */
@@ -72,6 +90,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
 
     /**
      * 크루 이름이 name 인 크루 존재 유무 반환
+     *
      * @param name 크루 이름
      * @return 크루 이름이 name 인 크루가 있다면 true, 없다면 false
      */

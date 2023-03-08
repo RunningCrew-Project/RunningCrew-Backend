@@ -1,9 +1,9 @@
 package com.project.runningcrew.crew.service;
 
+import com.project.runningcrew.area.entity.SidoArea;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
-import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.user.entity.User;
@@ -347,7 +347,7 @@ class CrewServiceTest {
         when(crewRepository.findRandomByDongAreaId(dongId, maxSize)).thenReturn(crews);
 
         ///when
-        List<Crew> crewList = crewService.findRandomByDongAreaId(dongId, maxSize);
+        List<Crew> crewList = crewService.findRandomByDongArea(dongArea, maxSize);
 
         //then
         assertThat(crewList.size()).isLessThanOrEqualTo(maxSize);
@@ -355,6 +355,36 @@ class CrewServiceTest {
             assertThat(crew.getDongArea().getId()).isSameAs(dongId);
         }
         verify(crewRepository, times(1)).findRandomByDongAreaId(dongId, maxSize);
+    }
+
+    @DisplayName("구 id 로 랜덤한 크루 maxSize 개 가져오기 테스트")
+    @Test
+    public void findRandomByGuAreaTest(@Mock SidoArea sidoArea) {
+        //given
+        Long guId = 1L;
+        int maxSize = 10;
+        GuArea guArea = new GuArea(guId, "gu1", sidoArea);
+        DongArea dongArea = new DongArea(2L, "dong1", guArea);
+        List<Crew> crews = new ArrayList<>();
+        for (int i = 0; i < maxSize; i++) {
+            Crew crew = Crew.builder().name("crew" + i)
+                    .introduction("introduction" + i)
+                    .crewImgUrl("crewImgUrl" + i)
+                    .dongArea(dongArea)
+                    .build();
+            crews.add(crew);
+        }
+        when(crewRepository.findRandomByGuAreaId(guId, maxSize)).thenReturn(crews);
+
+        ///when
+        List<Crew> crewList = crewService.findRandomByGuArea(guArea, maxSize);
+
+        //then
+        assertThat(crewList.size()).isLessThanOrEqualTo(maxSize);
+        for (Crew crew : crewList) {
+            assertThat(crew.getDongArea().getGuArea().getId()).isSameAs(guId);
+        }
+        verify(crewRepository, times(1)).findRandomByGuAreaId(guId, maxSize);
     }
 
     @DisplayName("유저가 속한 모든 크루 찾기 테스트")
@@ -377,6 +407,36 @@ class CrewServiceTest {
         //then
         assertThat(crewList.size()).isSameAs(crews.size());
         verify(crewRepository, times(1)).findAllByUser(user);
+    }
+
+    @DisplayName("입력받은 이름을 가진 크루 존재함 테스트")
+    @Test
+    public void existsByNameTest1() {
+        //given
+        String name = "crew";
+        when(crewRepository.existsByName(name)).thenReturn(true);
+
+        ///when
+        boolean result = crewService.existsByName(name);
+
+        //then
+        assertThat(result).isTrue();
+        verify(crewRepository, times(1)).existsByName(name);
+    }
+
+    @DisplayName("입력받은 이름을 가진 크루 존재 안함 테스트")
+    @Test
+    public void existsByNameTest2() {
+        //given
+        String name = "crew";
+        when(crewRepository.existsByName(name)).thenReturn(false);
+
+        ///when
+        boolean result = crewService.existsByName(name);
+
+        //then
+        assertThat(result).isFalse();
+        verify(crewRepository, times(1)).existsByName(name);
     }
 
 }
