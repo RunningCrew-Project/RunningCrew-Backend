@@ -19,10 +19,10 @@ spring:
 cloud:
   aws:
     credentials:
-      accessKey: AKIAQP4HH4EELRPC7VWE
-      secretKey: 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
+      accessKey: AKIAQP4HH4EEIU5OVHM6
+      secretKey: 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
     s3:
-      bucket: s3-running-crew
+      bucket: running-crew-s3
     region:
       static: ap-northeast-2
     stack:

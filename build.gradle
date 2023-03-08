@@ -31,7 +31,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'com.google.firebase:firebase-admin:9.1.1'
-    implementation ('org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE')
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.281'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.14'
 
 }

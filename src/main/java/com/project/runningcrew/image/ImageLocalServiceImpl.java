@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.UUID;
 
 //@Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class ImageLocalServiceImpl implements ImageService {
 
     private String DOWNLOAD_PATH = "C:\\Users\\alsrn\\Desktop\\test";
