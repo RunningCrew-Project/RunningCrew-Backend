@@ -17,12 +17,12 @@ spring:
 cloud:
   aws:
     credentials:
-      access-key:
-      secret-key:
+      access-key: AKIAQP4HH4EEITRO3TZY
+      secret-key: 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
     region:
       static: ap-northeast-2
     s3:
-      bucket:
+      bucket: s3-running-crew
     stack:
       auto: false
 
