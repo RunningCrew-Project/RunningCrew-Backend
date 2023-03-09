@@ -9,7 +9,6 @@ import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -68,7 +67,7 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
         } catch (ExpiredJwtException e) {
             throw new AuthenticationServiceException("토큰 값이 만료되었습니다.");
         } catch (Exception e) {
-            throw new AccessDeniedException("토큰 형식이 올바르지 않습니다.");
+            throw new AuthenticationServiceException("토큰 형식이 올바르지 않습니다.");
         }
     }
 
