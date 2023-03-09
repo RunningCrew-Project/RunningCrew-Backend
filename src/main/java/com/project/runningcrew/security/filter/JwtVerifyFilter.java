@@ -1,7 +1,9 @@
 package com.project.runningcrew.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
+import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.security.CustomUserDetail;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.repository.UserRepository;
@@ -9,6 +11,7 @@ import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,12 +24,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 public class JwtVerifyFilter extends BasicAuthenticationFilter {
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final String SECRET_KEY;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public JwtVerifyFilter(AuthenticationManager authenticationManager,
                            UserRepository userRepository,
@@ -47,7 +52,34 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
         }
 
         String jwtToken = jwtHeader.replace("Bearer ", "");
-        String email = getEmail(jwtToken);
+        String email = null;
+        try {
+            email =  Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwtToken).getBody().getSubject();
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("utf-8");
+
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                    .status(HttpServletResponse.SC_UNAUTHORIZED)
+                    .messages("토큰 값이 만료되었습니다.")
+                    .errors(Map.of())
+                    .build();
+            objectMapper.writeValue(response.getOutputStream(), errorResponse);
+            return;
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("utf-8");
+
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                    .status(HttpServletResponse.SC_UNAUTHORIZED)
+                    .messages("토큰 형식이 올바르지 않습니다.")
+                    .errors(Map.of())
+                    .build();
+            objectMapper.writeValue(response.getOutputStream(), errorResponse);
+            return;
+        }
 
         if (email != null) {
             User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
@@ -59,16 +91,6 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         chain.doFilter(request, response);
-    }
-
-    private String getEmail(String token) {
-        try {
-            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
-        } catch (ExpiredJwtException e) {
-            throw new AuthenticationServiceException("토큰 값이 만료되었습니다.");
-        } catch (Exception e) {
-            throw new AuthenticationServiceException("토큰 형식이 올바르지 않습니다.");
-        }
     }
 
 }
