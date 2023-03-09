@@ -11,6 +11,7 @@ import com.project.runningcrew.security.filter.JwtVerifyFilter;
 import com.project.runningcrew.user.repository.UserRepository;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -34,7 +35,8 @@ public class SecurityConfig {
     private final UserRoleRepository userRoleRepository;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
-    private final String SECRET_KEY = "FDSAFSDAFSDF";
+    @Value("${jwt.secret-key}")
+    private final String SECRET_KEY;
 
     @Bean
     public AuthenticationManager authenticationManager(
