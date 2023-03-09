@@ -13,11 +13,10 @@ import java.util.Date;
 
 
 @Component
-@RequiredArgsConstructor
 public class JwtProvider {
 
     @Value("${jwt.secret-key}")
-    private final String SECRET_KEY;
+    private String SECRET_KEY;
     private final Long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 60 * 12;
     private final Long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 14;
 
