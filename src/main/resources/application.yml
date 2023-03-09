@@ -19,8 +19,8 @@ spring:
 cloud:
   aws:
     credentials:
-      accessKey: AKIAQP4HH4EEIU5OVHM6
-      secretKey: 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
+      accessKey: AKIAQP4HH4EEFLZRD27U # test-user-yongsoo IAM 사용자의 엑세스 키
+      secretKey: +LSBk21aAoI6Ki8wIJ1mP+qeXPzZq0R17xdrIWup # test-user-yongsoo IAM 사용자의 비밀 키
     s3:
       bucket: running-crew-s3
     region:
