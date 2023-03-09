@@ -36,7 +36,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     @Value("${jwt.secret-key}")
-    private final String SECRET_KEY;
+    private String SECRET_KEY;
 
     @Bean
     public AuthenticationManager authenticationManager(

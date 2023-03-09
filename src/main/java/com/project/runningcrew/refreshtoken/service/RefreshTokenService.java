@@ -29,7 +29,7 @@ public class RefreshTokenService {
     private final UserRoleRepository userRoleRepository;
     private final JwtProvider jwtProvider;
     @Value("${jwt.secret-key}")
-    private final String SECRET_KEY;
+    private String SECRET_KEY;
 
     /**
      * refreshToken 을 확인하고, user 의 refreshToken 이 맞다면 accessToken 을 생성하여 TokenDto 에 넣는다.
