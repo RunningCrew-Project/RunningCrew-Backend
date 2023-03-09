@@ -1,4 +1,4 @@
-package com.project.runningcrew.exception;
+package com.project.runningcrew.exception.s3;
 
 public class S3UploadException extends RuntimeException {
     public S3UploadException() {

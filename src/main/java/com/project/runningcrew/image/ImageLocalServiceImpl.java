@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
+//@Service
+//@RequiredArgsConstructor
 public class ImageLocalServiceImpl implements ImageService {
 
     private String DOWNLOAD_PATH = "C:\\Users\\alsrn\\Desktop\\test";
