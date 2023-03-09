@@ -4,6 +4,7 @@ import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.comment.entity.RunningNoticeComment;
+import com.project.runningcrew.exception.notFound.CommentNotFoundException;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.comment.repository.BoardCommentRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -27,6 +29,10 @@ public class CommentService {
     private final RunningNoticeCommentRepository runningNoticeCommentRepository;
 
 
+
+    public Comment findById(Long id) {
+        return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+    }
 
 
     /**
