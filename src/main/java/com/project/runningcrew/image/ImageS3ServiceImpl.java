@@ -4,14 +4,14 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.project.runningcrew.exception.ImageFileCreationException;
-import com.project.runningcrew.exception.S3UploadException;
+import com.project.runningcrew.exception.s3.S3DeleteException;
+import com.project.runningcrew.exception.s3.S3UploadException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.UUID;
 
 
@@ -64,6 +64,8 @@ public class ImageS3ServiceImpl implements ImageService{
         boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, fileUrl);
         if(isObjectExist) {
             amazonS3Client.deleteObject(bucketName, fileUrl);
+        } else {
+            throw new S3DeleteException();
         }
     }
 }
