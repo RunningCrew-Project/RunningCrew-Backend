@@ -68,12 +68,12 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
             objectMapper.writeValue(response.getOutputStream(), errorResponse);
             return;
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("utf-8");
 
             ErrorResponse errorResponse = ErrorResponse.builder()
-                    .status(HttpServletResponse.SC_UNAUTHORIZED)
+                    .status(HttpServletResponse.SC_FORBIDDEN)
                     .messages("토큰 형식이 올바르지 않습니다.")
                     .errors(Map.of())
                     .build();

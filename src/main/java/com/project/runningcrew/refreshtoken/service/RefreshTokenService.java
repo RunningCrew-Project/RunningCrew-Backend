@@ -1,6 +1,7 @@
 package com.project.runningcrew.refreshtoken.service;
 
-import com.project.runningcrew.exception.JwtVerificationException;
+import com.project.runningcrew.exception.jwt.JwtExpiredException;
+import com.project.runningcrew.exception.jwt.JwtVerificationException;
 import com.project.runningcrew.exception.notFound.RefreshTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
 import com.project.runningcrew.refreshtoken.dto.TokensDto;
@@ -47,7 +48,7 @@ public class RefreshTokenService {
         try {
             claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(refreshToken).getBody();
         } catch (ExpiredJwtException e) {
-            throw new JwtVerificationException("토큰 값이 만료되었습니다.");
+            throw new JwtExpiredException();
         } catch (Exception e) {
             throw new JwtVerificationException("토큰 형식이 올바르지 않습니다.");
         }
