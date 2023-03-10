@@ -9,12 +9,14 @@ import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.comment.entity.RunningNoticeComment;
 import com.project.runningcrew.comment.service.CommentService;
+import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.service.RunningNoticeService;
+import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -82,22 +84,21 @@ public class CommentController {
     @PostMapping("/api/boards/{boardId}/comments")
     public ResponseEntity<Void> createBoardComment(
             @PathVariable("boardId") Long boardId,
-            @ModelAttribute @Valid CreateBoardCommentRequest request
-            // @CurrentUser User user
+            @ModelAttribute @Valid CreateBoardCommentRequest request,
+            @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
-        Crew crew = board.getMember().getCrew();
-        //Member member = memberService.findByUserAndCrew(user, crew);
-        //BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
+        Member member = memberService.findByUserAndCrew(user, board.getMember().getCrew());
+        BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
 
-//        Long commentId = commentService.saveComment(boardComment);
-//        URI uri = UriComponentsBuilder.newInstance()
-//                .scheme("http")
-//                .host(host)
-//                .path("/api/comments/{id}")
-//                .build(commentId);
+        Long commentId = commentService.saveComment(boardComment);
+        URI uri = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host(host)
+                .path("/api/comments/{id}")
+                .build(commentId);
 
-        return null;// ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uri).build();
     }
 
 
@@ -117,10 +118,11 @@ public class CommentController {
     @PostMapping("/api/running-notices/{runningNoticeId}/comments")
     public ResponseEntity<Void> createRunningNoticeComment(
             @PathVariable("runningNoticeId") Long runningNoticeId,
-            @ModelAttribute @Valid CreateRunningNoticeCommentRequest request
+            @ModelAttribute @Valid CreateRunningNoticeCommentRequest request,
+            @CurrentUser User user
     ) {
-        Member member = memberService.findById(request.getMemberId());
         RunningNotice runningNotice =  runningNoticeService.findById(runningNoticeId);
+        Member member = memberService.findByUserAndCrew(user, runningNotice.getMember().getCrew());
         RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, request.getDetail(), runningNotice);
 
         Long commentId = commentService.saveComment(runningNoticeComment);
