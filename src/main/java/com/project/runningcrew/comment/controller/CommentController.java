@@ -129,4 +129,25 @@ public class CommentController {
         return ResponseEntity.created(uri).build();
     }
 
+
+    //TODO 댓글 수정기능
+
+
+
+    //TODO 댓글 삭제기능
+
+
+
+    //TODO 특정 게시글의 모든 댓글 정보 가져오기
+
+
+
+    //TODO 특정 공지의 모든 댓글 정보 가져오기
+
+
+
+    //TODO 특정 멤버가 작성한 모든 댓글 정보 가져오기 - 페이징
+
+
+
 }
