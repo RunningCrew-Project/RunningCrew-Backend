@@ -1,4 +1,4 @@
-package com.project.runningcrew.comment.dto.get;
+package com.project.runningcrew.comment.dto.response;
 
 import com.project.runningcrew.board.entity.Board;
 import io.swagger.v3.oas.annotations.media.Schema;

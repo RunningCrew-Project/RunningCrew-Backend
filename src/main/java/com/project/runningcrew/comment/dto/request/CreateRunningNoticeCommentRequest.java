@@ -1,4 +1,4 @@
-package com.project.runningcrew.comment.dto.create;
+package com.project.runningcrew.comment.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

@@ -2,13 +2,14 @@ package com.project.runningcrew.comment.controller;
 
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.board.service.BoardService;
-import com.project.runningcrew.comment.dto.create.CreateBoardCommentRequest;
-import com.project.runningcrew.comment.dto.create.CreateRunningNoticeCommentRequest;
-import com.project.runningcrew.comment.dto.get.GetCommentResponse;
+import com.project.runningcrew.comment.dto.request.CreateBoardCommentRequest;
+import com.project.runningcrew.comment.dto.request.CreateRunningNoticeCommentRequest;
+import com.project.runningcrew.comment.dto.response.GetCommentResponse;
 import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.comment.entity.RunningNoticeComment;
 import com.project.runningcrew.comment.service.CommentService;
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.service.MemberService;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.Current;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -81,19 +83,21 @@ public class CommentController {
     public ResponseEntity<Void> createBoardComment(
             @PathVariable("boardId") Long boardId,
             @ModelAttribute @Valid CreateBoardCommentRequest request
+            // @CurrentUser User user
     ) {
-        Member member = memberService.findById(request.getMemberId());
         Board board = boardService.findById(boardId);
-        BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
+        Crew crew = board.getMember().getCrew();
+        //Member member = memberService.findByUserAndCrew(user, crew);
+        //BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
 
-        Long commentId = commentService.saveComment(boardComment);
-        URI uri = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host(host)
-                .path("/api/comments/{id}")
-                .build(commentId);
+//        Long commentId = commentService.saveComment(boardComment);
+//        URI uri = UriComponentsBuilder.newInstance()
+//                .scheme("http")
+//                .host(host)
+//                .path("/api/comments/{id}")
+//                .build(commentId);
 
-        return ResponseEntity.created(uri).build();
+        return null;// ResponseEntity.created(uri).build();
     }
 
 

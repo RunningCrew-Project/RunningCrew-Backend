@@ -88,7 +88,7 @@ public class BoardService {
     public void deleteBoard(Board board) {
         boardRepository.delete(board);
         /**
-         * 추가 내용 추후 작성예정
+         * 댓글 삭제, s3 이미지 삭제, 이미지 레파지토리 삭제
          */
     }
 

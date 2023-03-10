@@ -1,4 +1,4 @@
-package com.project.runningcrew.comment.dto.get;
+package com.project.runningcrew.comment.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.runningcrew.comment.entity.BoardComment;
