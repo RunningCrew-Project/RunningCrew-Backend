@@ -12,7 +12,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor
 public class CrewInfoRequest {
 
     @Schema(description = "크루 이름", example = "crew")
