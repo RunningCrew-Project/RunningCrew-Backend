@@ -60,29 +60,43 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         CustomUserDetail customUserDetail = (CustomUserDetail) authResult.getPrincipal();
         User user = customUserDetail.getUser();
         UserRole userRole = customUserDetail.getUserRole();
-        String accessToken = jwtProvider.createAccessToken(user, userRole);
-        String refreshToken = jwtProvider.createRefreshToken(user);
-        if (refreshTokenRepository.findByUser(user).isPresent()) {
-            throw new AuthenticationServiceException("이미 로그인한 유저입니다.");
+
+        try {
+            String accessToken = jwtProvider.createAccessToken(user, userRole);
+            if (refreshTokenRepository.findByUser(user).isPresent()) {
+                throw new RuntimeException("이미 로그인된 유저입니다.");
+            }
+            String refreshToken = jwtProvider.createRefreshToken(user);
+            refreshTokenRepository.save(new RefreshToken(user, refreshToken));
+
+            if (fcmTokenRepository.existsByUser(user)) {
+                throw new RuntimeException("이미 로그인된 유저입니다.");
+            }
+            String fcmToken = request.getHeader("FcmToken");
+            fcmTokenRepository.save(new FcmToken(user, fcmToken));
+
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("utf-8");
+
+            response.setHeader("Authorization", "Bearer" + accessToken);
+            Cookie cookie = new Cookie("refreshToken", refreshToken);
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("utf-8");
+
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                    .status(HttpServletResponse.SC_UNAUTHORIZED)
+                    .messages(e.getMessage())
+                    .errors(Map.of())
+                    .build();
+            objectMapper.writeValue(response.getOutputStream(), errorResponse);
         }
-        refreshTokenRepository.save(new RefreshToken(user, refreshToken));
-
-        String fcmToken = request.getHeader("FcmToken");
-        if (fcmTokenRepository.existsByUser(user)) {
-            throw new AuthenticationServiceException("이미 로그인한 유저입니다.");
-        }
-        fcmTokenRepository.save(new FcmToken(user, fcmToken));
-
-        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("utf-8");
-
-        response.setHeader("Authorization", "Bearer" + accessToken);
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
     }
 
     @Override
