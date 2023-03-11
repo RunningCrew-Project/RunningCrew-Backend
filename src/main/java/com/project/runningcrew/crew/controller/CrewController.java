@@ -4,14 +4,16 @@ import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.service.DongAreaService;
 import com.project.runningcrew.area.service.GuAreaService;
+import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.PagingResponse;
-import com.project.runningcrew.crew.dto.CreateCrewRequest;
-import com.project.runningcrew.crew.dto.CrewListResponse;
-import com.project.runningcrew.crew.dto.GetCrewResponse;
-import com.project.runningcrew.crew.dto.SimpleCrewDto;
+import com.project.runningcrew.crew.dto.*;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.duplicate.CrewNameDuplicateException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
+import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
@@ -46,8 +49,9 @@ public class CrewController {
     private final MemberService memberService;
     private final DongAreaService dongAreaService;
     private final GuAreaService guAreaService;
-    private final String host = "localhost";
-    private final int pagingSize = 15;
+    @Value("${domain.name}")
+    private String host;
+    private int pagingSize = 15;
 
     @Operation(summary = "크루 가져오기", description = "crewId 에 해당하는 크루를 가져온다.")
     @ApiResponses({
@@ -63,6 +67,7 @@ public class CrewController {
         return ResponseEntity.ok(new GetCrewResponse(crew, memberCount));
     }
 
+
     @Operation(summary = "크루 생성하기", description = "크루를 생성한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED", content = @Content()),
@@ -74,26 +79,103 @@ public class CrewController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping(value = "/api/crews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> createCrew(@Parameter(hidden = true) User user,
-                                     @ModelAttribute @Valid CreateCrewRequest createCrewRequest) {
-        DongArea dongArea = dongAreaService.findById(createCrewRequest.getDongId());
+    public ResponseEntity<Void> createCrew(@Parameter(hidden = true) @CurrentUser User user,
+                                     @ModelAttribute @Valid CrewInfoRequest crewInfoRequest) {
+        DongArea dongArea = dongAreaService.findById(crewInfoRequest.getDongId());
         Crew crew = Crew.builder()
-                .name(createCrewRequest.getName())
-                .introduction(createCrewRequest.getIntroduction())
+                .name(crewInfoRequest.getName())
+                .introduction(crewInfoRequest.getIntroduction())
                 .dongArea(dongArea)
                 .build();
-        Long crewId = crewService.saveCrew(user, crew, createCrewRequest.getFile());
-        URI uri = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host(host)
+        Long crewId = crewService.saveCrew(user, crew, crewInfoRequest.getFile());
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl(host)
                 .path("/api/crews/{id}")
                 .build(crewId);
         return ResponseEntity.created(uri).build();
     }
 
-    //TODO 크루 정보 수정
 
-    //TODO 크루 삭제
+    @Operation(summary = "크루 수정하기", description = "크루의 정보를 수정한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "CONFLICT",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping(value = "/api/crews/{crewId}")
+    public ResponseEntity<Void> updateCrew(@Parameter(hidden = true) @CurrentUser User user,
+                                           @PathVariable("crewId") Long crewId,
+                                           @ModelAttribute @Valid CrewInfoRequest crewInfoRequest) {
+        Crew originCrew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, originCrew);
+        if (member.getRole() != MemberRole.ROLE_LEADER) {
+            throw new AuthorizationException();
+        }
+
+        DongArea dongArea = dongAreaService.findById(crewInfoRequest.getDongId());
+        Crew newCrew = Crew.builder()
+                .name(crewInfoRequest.getName())
+                .introduction(crewInfoRequest.getIntroduction())
+                .dongArea(dongArea)
+                .build();
+
+        crewService.updateCrew(originCrew, newCrew, crewInfoRequest.getFile());
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @Operation(summary = "크루 삭제하기", description = "크루를 삭제한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @DeleteMapping(value = "/api/crews/{crewId}")
+    public ResponseEntity<Void> deleteCrew(@Parameter(hidden = true) @CurrentUser User user,
+                                           @PathVariable("crewId") Long crewId) {
+        Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
+        if (member.getRole() != MemberRole.ROLE_LEADER) {
+            throw new AuthorizationException();
+        }
+
+        crewService.deleteCrew(crew);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @Operation(summary = "크루 이름 중복 확인", description = "입력받은 이름을 가진 크루 확인한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "CONFLICT",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping(value = "/api/crews/name")
+    public ResponseEntity<Void> checkCrewNameDuplicate(@RequestBody CrewNameRequest crewNameRequest) {
+        String crewName = crewNameRequest.getName();
+        if (crewService.existsByName(crewName)) {
+            throw new CrewNameDuplicateException(crewName);
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     @Operation(summary = "키워드에 맞는 크루 가져오기", description = "키워드에 맞는 크루를 가져온다.")
     @ApiResponses({
@@ -108,7 +190,23 @@ public class CrewController {
         return ResponseEntity.ok(new PagingResponse<>(crewSlice));
     }
 
-    //TODO 유저가 가입한 모든 크루
+
+    @Operation(summary = "유저가 가입한 크루 가져오기", description = "유저가 가입한 크루를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CrewListResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/users/crews")
+    public ResponseEntity<CrewListResponse<UserCrewDto>> findCrewsByUser(@Parameter(hidden = true) @CurrentUser User user) {
+        List<Crew> crews = crewService.findAllByUser(user);
+        List<UserCrewDto> userCrewDtos = crews.stream().map(UserCrewDto::new).collect(Collectors.toList());
+        return ResponseEntity.ok(new CrewListResponse<>(userCrewDtos));
+    }
+
 
     @Operation(summary = "구에 대한 추천 크루 가져오기", description = "guAreaId 에 속하는 크루를 가져온다.")
     @ApiResponses({
