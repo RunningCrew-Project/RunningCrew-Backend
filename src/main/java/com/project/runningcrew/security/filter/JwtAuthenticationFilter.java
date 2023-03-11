@@ -40,7 +40,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         if (!request.getMethod().equals("POST") || !request.getContentType().equals("application/json")) {
-            throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
+            throw new AuthenticationServiceException("잘못된 형식의 요청입니다.");
+        }
+
+        String fcmToken = request.getHeader("FcmToken");
+        if (fcmToken == null) {
+            throw new AuthenticationServiceException("FcmToken 이 누락되었습니다.");
         }
 
         try {
@@ -62,6 +67,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         UserRole userRole = customUserDetail.getUserRole();
 
         try {
+            String fcmToken = request.getHeader("FcmToken");
+            if (fcmTokenRepository.existsByUser(user)) {
+                throw new RuntimeException("이미 로그인된 유저입니다.");
+            }
+            fcmTokenRepository.save(new FcmToken(user, fcmToken));
+
             String accessToken = jwtProvider.createAccessToken(user, userRole);
             if (refreshTokenRepository.findByUser(user).isPresent()) {
                 throw new RuntimeException("이미 로그인된 유저입니다.");
@@ -69,17 +80,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             String refreshToken = jwtProvider.createRefreshToken(user);
             refreshTokenRepository.save(new RefreshToken(user, refreshToken));
 
-            if (fcmTokenRepository.existsByUser(user)) {
-                throw new RuntimeException("이미 로그인된 유저입니다.");
-            }
-            String fcmToken = request.getHeader("FcmToken");
-            fcmTokenRepository.save(new FcmToken(user, fcmToken));
+
 
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("utf-8");
 
-            response.setHeader("Authorization", "Bearer" + accessToken);
+            response.setHeader("Authorization", "Bearer " + accessToken);
             Cookie cookie = new Cookie("refreshToken", refreshToken);
             cookie.setHttpOnly(true);
             cookie.setMaxAge(0);
@@ -107,7 +114,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpServletResponse.SC_UNAUTHORIZED)
-                .messages("아이디와 비밀번호가 일치하지 않습니다.")
+                .messages(failed.getMessage())
                 .errors(Map.of())
                 .build();
         objectMapper.writeValue(response.getOutputStream(), errorResponse);
