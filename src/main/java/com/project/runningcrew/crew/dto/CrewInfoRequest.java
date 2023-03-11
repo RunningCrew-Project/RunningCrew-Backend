@@ -3,6 +3,7 @@ package com.project.runningcrew.crew.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -11,8 +12,8 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Getter
-@AllArgsConstructor
-public class CreateCrewRequest {
+@NoArgsConstructor
+public class CrewInfoRequest {
 
     @Schema(description = "크루 이름", example = "crew")
     @NotBlank(message = "크루 이름은 필수값입니다.")
