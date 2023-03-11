@@ -52,7 +52,7 @@ public class CrewService {
     @Transactional
     public Long saveCrew(User user, Crew crew, MultipartFile multipartFile) {
         if (crewRepository.existsByName(crew.getName())) {
-            throw new CrewNameDuplicateException();
+            throw new CrewNameDuplicateException(crew.getName());
         }
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         crew.updateCrewImgUrl(imageUrl);
@@ -73,7 +73,7 @@ public class CrewService {
     public void updateCrew(Crew originCrew, Crew newCrew, MultipartFile multipartFile) {
         if (!originCrew.getName().equals(newCrew.getName())) {
             if (crewRepository.existsByName(newCrew.getName())) {
-                throw new CrewNameDuplicateException();
+                throw new CrewNameDuplicateException(newCrew.getName());
             }
             originCrew.updateName(newCrew.getName());
         }
