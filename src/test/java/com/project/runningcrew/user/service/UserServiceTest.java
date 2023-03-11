@@ -25,7 +25,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -60,6 +63,9 @@ class UserServiceTest {
 
     @Mock
     ImageService imageService;
+
+    @Mock
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @InjectMocks
     UserService userService;
@@ -129,8 +135,10 @@ class UserServiceTest {
         //given
         Long userId = 1L;
         String imgUrl = "userImgUrl";
+        String password = "qwer1234!";
         User user = User.builder()
                 .id(userId)
+                .password(passwordEncoder.encode(password))
                 .dongArea(dongArea)
                 .build();
 
@@ -144,6 +152,7 @@ class UserServiceTest {
         //then
         assertThat(userId).isEqualTo(saveId);
         assertThat(user.getImgUrl()).isEqualTo(imgUrl);
+        assertThat(user.getPassword()).isEqualTo(passwordEncoder.encode(password));
         verify(imageService, times(1)).uploadImage(multipartFile, "user");
         verify(userRepository, times(1)).save(user);
         verify(userRoleRepository, times(1)).save(any());

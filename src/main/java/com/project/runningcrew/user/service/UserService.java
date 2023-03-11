@@ -15,7 +15,6 @@ import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.repository.MemberRepository;
 import com.project.runningcrew.refreshtoken.entity.RefreshToken;
 import com.project.runningcrew.refreshtoken.repository.RefreshTokenRepository;
-import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.repository.UserRepository;
@@ -23,6 +22,7 @@ import com.project.runningcrew.userrole.entity.Role;
 import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +42,7 @@ public class UserService {
     private final ImageService imageService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRoleRepository userRoleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final String imageDirName = "user";
 
     /**
@@ -100,6 +101,7 @@ public class UserService {
 
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         user.updateImgUrl(imageUrl);
+        user.updatePassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         userRoleRepository.save(new UserRole(user, Role.USER));
 
@@ -124,6 +126,7 @@ public class UserService {
 
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         user.updateImgUrl(imageUrl);
+        user.updatePassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         userRoleRepository.save(new UserRole(user, Role.ADMIN));
 
