@@ -28,7 +28,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpServletResponse.SC_UNAUTHORIZED)
-                .messages(authException.getMessage())
+                .messages("인증이 필요합니다.")
                 .errors(Map.of())
                 .build();
         objectMapper.writeValue(response.getOutputStream(), errorResponse);
