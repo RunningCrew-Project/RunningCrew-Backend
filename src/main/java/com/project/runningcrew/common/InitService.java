@@ -1,6 +1,16 @@
 package com.project.runningcrew.common;
 
 
+import com.project.runningcrew.area.CSVAreaParser;
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.area.repository.DongAreaRepository;
+import com.project.runningcrew.area.repository.GuAreaRepository;
+import com.project.runningcrew.area.repository.SidoAreaRepository;
+import com.project.runningcrew.exception.notFound.DongAreaNotFoundException;
+import com.project.runningcrew.exception.notFound.GuAreaNotFoundException;
+import com.project.runningcrew.exception.notFound.SidoAreaNotFoundException;
 import com.project.runningcrew.user.entity.LoginType;
 import com.project.runningcrew.user.entity.Sex;
 import com.project.runningcrew.user.entity.User;
@@ -23,14 +33,28 @@ public class InitService implements ApplicationListener<ContextRefreshedEvent> {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CSVAreaParser csvAreaParser;
+    private final SidoAreaRepository sidoAreaRepository;
+    private final GuAreaRepository guAreaRepository;
+    private final DongAreaRepository dongAreaRepository;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        //TODO 시구동 초기 설정
+        csvAreaParser.createAreas();
         createAdmin();
     }
 
     private void createAdmin() {
+        if (userRepository.existsByEmail("admin@naver.com")) {
+            return;
+        }
+
+        SidoArea sidoArea = sidoAreaRepository.findByName("서울특별시")
+                .orElseThrow(SidoAreaNotFoundException::new);
+        GuArea guArea = guAreaRepository.findBySidoAreaAndName(sidoArea, "동대문구")
+                .orElseThrow(GuAreaNotFoundException::new);
+        DongArea dongArea = dongAreaRepository.findByGuAreaAndName(guArea, "전농2동")
+                .orElseThrow(DongAreaNotFoundException::new);
         User user = User.builder()
                 .email("admin@naver.com")
                 .password(passwordEncoder.encode("admin123!"))
@@ -39,7 +63,7 @@ public class InitService implements ApplicationListener<ContextRefreshedEvent> {
                 .imgUrl("https://running-crew-s3.s3.ap-northeast-2.amazonaws.com/test/aeeb740e-ec8a-495e-a232-627bffcb2940-test.png")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
-                .dongArea(null)
+                .dongArea(dongArea)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.now())
                 .height(100)
