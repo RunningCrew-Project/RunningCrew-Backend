@@ -2,6 +2,7 @@ package com.project.runningcrew.area.service;
 
 import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.exception.badinput.GuFullNameException;
 import com.project.runningcrew.exception.notFound.GuAreaNotFoundException;
 import com.project.runningcrew.exception.notFound.SidoAreaNotFoundException;
 import com.project.runningcrew.area.repository.GuAreaRepository;
@@ -113,7 +114,7 @@ class GuAreaServiceTest {
         ///when
         //then
         assertThatThrownBy(() -> guAreaService.getIdByGuAreaFullName(fullName))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(GuFullNameException.class);
     }
 
     @DisplayName("구의 fullName 으로 GuArea 의 id 반환 SidoArea 존재 안함 예외 테스트")
