@@ -2,6 +2,7 @@ package com.project.runningcrew.area.service;
 
 import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
+import com.project.runningcrew.exception.badinput.GuFullNameException;
 import com.project.runningcrew.exception.notFound.DongAreaNotFoundException;
 import com.project.runningcrew.exception.notFound.GuAreaNotFoundException;
 import com.project.runningcrew.exception.notFound.SidoAreaNotFoundException;
@@ -49,13 +50,13 @@ public class GuAreaService {
      * @param fullName SidoArea 의 name 과 GuArea 의 name 이 합쳐진 이름. 중간에 공백이 필요함
      *                 ex) 서울시 동대문구
      * @return 찾은 GuArea 의 id
-     * @throws ValidationException       올바르지 않은 형식의 fullName 일 때
+     * @throws GuFullNameException       올바르지 않은 형식의 fullName 일 때
      * @throws SidoAreaNotFoundException 특정 이름을 가진 SidoArea 가 존재하지 않을 때
      * @throws GuAreaNotFoundException   특정 이름을 가진 GuArea 가 존재하지 않을 때
      */
     public Long getIdByGuAreaFullName(String fullName) {
         if (!fullName.matches("([가-힣A-Za-z]+(시|도)\\s[가-힣A-Za-z]+(시|군|구)+)")) {
-            throw new ValidationException("올바르지 않은 형식의 fullName 입니다.");
+            throw new GuFullNameException(fullName);
         }
         String[] words = fullName.split("\\s");
         String sidoAreaName = words[0];
