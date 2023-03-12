@@ -80,14 +80,14 @@ public class CrewController {
     })
     @PostMapping(value = "/api/crews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createCrew(@Parameter(hidden = true) @CurrentUser User user,
-                                     @ModelAttribute @Valid CrewInfoRequest crewInfoRequest) {
-        DongArea dongArea = dongAreaService.findById(crewInfoRequest.getDongId());
+                                           @ModelAttribute @Valid CreateCrewRequest createCrewRequest) {
+        DongArea dongArea = dongAreaService.findById(createCrewRequest.getDongId());
         Crew crew = Crew.builder()
-                .name(crewInfoRequest.getName())
-                .introduction(crewInfoRequest.getIntroduction())
+                .name(createCrewRequest.getName())
+                .introduction(createCrewRequest.getIntroduction())
                 .dongArea(dongArea)
                 .build();
-        Long crewId = crewService.saveCrew(user, crew, crewInfoRequest.getFile());
+        Long crewId = crewService.saveCrew(user, crew, createCrewRequest.getFile());
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
                 .path("/api/crews/{id}")
@@ -110,24 +110,24 @@ public class CrewController {
             @ApiResponse(responseCode = "409", description = "CONFLICT",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping(value = "/api/crews/{crewId}")
+    @PutMapping(value = "/api/crews/{crewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateCrew(@Parameter(hidden = true) @CurrentUser User user,
                                            @PathVariable("crewId") Long crewId,
-                                           @ModelAttribute @Valid CrewInfoRequest crewInfoRequest) {
+                                           @ModelAttribute @Valid UpdateCrewRequest updateCrewRequest) {
         Crew originCrew = crewService.findById(crewId);
         Member member = memberService.findByUserAndCrew(user, originCrew);
         if (member.getRole() != MemberRole.ROLE_LEADER) {
             throw new AuthorizationException();
         }
 
-        DongArea dongArea = dongAreaService.findById(crewInfoRequest.getDongId());
+        DongArea dongArea = dongAreaService.findById(updateCrewRequest.getDongId());
         Crew newCrew = Crew.builder()
-                .name(crewInfoRequest.getName())
-                .introduction(crewInfoRequest.getIntroduction())
+                .name(updateCrewRequest.getName())
+                .introduction(updateCrewRequest.getIntroduction())
                 .dongArea(dongArea)
                 .build();
 
-        crewService.updateCrew(originCrew, newCrew, crewInfoRequest.getFile());
+        crewService.updateCrew(originCrew, newCrew, updateCrewRequest.getFile());
 
         return ResponseEntity.noContent().build();
     }
@@ -184,7 +184,7 @@ public class CrewController {
     })
     @GetMapping(value = "/api/crews")
     public ResponseEntity<PagingResponse<Crew>> findCrewsByKeyword(@RequestParam("page") int page,
-                                                             @RequestParam("keyword") String keyword) {
+                                                                   @RequestParam("keyword") String keyword) {
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<Crew> crewSlice = crewService.findByKeyword(pageRequest, keyword);
         return ResponseEntity.ok(new PagingResponse<>(crewSlice));

@@ -83,7 +83,7 @@ public class CrewService {
         if (!originCrew.getDongArea().equals(newCrew.getDongArea())) {
             originCrew.updateDongArea(newCrew.getDongArea());
         }
-        if (!multipartFile.isEmpty()) {
+        if (multipartFile!= null && !multipartFile.isEmpty()) {
             imageService.deleteImage(originCrew.getCrewImgUrl());
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
             originCrew.updateCrewImgUrl(imageUrl);
@@ -97,6 +97,15 @@ public class CrewService {
      */
     @Transactional
     public void deleteCrew(Crew crew) {
+        //TODO recruitAnswer 삭제
+        //TODO recruitQuestion 삭제
+        //TODO runningMember 삭제
+        //TODO runningNotice 삭제
+        //TODO board 삭제
+        //TODO comment 삭제
+        //TODO boardImage 삭제
+        //TODO runningNoticeImage 삭제
+        //TODO member 삭제
         List<Member> members = memberRepository.findAllByCrew(crew);
         for (Member member : members) {
             memberRepository.delete(member);

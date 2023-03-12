@@ -3,17 +3,15 @@ package com.project.runningcrew.crew.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Getter
 @AllArgsConstructor
-public class CrewInfoRequest {
+public class UpdateCrewRequest {
 
     @Schema(description = "크루 이름", example = "crew")
     @NotBlank(message = "크루 이름은 필수값입니다.")
@@ -29,8 +27,7 @@ public class CrewInfoRequest {
     @Positive(message = "동 id 는 1 이상의 수입니다.")
     private Long dongId;
 
-    @Schema(description = "크루 이미지")
-    @NotNull(message = "이미지는 필수값입니다.")
+    @Schema(description = "수정할 크루 이미지")
     private MultipartFile file;
 
 }
