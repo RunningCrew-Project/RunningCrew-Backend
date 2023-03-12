@@ -38,3 +38,6 @@ out/
 
 ### fcm key ###
 src/main/resources/fcm/*.json
+
+### area information csv ###
+src/main/resources/area/*.csv
