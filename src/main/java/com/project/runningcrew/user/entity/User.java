@@ -72,9 +72,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private int weight;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Member> members = new ArrayList<>();
-
     public static User createBasicUser(String email, String name, String nickname, String imgUrl,
                                   LoginType login_type, String phoneNumber) {
         return User.builder().email(email)
