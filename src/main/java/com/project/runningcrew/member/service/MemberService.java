@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,8 +45,9 @@ public class MemberService {
      */
     @Transactional
     public Long saveMember(Member member) {
-        if (memberRepository.existsByUserAndCrew(member.getUser(), member.getCrew())) {
-            throw new MemberAlreadyExistsException();
+        Optional<Member> optionalMember = memberRepository.findByUserAndCrew(member.getUser(), member.getCrew());
+        if (optionalMember.isPresent()) {
+            throw new MemberAlreadyExistsException(optionalMember.get().getId());
         }
         return memberRepository.save(member).getId();
     }
