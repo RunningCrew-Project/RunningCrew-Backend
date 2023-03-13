@@ -86,10 +86,20 @@ public class BoardService {
      * @param board
      */
     public void deleteBoard(Board board) {
+
+        List<BoardImage> deleteBoards = boardImageRepository.findAllByBoard(board);
+
+        for (BoardImage deleteBoard : deleteBoards) {
+            imageService.deleteImage(deleteBoard.getFileName());
+        }
+        // s3 이미지 delete
+
+        boardImageRepository.deleteAll(deleteBoards);
+        // boardImage delete
+
         boardRepository.delete(board);
-        /**
-         * 댓글 삭제, s3 이미지 삭제, 이미지 레파지토리 삭제
-         */
+        // board delete
+
     }
 
     /**

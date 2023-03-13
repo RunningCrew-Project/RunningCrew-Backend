@@ -1,15 +1,19 @@
 package com.project.runningcrew.comment.controller;
 
+import com.amazonaws.services.cloudformation.model.Change;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.board.service.BoardService;
+import com.project.runningcrew.comment.dto.request.ChangeCommentRequest;
 import com.project.runningcrew.comment.dto.request.CreateBoardCommentRequest;
 import com.project.runningcrew.comment.dto.request.CreateRunningNoticeCommentRequest;
+import com.project.runningcrew.comment.dto.response.CommentListResponse;
 import com.project.runningcrew.comment.dto.response.GetCommentResponse;
 import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.comment.entity.RunningNoticeComment;
 import com.project.runningcrew.comment.service.CommentService;
 import com.project.runningcrew.common.annotation.CurrentUser;
+import com.project.runningcrew.common.dto.SimpleCommentDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
@@ -25,13 +29,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.Current;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 
 @Tag(name = "comment", description = "댓글에 관한 api")
 @RestController
@@ -43,6 +49,7 @@ public class CommentController {
     private final BoardService boardService;
     private final RunningNoticeService runningNoticeService;
     private final MemberService memberService;
+    private final com.project.runningcrew.service.UserService userService;
 
     private final String host = "localhost";
 
@@ -65,8 +72,6 @@ public class CommentController {
         Comment comment = commentService.findById(commentId);
         return ResponseEntity.ok(new GetCommentResponse(comment));
     }
-
-
 
 
     @Operation(summary = "게시글 댓글 생성하기", description = "게시글 댓글을 생성한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
@@ -102,7 +107,6 @@ public class CommentController {
     }
 
 
-
     @Operation(summary = "런닝 공지 댓글 생성하기", description = "런닝 공지 댓글을 생성한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED", content = @Content()),
@@ -136,15 +140,74 @@ public class CommentController {
     }
 
 
-    //TODO 댓글 수정기능
+    @Operation(summary = "댓글 수정하기", description = "댓글을 수정한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/api/comments/{commentId}")
+    public ResponseEntity<Void> changeComment(
+            @PathVariable("commentId") Long commentId,
+            @ModelAttribute @Valid ChangeCommentRequest request,
+            @CurrentUser User user
+    ) {
+        Comment comment = commentService.findById(commentId);
+        commentService.changeComment(comment, request.getDetail());
+
+        return ResponseEntity.noContent().build();
+    }
 
 
+    @Operation(summary = "댓글 삭제하기", description = "댓글을 삭제한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/api/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable("commentId") Long commentId,
+            @CurrentUser User user
+    ) {
+        Comment comment = commentService.findById(commentId);
+        User writerUser = comment.getMember().getUser();
 
-    //TODO 댓글 삭제기능
+        if(user.equals(writerUser)) {
+            commentService.deleteComment(comment);
+            return ResponseEntity.noContent().build();
+            // user 의 comment 삭제 권한 검증
+        } else {
+            throw new AccessDeniedException("댓글 작성자만 삭제할 수 있습니다.");
+        }
+    }
 
 
 
     //TODO 특정 게시글의 모든 댓글 정보 가져오기
+
+    @GetMapping("/api/boards/{boardId}/comments")
+    public ResponseEntity<CommentListResponse<SimpleCommentDto>> getCommentListOfBoard(
+            @PathVariable("boardId") Long boardId
+    ) {
+        Board board = boardService.findById(boardId);
+        List<BoardComment> commentList = commentService.findAllByBoard(board);
+        int commentCount = commentService.countCommentAtBoard(board);
+
+        List<SimpleCommentDto>
+
+    }
+
 
 
 
