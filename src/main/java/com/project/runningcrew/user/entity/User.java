@@ -53,8 +53,6 @@ public class User extends BaseEntity {
     @JoinColumn(name = "dong_area_id")
     private DongArea dongArea;
 
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{4,16}$",
-            message = "비밀번호는 4글자 이상 16글자 이하의 영문, 숫자, 특수문자의 조합이여야 합니다.")
     @NotNull
     private String password;
 
@@ -74,9 +72,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private int weight;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Member> members = new ArrayList<>();
-
     public static User createBasicUser(String email, String name, String nickname, String imgUrl,
                                   LoginType login_type, String phoneNumber) {
         return User.builder().email(email)
@@ -88,8 +83,8 @@ public class User extends BaseEntity {
                 .dongArea(null)
                 .sex(Sex.MAN)
                 .birthday(LocalDate.of(1990,1,1))
-                .height(170)
-                .weight(70)
+                .height(0)
+                .weight(0)
                 .build();
     }
 
