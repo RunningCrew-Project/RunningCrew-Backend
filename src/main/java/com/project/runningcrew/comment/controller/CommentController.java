@@ -167,9 +167,14 @@ public class CommentController {
             @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);
-        commentService.changeComment(comment, request.getDetail());
+        User writer = comment.getMember().getUser();
 
-        return ResponseEntity.noContent().build();
+        if(user.equals(writer)) {
+            commentService.changeComment(comment, request.getDetail());
+            return ResponseEntity.noContent().build();
+        } else {
+            throw new AccessDeniedException("댓글 작성자만 수정할 수 있습니다.");
+        }
     }
 
 
@@ -189,9 +194,9 @@ public class CommentController {
             @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);
-        User writerUser = comment.getMember().getUser();
+        User writer = comment.getMember().getUser();
 
-        if(user.equals(writerUser)) {
+        if(user.equals(writer)) {
             commentService.deleteComment(comment);
             return ResponseEntity.noContent().build();
             // user 의 comment 삭제 권한 검증
