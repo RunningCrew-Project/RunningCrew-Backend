@@ -1,6 +1,7 @@
 package com.project.runningcrew.member.service;
 
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
@@ -59,36 +60,57 @@ public class MemberService {
      */
     @Transactional
     public void deleteMember(Member member) {
+        //TODO board
+        //TODO comment
+        //TODO runningnotice
+        //TODO runningmember
+        //TODO image
         memberRepository.delete(member);
     }
 
     /**
-     * 입력받은 Member 의 role 을 MemberRole.ROLE_LEADER 로 변경한다.
+     * role 이 MemberRole.ROLE_LEADER 인 leaderMember 의 role 을 MemberRole.ROLE_MANAGER 로 변경하고,
+     * role 이 MemberRole.ROLE_MANAGER 인 updateMember 의 role 을 MemberRole.ROLE_LEADER 로 변경한다.
      *
-     * @param member role 을 변경할 Member
+     * @param leaderMember role 을 MemberRole.ROLE_LEADER 에서 MemberRole.ROLE_MANAGER 로 변경할 Member
+     * @param updateMember role 을 MemberRole.ROLE_MANAGER 에서 MemberRole.ROLE_LEADER 로 변경할 Member
      */
     @Transactional
-    public void updateMemberLeader(Member member) {
-        member.updateRole(MemberRole.ROLE_LEADER);
+    public void updateMemberLeader(Member leaderMember, Member updateMember) {
+        if (leaderMember.getRole() != MemberRole.ROLE_LEADER) {
+            throw new UpdateMemberRoleException(leaderMember.getRole());
+        }
+        if (updateMember.getRole() != MemberRole.ROLE_MANAGER) {
+            throw new UpdateMemberRoleException(updateMember.getRole());
+        }
+
+        leaderMember.updateRole(MemberRole.ROLE_MANAGER);
+        updateMember.updateRole(MemberRole.ROLE_LEADER);
     }
 
     /**
-     * 입력받은 Member 의 role 을 MemberRole.ROLE_MANAGER 로 변경한다.
+     * role 이 MemberRole.ROLE_NORMAL 인 Member 의 role 을 MemberRole.ROLE_MANAGER 로 변경한다.
      *
-     * @param member role 을 변경할 Member
+     * @param member role 을 MemberRole.ROLE_NORMAL 에서 MemberRole.ROLE_MANAGER 로 변경할 Member
      */
     @Transactional
     public void updateMemberManager(Member member) {
+        if (member.getRole() != MemberRole.ROLE_NORMAL) {
+            throw new UpdateMemberRoleException(member.getRole());
+        }
         member.updateRole(MemberRole.ROLE_MANAGER);
     }
 
     /**
-     * 입력받은 Member 의 role 을 MemberRole.ROLE_NORMAL 로 변경한다.
+     * role 이 MemberRole.ROLE_MANAGER 인 Member 의 role 을 MemberRole.ROLE_NORMAL 로 변경한다.
      *
-     * @param member role 을 변경할 Member
+     * @param member role 을 MemberRole.ROLE_MANAGER 에서 MemberRole.ROLE_NORMAL 로 변경할 Member
      */
     @Transactional
     public void updateMemberNormal(Member member) {
+        if (member.getRole() != MemberRole.ROLE_MANAGER) {
+            throw new UpdateMemberRoleException(member.getRole());
+        }
         member.updateRole(MemberRole.ROLE_NORMAL);
     }
 
@@ -166,8 +188,10 @@ public class MemberService {
      * @return ey 가 Crew 의 id 이고 value 가 Crew 의 멤버수인 map
      */
     public Map<Long, Long> countAllByCrewIds(List<Long> crewIds) {
-       return memberRepository.countAllByCrewIds(crewIds).stream()
-               .collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
+        return memberRepository.countAllByCrewIds(crewIds).stream()
+                .collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
     }
+    
+    //TODO crew 의 모든 member 삭제
 
 }

@@ -113,16 +113,19 @@ class MemberServiceTest {
 
     @DisplayName("멤버의 role 리더로 변경 테스트")
     @Test
-    public void updateMemberLeaderTest(@Mock User user, @Mock Crew crew) {
+    public void updateMemberLeaderTest(@Mock User user1, @Mock User user2, @Mock Crew crew) {
         //given
-        Long memberId = 1L;
-        Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
+        Long memberId1 = 1L;
+        Long memberId2 = 1L;
+        Member leaderMember = new Member(memberId1, user1, crew, MemberRole.ROLE_LEADER);
+        Member updateMember = new Member(memberId2, user2, crew, MemberRole.ROLE_MANAGER);
 
         ///when
-        memberService.updateMemberLeader(member);
+        memberService.updateMemberLeader(leaderMember, updateMember);
 
         //then
-        assertThat(member.getRole()).isSameAs(MemberRole.ROLE_LEADER);
+        assertThat(leaderMember.getRole()).isSameAs(MemberRole.ROLE_MANAGER);
+        assertThat(updateMember.getRole()).isSameAs(MemberRole.ROLE_LEADER);
     }
 
     @DisplayName("멤버의 role 매니저로 변경 테스트")
