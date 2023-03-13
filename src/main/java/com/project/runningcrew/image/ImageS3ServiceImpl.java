@@ -39,7 +39,7 @@ public class ImageS3ServiceImpl implements ImageService{
             throw new ImageFileCreationException();
         }
 
-        String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
+        String s3FileName = dirName + "/" + UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
 
         ObjectMetadata obj = new ObjectMetadata();
         obj.setContentLength(multipartFile.getSize());
@@ -54,6 +54,7 @@ public class ImageS3ServiceImpl implements ImageService{
 
         return amazonS3.getUrl(bucketName, s3FileName).toString();
     }
+
 
     /**
      * s3 스토리지에 저장된 이미지를 삭제한다.

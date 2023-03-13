@@ -34,7 +34,7 @@ class ImageS3ServiceImplTest {
      void uploadImageTest() throws Exception {
         // 이미지 업로드 테스트 확인 완료
 
-        /**
+
         File file = new File("C:\\Users\\USER\\Desktop\\test.png");
 
         FileInputStream input = new FileInputStream(file);
@@ -46,18 +46,17 @@ class ImageS3ServiceImplTest {
                 input.readAllBytes()
         );
 
-        imageService.uploadImage(multipartFile, "test");
-        */
+        String url = imageService.uploadImage(multipartFile, "test");
 
-
+        System.out.println("url = " + url);
     }
 
     @DisplayName("S3 이미지 삭제 테스트")
     @Test
     void deleteImageTest() throws Exception {
-        /**
-         * 이미지 삭제 테스트 확인 완료
-         */
+        //테스트 삑남
+        //imageService.deleteImage("6553efb1-ab95-4f61-8c3a-af86ce61e66b-test.png");
+
     }
 
 
