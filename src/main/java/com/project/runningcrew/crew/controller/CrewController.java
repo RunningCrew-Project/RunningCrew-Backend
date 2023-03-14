@@ -9,11 +9,9 @@ import com.project.runningcrew.common.dto.PagingResponse;
 import com.project.runningcrew.crew.dto.*;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
-import com.project.runningcrew.exception.AuthorizationException;
 import com.project.runningcrew.exception.duplicate.CrewNameDuplicateException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
-import com.project.runningcrew.member.entity.Member;
-import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +48,7 @@ public class CrewController {
     private final MemberService memberService;
     private final DongAreaService dongAreaService;
     private final GuAreaService guAreaService;
+    private final MemberAuthorizationChecker memberAuthorizationChecker;
     @Value("${domain.name}")
     private String host;
     private int pagingSize = 15;
@@ -115,10 +115,7 @@ public class CrewController {
                                            @PathVariable("crewId") Long crewId,
                                            @ModelAttribute @Valid UpdateCrewRequest updateCrewRequest) {
         Crew originCrew = crewService.findById(crewId);
-        Member member = memberService.findByUserAndCrew(user, originCrew);
-        if (member.getRole() != MemberRole.ROLE_LEADER) {
-            throw new AuthorizationException();
-        }
+        memberAuthorizationChecker.checkLeader(user, originCrew);
 
         DongArea dongArea = dongAreaService.findById(updateCrewRequest.getDongId());
         Crew newCrew = Crew.builder()
@@ -147,10 +144,7 @@ public class CrewController {
     public ResponseEntity<Void> deleteCrew(@Parameter(hidden = true) @CurrentUser User user,
                                            @PathVariable("crewId") Long crewId) {
         Crew crew = crewService.findById(crewId);
-        Member member = memberService.findByUserAndCrew(user, crew);
-        if (member.getRole() != MemberRole.ROLE_LEADER) {
-            throw new AuthorizationException();
-        }
+        memberAuthorizationChecker.checkLeader(user, crew);
 
         crewService.deleteCrew(crew);
 
@@ -183,11 +177,17 @@ public class CrewController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class)))
     })
     @GetMapping(value = "/api/crews")
-    public ResponseEntity<PagingResponse<Crew>> findCrewsByKeyword(@RequestParam("page") int page,
+    public ResponseEntity<PagingResponse<SimpleCrewDto>> findCrewsByKeyword(@RequestParam("page") int page,
                                                                    @RequestParam("keyword") String keyword) {
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<Crew> crewSlice = crewService.findByKeyword(pageRequest, keyword);
-        return ResponseEntity.ok(new PagingResponse<>(crewSlice));
+        List<Long> crewIds = crewSlice.stream().map(Crew::getId).collect(Collectors.toList());
+        Map<Long, Long> crewIdMemberCountMap = memberService.countAllByCrewIds(crewIds);
+        List<SimpleCrewDto> simpleCrewDtos = crewSlice.stream()
+                .map(c -> new SimpleCrewDto(c, crewIdMemberCountMap.get(c.getId())))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new PagingResponse<>(
+                new SliceImpl<>(simpleCrewDtos, crewSlice.getPageable(), crewSlice.hasNext())));
     }
 
 

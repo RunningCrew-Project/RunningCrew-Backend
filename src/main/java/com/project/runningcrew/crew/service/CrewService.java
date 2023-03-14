@@ -106,10 +106,7 @@ public class CrewService {
         //TODO boardImage 삭제
         //TODO runningNoticeImage 삭제
         //TODO member 삭제
-        List<Member> members = memberRepository.findAllByCrew(crew);
-        for (Member member : members) {
-            memberRepository.delete(member);
-        }
+        memberRepository.deleteAllByCrew(crew);
         crewRepository.delete(crew);
         imageService.deleteImage(crew.getCrewImgUrl());
     }
