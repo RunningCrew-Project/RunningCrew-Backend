@@ -57,7 +57,7 @@ public class CommentController {
     private final RunningNoticeService runningNoticeService;
     private final MemberService memberService;
     private final UserService userService;
-    private int pagingSize = 10;
+    private final int pagingSize = 10;
 
     private final String host = "localhost";
 
