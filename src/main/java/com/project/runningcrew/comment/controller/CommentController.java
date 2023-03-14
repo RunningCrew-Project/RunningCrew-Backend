@@ -16,6 +16,7 @@ import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.PagingResponse;
 import com.project.runningcrew.common.dto.SimpleCommentDto;
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.service.MemberService;
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -56,10 +58,12 @@ public class CommentController {
     private final BoardService boardService;
     private final RunningNoticeService runningNoticeService;
     private final MemberService memberService;
-    private final UserService userService;
+    private final CrewService crewService;
+
+    @Value("${domain.name}")
+    private String host;
     private final int pagingSize = 10;
 
-    private final String host = "localhost";
 
 
 
@@ -101,17 +105,25 @@ public class CommentController {
             @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
-        Member member = memberService.findByUserAndCrew(user, board.getMember().getCrew());
-        BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
+        Crew crew = board.getMember().getCrew();
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
 
-        Long commentId = commentService.saveComment(boardComment);
-        URI uri = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host(host)
-                .path("/api/comments/{id}")
-                .build(commentId);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 의 크루 회원 여부 검증
+            Member member = memberService.findByUserAndCrew(user, board.getMember().getCrew());
+            BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
 
-        return ResponseEntity.created(uri).build();
+            Long commentId = commentService.saveComment(boardComment);
+            URI uri = UriComponentsBuilder
+                    .fromHttpUrl(host)
+                    .path("/api/comments/{id}")
+                    .build(commentId);
+
+            return ResponseEntity.created(uri).build();
+        } else {
+            throw new AccessDeniedException("댓글 생성은 크루원 전용 기능입니다.");
+        }
+
     }
 
 
@@ -134,17 +146,25 @@ public class CommentController {
             @CurrentUser User user
     ) {
         RunningNotice runningNotice =  runningNoticeService.findById(runningNoticeId);
-        Member member = memberService.findByUserAndCrew(user, runningNotice.getMember().getCrew());
-        RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, request.getDetail(), runningNotice);
+        Crew crew = runningNotice.getMember().getCrew();
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
 
-        Long commentId = commentService.saveComment(runningNoticeComment);
-        URI uri = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host(host)
-                .path("/api/comments/{id}")
-                .build(commentId);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 의 크루 회원 여부 검증
+            Member member = memberService.findByUserAndCrew(user, runningNotice.getMember().getCrew());
+            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, request.getDetail(), runningNotice);
 
-        return ResponseEntity.created(uri).build();
+            Long commentId = commentService.saveComment(runningNoticeComment);
+            URI uri = UriComponentsBuilder
+                    .fromHttpUrl(host)
+                    .path("/api/comments/{id}")
+                    .build(commentId);
+
+            return ResponseEntity.created(uri).build();
+        } else {
+            throw new AccessDeniedException("댓글 생성은 크루원 전용 기능입니다.");
+        }
+
     }
 
 
@@ -168,13 +188,16 @@ public class CommentController {
     ) {
         Comment comment = commentService.findById(commentId);
         User writer = comment.getMember().getUser();
+        //note writer : 댓글 작성자
 
         if(user.equals(writer)) {
+            //note 요청 user 의 writer 여부 검증
             commentService.changeComment(comment, request.getDetail());
             return ResponseEntity.noContent().build();
         } else {
             throw new AccessDeniedException("댓글 작성자만 수정할 수 있습니다.");
         }
+
     }
 
 
@@ -195,11 +218,12 @@ public class CommentController {
     ) {
         Comment comment = commentService.findById(commentId);
         User writer = comment.getMember().getUser();
+        //note writer : 댓글 작성자
 
         if(user.equals(writer)) {
+            //note 요청 user 의 writer 여부 검증
             commentService.deleteComment(comment);
             return ResponseEntity.noContent().build();
-            // user 의 comment 삭제 권한 검증
         } else {
             throw new AccessDeniedException("댓글 작성자만 삭제할 수 있습니다.");
         }
@@ -225,11 +249,9 @@ public class CommentController {
         Board board = boardService.findById(boardId);
         List<BoardComment> commentList = commentService.findAllByBoard(board);
         int commentCount = commentService.countCommentAtBoard(board);
-        // 게시글의 댓글 수 정보 -> commentCount
 
         List<SimpleCommentDto> simpleCommentDtos = commentList.stream().map(SimpleCommentDto::new)
                 .collect(Collectors.toList());
-        // 각 댓글의 정보 -> SimpleCommentDtos
 
         return ResponseEntity.ok(new CommentListResponse<>(commentCount, simpleCommentDtos));
     }
@@ -254,11 +276,9 @@ public class CommentController {
         RunningNotice runningNotice = runningNoticeService.findById(runningNoticeId);
         List<RunningNoticeComment> commentList = commentService.findAllByRunningNotice(runningNotice);
         int commentCount = commentService.countCommentAtRunningNotice(runningNotice);
-        // 런닝 공지의 댓글 수 정보 -> commentCount
 
         List<SimpleCommentDto> simpleCommentDtos = commentList.stream().map(SimpleCommentDto::new)
                 .collect(Collectors.toList());
-        // 각 댓글의 정보 -> SimppleCommentDtos
 
         return ResponseEntity.ok(new CommentListResponse<>(commentCount, simpleCommentDtos));
     }
