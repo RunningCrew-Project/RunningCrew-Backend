@@ -65,7 +65,6 @@ public class BoardController {
     private final BoardImageService boardImageService;
     private final MemberService memberService;
     private final CrewService crewService;
-    private final UserService userService;
 
 
     private final FreeBoardService freeBoardService;
@@ -403,9 +402,7 @@ public class BoardController {
             throw new AccessDeniedException("크루 가입자 전용 게시판입니다.");
         }
 
-
     }
-
 
 
     @Operation(summary = "특정 크루의 자유 게시판 정보 가져오기"
@@ -499,10 +496,47 @@ public class BoardController {
     }
 
 
+    @Operation(summary = "특정 크루의 리뷰 게시판 정보 가져오기"
+            , description = "리뷰 게시판의 모든 게시글을 가져온다."
+            , security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/crews/{crewId}/boards/review")
+    public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfReviewBoards(
+            @PathVariable("crewId") Long crewId,
+            @RequestParam("page") int page,
+            @CurrentUser User user
+    ) {
+        Crew crew = crewService.findById(crewId);
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 가 crew 의 회원이라면 - 검증
+            PageRequest pageRequest = PageRequest.of(page, pagingSize);
+            Slice<ReviewBoard> reviewBoardSlice = reviewBoardService.findReviewBoardByCrew(crew, pageRequest);
 
-    //TODO 리뷰 게시판 전체 게시글 정보 - 페이징
+            List<Long> boardIdList = new ArrayList<>();
+            for (ReviewBoard reviewBoard : reviewBoardSlice) { boardIdList.add(reviewBoard.getId()); }
+            List<Integer> commentCountList = commentService.countByBoardIdList(boardIdList);
 
+            List<SimpleBoardDto> dtoList = new ArrayList<>();
+            for (int i = 0; i < commentCountList.size(); i++) {
+                dtoList.add(new SimpleBoardDto(reviewBoardSlice.getContent().get(i), commentCountList.get(i)));
+            }
 
+            Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList);
+            return ResponseEntity.ok(new PagingResponse<>(responseSlice));
+        } else {
+            throw new AccessDeniedException("크루 가입자 전용 게시판입니다.");
+        }
+    }
 
 
 }
