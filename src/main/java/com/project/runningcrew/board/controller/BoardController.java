@@ -8,7 +8,9 @@ import com.project.runningcrew.board.entity.FreeBoard;
 import com.project.runningcrew.board.entity.NoticeBoard;
 import com.project.runningcrew.board.entity.ReviewBoard;
 import com.project.runningcrew.board.service.BoardService;
+import com.project.runningcrew.board.service.FreeBoardService;
 import com.project.runningcrew.board.service.NoticeBoardService;
+import com.project.runningcrew.board.service.ReviewBoardService;
 import com.project.runningcrew.comment.service.CommentService;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.PagingResponse;
@@ -25,6 +27,7 @@ import com.project.runningcrew.resourceimage.service.BoardImageService;
 import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import com.project.runningcrew.runningrecord.service.RunningRecordService;
 import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +35,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -58,10 +62,16 @@ public class BoardController {
     private final CommentService commentService;
     private final BoardService boardService;
     private final RunningRecordService runningRecordService;
-    private final NoticeBoardService noticeBoardService;
     private final BoardImageService boardImageService;
     private final MemberService memberService;
     private final CrewService crewService;
+    private final UserService userService;
+
+
+    private final FreeBoardService freeBoardService;
+    private final NoticeBoardService noticeBoardService;
+    private final ReviewBoardService reviewBoardService;
+
 
     @Value("${domain.name}")
     private String host;
@@ -83,10 +93,18 @@ public class BoardController {
             @PathVariable("boardId") Long boardId,
             @CurrentUser User user
     ) {
-        // user 검증 필요(?)
+
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
         Board board = boardService.findById(boardId);
-        int commentCount = commentService.countCommentAtBoard(board);
-        return ResponseEntity.ok(new GetBoardResponse(board, commentCount));
+
+        if(crewOfUser.contains(board.getMember().getCrew())) {
+            //note 요청 user 의 크루 회원 여부 검증
+            int commentCount = commentService.countCommentAtBoard(board);
+            return ResponseEntity.ok(new GetBoardResponse(board, commentCount));
+        } else {
+            throw new AccessDeniedException("크루 가입자만 확인할 수 있습니다.");
+        }
+
     }
 
 
@@ -109,16 +127,23 @@ public class BoardController {
             @ModelAttribute @Valid CreateBoardRequest request
     ) {
         Crew crew = crewService.findById(crewId);
-        Member member = memberService.findByUserAndCrew(user, crew);
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 의 크루 회원 여부 검증
+            Member member = memberService.findByUserAndCrew(user, crew);
 
-        FreeBoard freeBoard = new FreeBoard(member, request.getTitle(), request.getDetail());
-        Long boardId = boardService.saveBoard(freeBoard, request.getFiles());
-        URI uri = UriComponentsBuilder
-                .fromHttpUrl(host)
-                .path("/api/boards/{id}")
-                .build(boardId);
+            FreeBoard freeBoard = new FreeBoard(member, request.getTitle(), request.getDetail());
+            Long boardId = boardService.saveBoard(freeBoard, request.getFiles());
+            URI uri = UriComponentsBuilder
+                    .fromHttpUrl(host)
+                    .path("/api/boards/{id}")
+                    .build(boardId);
 
-        return ResponseEntity.created(uri).build();
+            return ResponseEntity.created(uri).build();
+        } else {
+            throw new AccessDeniedException("크루 가입자만 생성할 수 있습니다.");
+        }
+
     }
 
 
@@ -140,16 +165,23 @@ public class BoardController {
             @ModelAttribute @Valid CreateBoardRequest request
     ) {
         Crew crew = crewService.findById(crewId);
-        Member member = memberService.findByUserAndCrew(user, crew);
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 의 크루 회원 여부 검증
+            Member member = memberService.findByUserAndCrew(user, crew);
 
-        NoticeBoard noticeBoard = new NoticeBoard(member, request.getTitle(), request.getDetail());
-        Long boardId = noticeBoardService.saveNoticeBoard(noticeBoard, request.getFiles());
-        URI uri = UriComponentsBuilder
-                .fromHttpUrl(host)
-                .path("/api/boards/{id}")
-                .build(boardId);
+            NoticeBoard noticeBoard = new NoticeBoard(member, request.getTitle(), request.getDetail());
+            Long boardId = noticeBoardService.saveNoticeBoard(noticeBoard, request.getFiles());
+            URI uri = UriComponentsBuilder
+                    .fromHttpUrl(host)
+                    .path("/api/boards/{id}")
+                    .build(boardId);
 
-        return ResponseEntity.created(uri).build();
+            return ResponseEntity.created(uri).build();
+        } else {
+            throw new AccessDeniedException("크루 가입자만 생성할 수 있습니다.");
+        }
+
     }
 
 
@@ -170,17 +202,24 @@ public class BoardController {
             @ModelAttribute @Valid CreateBoardRequest request
     ) {
         Crew crew = crewService.findById(crewId);
-        Member member = memberService.findByUserAndCrew(user, crew);
-        RunningRecord runningRecord = runningRecordService.findById(request.getRunningRecordId());
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        if (crewOfUser.contains(crew)) {
+            //note 요청 user 의 크루 회원 여부 검증
+            Member member = memberService.findByUserAndCrew(user, crew);
+            RunningRecord runningRecord = runningRecordService.findById(request.getRunningRecordId());
 
-        ReviewBoard reviewBoard = new ReviewBoard(member, request.getTitle(), request.getDetail(), runningRecord);
-        Long boardId = boardService.saveBoard(reviewBoard, request.getFiles());
-        URI uri = UriComponentsBuilder
-                .fromHttpUrl(host)
-                .path("/api/boards/{id}")
-                .build(boardId);
+            ReviewBoard reviewBoard = new ReviewBoard(member, request.getTitle(), request.getDetail(), runningRecord);
+            Long boardId = boardService.saveBoard(reviewBoard, request.getFiles());
+            URI uri = UriComponentsBuilder
+                    .fromHttpUrl(host)
+                    .path("/api/boards/{id}")
+                    .build(boardId);
 
-        return ResponseEntity.created(uri).build();
+            return ResponseEntity.created(uri).build();
+        } else {
+            throw new AccessDeniedException("크루 가입자만 생성할 수 있습니다.");
+        }
+
     }
 
 
@@ -256,8 +295,10 @@ public class BoardController {
     ) {
         Board board = boardService.findById(boardId);
         User writer = board.getMember().getUser();
+        //note 게시글 작성자 : writer
 
         if(writer.equals(user)) {
+            //note 작성자 권한 검증
             boardService.deleteBoard(board);
             return ResponseEntity.noContent().build();
         } else {
@@ -339,34 +380,127 @@ public class BoardController {
     ) {
 
         Crew crew = crewService.findById(crewId);
-        Slice<Board> boardSlice = boardService.findBoardByCrewAndKeyWord(crew, keyword);
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 가 crew 의 회원이라면 - 검증
+            Slice<Board> boardSlice = boardService.findBoardByCrewAndKeyWord(crew, keyword);
 
-        List<Long> boardIdList = new ArrayList<>();
-        for (Board board : boardSlice) { boardIdList.add(board.getId()); }
-        //note idList 를 만들어 commentCountList 를 뽑아낸다.
+            List<Long> boardIdList = new ArrayList<>();
+            for (Board board : boardSlice) { boardIdList.add(board.getId()); }
 
+            List<Integer> commentCountList = commentService.countByBoardIdList(boardIdList);
+            List<SimpleBoardDto> dtoList = new ArrayList<>();
 
-        List<Integer> commentCountList = commentService.countByBoardIdList(boardIdList);
-        List<SimpleBoardDto> dtoList = new ArrayList<>();
+            for (int i = 0; i < commentCountList.size(); i++) {
+                dtoList.add(new SimpleBoardDto(boardSlice.getContent().get(i), commentCountList.get(i)));
+            }
 
-        for (int i = 0; i < commentCountList.size(); i++) {
-            dtoList.add(new SimpleBoardDto(boardSlice.getContent().get(i), commentCountList.get(i)));
+            Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList);
+            //note dtoList -> Slice
+
+            return ResponseEntity.ok(new PagingResponse<>(responseSlice));
+        } else {
+            throw new AccessDeniedException("크루 가입자 전용 게시판입니다.");
         }
 
-        Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList);
-        //note dtoList -> Slice
-
-        return ResponseEntity.ok(new PagingResponse<>(responseSlice));
 
     }
 
 
 
-    //TODO 자유 게시판 전체 게시글 정보 - 페이징
+    @Operation(summary = "특정 크루의 자유 게시판 정보 가져오기"
+            , description = "자유 게시판의 모든 게시글을 가져온다."
+            , security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/crews/{crewId}/boards/free")
+    public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfFreeBoards(
+        @PathVariable("crewId") Long crewId,
+        @RequestParam("page") int page,
+        @CurrentUser User user
+    ){
+
+        Crew crew = crewService.findById(crewId);
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 가 crew 의 회원이라면 - 검증
+            PageRequest pageRequest = PageRequest.of(page, pagingSize);
+            Slice<FreeBoard> freeBoardSlice = freeBoardService.findFreeBoardByCrew(crew, pageRequest);
+
+            List<Long> boardIdList = new ArrayList<>();
+            for (FreeBoard freeBoard : freeBoardSlice) { boardIdList.add(freeBoard.getId()); }
+            List<Integer> commentCountList = commentService.countByBoardIdList(boardIdList);
+
+            List<SimpleBoardDto> dtoList = new ArrayList<>();
+            for (int i = 0; i < commentCountList.size(); i++) {
+                dtoList.add(new SimpleBoardDto(freeBoardSlice.getContent().get(i), commentCountList.get(i)));
+            }
+
+            Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList);
+            return ResponseEntity.ok(new PagingResponse<>(responseSlice));
+        } else {
+            throw new AccessDeniedException("크루 가입자 전용 게시판입니다.");
+        }
+
+    }
+
+
+
+    @Operation(summary = "특정 크루의 공지 게시판 정보 가져오기"
+            , description = "공지 게시판의 모든 게시글을 가져온다."
+            , security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/crews/{crewId}/boards/notice")
+    public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfNoticeBoards(
+            @PathVariable("crewId") Long crewId,
+            @RequestParam("page") int page,
+            @CurrentUser User user
+    ) {
+
+        Crew crew = crewService.findById(crewId);
+        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        if(crewOfUser.contains(crew)) {
+            //note 요청 user 가 crew 의 회원이라면 - 검증
+            PageRequest pageRequest = PageRequest.of(page, pagingSize);
+            Slice<NoticeBoard> noticeBoardSlice = noticeBoardService.findNoticeBoardByCrew(crew, pageRequest);
+
+            List<Long> boardIdList = new ArrayList<>();
+            for (NoticeBoard noticeBoard : noticeBoardSlice) { boardIdList.add(noticeBoard.getId()); }
+            List<Integer> commentCountList = commentService.countByBoardIdList(boardIdList);
+
+            List<SimpleBoardDto> dtoList = new ArrayList<>();
+            for (int i = 0; i < commentCountList.size(); i++) {
+                dtoList.add(new SimpleBoardDto(noticeBoardSlice.getContent().get(i), commentCountList.get(i)));
+            }
+
+            Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList);
+            return ResponseEntity.ok(new PagingResponse<>(responseSlice));
+        } else {
+            throw new AccessDeniedException("크루 가입자 전용 게시판입니다.");
+        }
+
+    }
+
+
 
     //TODO 리뷰 게시판 전체 게시글 정보 - 페이징
-
-    //TODO 공지 게시판 전체 게시글 정보 - 페이징
 
 
 
