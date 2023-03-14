@@ -4,6 +4,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
@@ -25,6 +26,7 @@ import java.util.stream.Stream;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final RecruitAnswerRepository recruitAnswerRepository;
 
     /**
      * 입력받은 id 를 가진 Member 를 찾아 반환한다. 없다면 MemberNotFoundException 을 throw 한다.
@@ -50,6 +52,25 @@ public class MemberService {
         if (optionalMember.isPresent()) {
             throw new MemberAlreadyExistsException(optionalMember.get().getId());
         }
+        return memberRepository.save(member).getId();
+    }
+
+    /**
+     * 입력받은 Member 의 가입여부를 확인하고, 가입하지 않았다면 Member 를 저장하고 Member 가 작성한
+     * RecruitAnswer 을 삭제한 후, Member 에 부여된 id 를 반환한다.
+     *
+     * @param member 저장할 Member
+     * @return Member 에 부여된 id
+     * @throws MemberAlreadyExistsException user 가 crew 에 이미 가입했을 때
+     */
+    @Transactional
+    public Long acceptMember(Member member) {
+        Optional<Member> optionalMember = memberRepository.findByUserAndCrew(member.getUser(), member.getCrew());
+        if (optionalMember.isPresent()) {
+            throw new MemberAlreadyExistsException(optionalMember.get().getId());
+        }
+
+        recruitAnswerRepository.deleteByUserAndCrew(member.getUser(), member.getCrew());
         return memberRepository.save(member).getId();
     }
 
