@@ -1,8 +1,10 @@
 package com.project.runningcrew.member.service;
 
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +26,7 @@ import java.util.stream.Stream;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final RecruitAnswerRepository recruitAnswerRepository;
 
     /**
      * 입력받은 id 를 가진 Member 를 찾아 반환한다. 없다면 MemberNotFoundException 을 throw 한다.
@@ -44,9 +48,29 @@ public class MemberService {
      */
     @Transactional
     public Long saveMember(Member member) {
-        if (memberRepository.existsByUserAndCrew(member.getUser(), member.getCrew())) {
-            throw new MemberAlreadyExistsException();
+        Optional<Member> optionalMember = memberRepository.findByUserAndCrew(member.getUser(), member.getCrew());
+        if (optionalMember.isPresent()) {
+            throw new MemberAlreadyExistsException(optionalMember.get().getId());
         }
+        return memberRepository.save(member).getId();
+    }
+
+    /**
+     * 입력받은 Member 의 가입여부를 확인하고, 가입하지 않았다면 Member 를 저장하고 Member 가 작성한
+     * RecruitAnswer 을 삭제한 후, Member 에 부여된 id 를 반환한다.
+     *
+     * @param member 저장할 Member
+     * @return Member 에 부여된 id
+     * @throws MemberAlreadyExistsException user 가 crew 에 이미 가입했을 때
+     */
+    @Transactional
+    public Long acceptMember(Member member) {
+        Optional<Member> optionalMember = memberRepository.findByUserAndCrew(member.getUser(), member.getCrew());
+        if (optionalMember.isPresent()) {
+            throw new MemberAlreadyExistsException(optionalMember.get().getId());
+        }
+
+        recruitAnswerRepository.deleteByUserAndCrew(member.getUser(), member.getCrew());
         return memberRepository.save(member).getId();
     }
 
@@ -57,36 +81,57 @@ public class MemberService {
      */
     @Transactional
     public void deleteMember(Member member) {
+        //TODO board
+        //TODO comment
+        //TODO runningnotice
+        //TODO runningmember
+        //TODO image
         memberRepository.delete(member);
     }
 
     /**
-     * 입력받은 Member 의 role 을 MemberRole.ROLE_LEADER 로 변경한다.
+     * role 이 MemberRole.ROLE_LEADER 인 leaderMember 의 role 을 MemberRole.ROLE_MANAGER 로 변경하고,
+     * role 이 MemberRole.ROLE_MANAGER 인 updateMember 의 role 을 MemberRole.ROLE_LEADER 로 변경한다.
      *
-     * @param member role 을 변경할 Member
+     * @param leaderMember role 을 MemberRole.ROLE_LEADER 에서 MemberRole.ROLE_MANAGER 로 변경할 Member
+     * @param updateMember role 을 MemberRole.ROLE_MANAGER 에서 MemberRole.ROLE_LEADER 로 변경할 Member
      */
     @Transactional
-    public void updateMemberLeader(Member member) {
-        member.updateRole(MemberRole.ROLE_LEADER);
+    public void updateMemberLeader(Member leaderMember, Member updateMember) {
+        if (leaderMember.getRole() != MemberRole.ROLE_LEADER) {
+            throw new UpdateMemberRoleException(leaderMember.getRole());
+        }
+        if (updateMember.getRole() != MemberRole.ROLE_MANAGER) {
+            throw new UpdateMemberRoleException(updateMember.getRole());
+        }
+
+        leaderMember.updateRole(MemberRole.ROLE_MANAGER);
+        updateMember.updateRole(MemberRole.ROLE_LEADER);
     }
 
     /**
-     * 입력받은 Member 의 role 을 MemberRole.ROLE_MANAGER 로 변경한다.
+     * role 이 MemberRole.ROLE_NORMAL 인 Member 의 role 을 MemberRole.ROLE_MANAGER 로 변경한다.
      *
-     * @param member role 을 변경할 Member
+     * @param member role 을 MemberRole.ROLE_NORMAL 에서 MemberRole.ROLE_MANAGER 로 변경할 Member
      */
     @Transactional
     public void updateMemberManager(Member member) {
+        if (member.getRole() != MemberRole.ROLE_NORMAL) {
+            throw new UpdateMemberRoleException(member.getRole());
+        }
         member.updateRole(MemberRole.ROLE_MANAGER);
     }
 
     /**
-     * 입력받은 Member 의 role 을 MemberRole.ROLE_NORMAL 로 변경한다.
+     * role 이 MemberRole.ROLE_MANAGER 인 Member 의 role 을 MemberRole.ROLE_NORMAL 로 변경한다.
      *
-     * @param member role 을 변경할 Member
+     * @param member role 을 MemberRole.ROLE_MANAGER 에서 MemberRole.ROLE_NORMAL 로 변경할 Member
      */
     @Transactional
     public void updateMemberNormal(Member member) {
+        if (member.getRole() != MemberRole.ROLE_MANAGER) {
+            throw new UpdateMemberRoleException(member.getRole());
+        }
         member.updateRole(MemberRole.ROLE_NORMAL);
     }
 
@@ -164,8 +209,10 @@ public class MemberService {
      * @return ey 가 Crew 의 id 이고 value 가 Crew 의 멤버수인 map
      */
     public Map<Long, Long> countAllByCrewIds(List<Long> crewIds) {
-       return memberRepository.countAllByCrewIds(crewIds).stream()
-               .collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
+        return memberRepository.countAllByCrewIds(crewIds).stream()
+                .collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
     }
+    
+    //TODO crew 의 모든 member 삭제
 
 }

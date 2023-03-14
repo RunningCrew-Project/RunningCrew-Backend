@@ -3,6 +3,7 @@ package com.project.runningcrew.member.service;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.user.entity.User;
@@ -29,6 +30,9 @@ class MemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private RecruitAnswerRepository recruitAnswerRepository;
 
     @InjectMocks
     private MemberService memberService;
@@ -69,7 +73,7 @@ class MemberServiceTest {
         //given
         Long memberId = 1L;
         Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
-        when(memberRepository.existsByUserAndCrew(user, crew)).thenReturn(false);
+        when(memberRepository.findByUserAndCrew(user, crew)).thenReturn(Optional.empty());
         when(memberRepository.save(member)).thenReturn(member);
 
         ///when
@@ -77,7 +81,7 @@ class MemberServiceTest {
 
         //then
         assertThat(findMemberId).isSameAs(memberId);
-        verify(memberRepository, times(1)).existsByUserAndCrew(user, crew);
+        verify(memberRepository, times(1)).findByUserAndCrew(user, crew);
         verify(memberRepository, times(1)).save(member);
     }
 
@@ -87,13 +91,33 @@ class MemberServiceTest {
         //given
         Long memberId = 1L;
         Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
-        when(memberRepository.existsByUserAndCrew(user, crew)).thenReturn(true);
+        when(memberRepository.findByUserAndCrew(user, crew)).thenReturn(Optional.of(member));
 
         ///when
         //then
         assertThatThrownBy(() -> memberService.saveMember(member))
                 .isInstanceOf(MemberAlreadyExistsException.class);
-        verify(memberRepository, times(1)).existsByUserAndCrew(user, crew);
+        verify(memberRepository, times(1)).findByUserAndCrew(user, crew);
+    }
+
+    @DisplayName("멤버 가입 수락 성공 테스트")
+    @Test
+    public void acceptMemberTest1(@Mock User user, @Mock Crew crew) {
+        //given
+        Long memberId = 1L;
+        Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
+        when(memberRepository.findByUserAndCrew(user, crew)).thenReturn(Optional.empty());
+        doNothing().when(recruitAnswerRepository).deleteByUserAndCrew(user, crew);
+        when(memberRepository.save(member)).thenReturn(member);
+
+        ///when
+        Long findMemberId = memberService.acceptMember(member);
+
+        //then
+        assertThat(findMemberId).isSameAs(memberId);
+        verify(memberRepository, times(1)).findByUserAndCrew(user, crew);
+        verify(recruitAnswerRepository,times(1)).deleteByUserAndCrew(user, crew);
+        verify(memberRepository, times(1)).save(member);
     }
 
     @DisplayName("멤버 삭제 테스트")
@@ -113,16 +137,19 @@ class MemberServiceTest {
 
     @DisplayName("멤버의 role 리더로 변경 테스트")
     @Test
-    public void updateMemberLeaderTest(@Mock User user, @Mock Crew crew) {
+    public void updateMemberLeaderTest(@Mock User user1, @Mock User user2, @Mock Crew crew) {
         //given
-        Long memberId = 1L;
-        Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
+        Long memberId1 = 1L;
+        Long memberId2 = 1L;
+        Member leaderMember = new Member(memberId1, user1, crew, MemberRole.ROLE_LEADER);
+        Member updateMember = new Member(memberId2, user2, crew, MemberRole.ROLE_MANAGER);
 
         ///when
-        memberService.updateMemberLeader(member);
+        memberService.updateMemberLeader(leaderMember, updateMember);
 
         //then
-        assertThat(member.getRole()).isSameAs(MemberRole.ROLE_LEADER);
+        assertThat(leaderMember.getRole()).isSameAs(MemberRole.ROLE_MANAGER);
+        assertThat(updateMember.getRole()).isSameAs(MemberRole.ROLE_LEADER);
     }
 
     @DisplayName("멤버의 role 매니저로 변경 테스트")

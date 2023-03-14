@@ -7,6 +7,7 @@ import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -86,12 +87,21 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
      * crewId 의 리스트에 포함된 id 를 가지는 Crew 들의 멤버수를 반환
-     * 
+     *
      * @param crewIds Crew 의 id 가 담긴 리스트
      * @return crewId 와 Crew 의 멤버수가 담긴 Object[] 의 리스트. Object[0] 에는 Long 타입인 crewId,
      * Object[1] 에는  Long 타입인 Crew 의 멤버수
      */
     @Query("select m.crew.id, count(m) from Member m where m.crew.id in (:crewIds) group by m.crew")
     List<Object[]> countAllByCrewIds(@Param("crewIds") List<Long> crewIds);
+
+    /**
+     * 특정 crew 의 모든 member 를 삭제한다.
+     *
+     * @param crew
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Member m where m.crew = :crew")
+    void deleteAllByCrew(@Param("crew") Crew crew);
 
 }

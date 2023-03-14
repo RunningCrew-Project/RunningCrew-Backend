@@ -1,7 +1,10 @@
 package com.project.runningcrew.exception.badinput;
 
+import lombok.Getter;
+
 import java.util.Map;
 
+@Getter
 public class BadInputException extends RuntimeException{
     private Map<String, String> badInputMaps;
 

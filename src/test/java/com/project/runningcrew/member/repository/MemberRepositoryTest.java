@@ -345,4 +345,27 @@ class MemberRepositoryTest {
         assertThat(commentMaps.get(crew2.getId())).isSameAs(30L);
     }
 
+    @DisplayName("crew 의 모든 member 삭제하기 테스트")
+    @Test
+    public void deleteAllByCrewTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        for (int i = 0; i < 10; i++) {
+            User user = testEntityFactory.getUser(dongArea, i);
+            Member member = new Member(user, crew, MemberRole.ROLE_NORMAL);
+            memberRepository.save(member);
+        }
+
+        ///when
+        memberRepository.deleteAllByCrew(crew);
+        
+        //then
+        List<Member> members = memberRepository.findAllByCrew(crew);
+        assertThat(members.isEmpty()).isTrue();
+    }
+
 }
