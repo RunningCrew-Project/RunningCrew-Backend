@@ -1,5 +1,7 @@
 package com.project.runningcrew.resourceimage.repository;
 
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,5 +40,25 @@ public interface RunningNoticeImageRepository extends JpaRepository<RunningNotic
      */
     @Query("select r from RunningNoticeImage r where r.runningNotice.id in (:runningNoticeIds)")
     List<RunningNoticeImage> findImagesByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
+
+    /**
+     * member 가 생성한 모든 RunningNoticeImage 삭제
+     *
+     * @param member
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from RunningNoticeImage i where i in " +
+            "(select img from RunningNoticeImage img where img.runningNotice.member = :member)")
+    void deleteAllByMember(@Param("member") Member member);
+
+    /**
+     * crew 에 포함된 모든 RunningNoticeImage 삭제
+     *
+     * @param crew
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from RunningNoticeImage i where i in " +
+            "(select img from RunningNoticeImage img where img.runningNotice.member.crew = :crew)")
+    void deleteAllByCrew(@Param("crew") Crew crew);
 
 }
