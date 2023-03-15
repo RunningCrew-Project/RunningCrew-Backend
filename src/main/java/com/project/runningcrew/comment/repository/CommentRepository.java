@@ -26,7 +26,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * 해당 member 가 작성한 모든 comment 를 삭제한다.
      * @param member
      */
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Comment c where c.member = :member")
     void deleteAllByMember(@Param("member") Member member);
 
@@ -34,8 +34,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * 해당 crew 의 모든 comment 를 삭제한다.
      * @param crew
      */
-    @Modifying
-    @Query("delete from Comment c where c.member.crew = :crew")
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Comment c where c in (select c2 from Comment c2 where c.member.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
 

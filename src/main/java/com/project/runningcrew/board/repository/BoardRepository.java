@@ -44,17 +44,17 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
      * 특정 Member 가 작성한 Board 를 모두 삭제한다.
      * @param member
      */
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Board b where b.member = :member")
-    void deleteBoardsByMember(@Param("member") Member member);
+    void deleteAllByMember(@Param("member") Member member);
 
     /**
      * 특정 crew 의 모든 Board 를 삭제한다.
      * @param crew
      */
-    @Modifying
-    @Query("delete from Board b where b.member.crew = :crew")
-    void deleteBoardsByCrew(@Param("crew") Crew crew);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Board b where b in (select b2 from Board b2 where b2.member.crew = :crew)")
+    void deleteAllByCrew(@Param("crew") Crew crew);
 
 
 }
