@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +127,6 @@ public class BoardController {
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-
         Member member = memberService.findByUserAndCrew(user, crew);
         FreeBoard freeBoard = new FreeBoard(member, request.getTitle(), request.getDetail());
 
@@ -161,7 +161,6 @@ public class BoardController {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkManager(user, crew);
         //note 요청 user 의 크루 회원 여부 && Manager 이상의 등급 체크
-
 
         Member member = memberService.findByUserAndCrew(user, crew);
 
@@ -312,7 +311,7 @@ public class BoardController {
     })
     @GetMapping("/api/members/{memberId}/boards")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getBoardsOfMember(
-            @RequestParam("page") int page,
+            @Positive @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
             @CurrentUser User user
     ) {
@@ -361,7 +360,7 @@ public class BoardController {
     })
     @GetMapping("/api/crews/{crewId}/boards")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getBoardsOfKeyword(
-            @RequestParam("page") int page,
+            @Positive @RequestParam("page") int page,
             @RequestParam("keyword") String keyword,
             @PathVariable("crewId") Long crewId,
             @CurrentUser User user
@@ -414,7 +413,7 @@ public class BoardController {
     @GetMapping("/api/crews/{crewId}/boards/free")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfFreeBoards(
         @PathVariable("crewId") Long crewId,
-        @RequestParam("page") int page,
+        @Positive @RequestParam("page") int page,
         @CurrentUser User user
     ){
         Crew crew = crewService.findById(crewId);
@@ -463,7 +462,7 @@ public class BoardController {
     @GetMapping("/api/crews/{crewId}/boards/notice")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfNoticeBoards(
             @PathVariable("crewId") Long crewId,
-            @RequestParam("page") int page,
+            @Positive @RequestParam("page") int page,
             @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
@@ -511,7 +510,7 @@ public class BoardController {
     @GetMapping("/api/crews/{crewId}/boards/review")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfReviewBoards(
             @PathVariable("crewId") Long crewId,
-            @RequestParam("page") int page,
+            @Positive @RequestParam("page") int page,
             @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);

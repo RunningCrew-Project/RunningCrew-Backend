@@ -1,6 +1,7 @@
 package com.project.runningcrew.board.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class UpdateBoardRequest {
 
     @Schema(description = "수정 게시글 제목", example = "new_title")
@@ -30,7 +32,6 @@ public class UpdateBoardRequest {
 
     @Schema(description = "수정 런닝 기록 아이디")
     private Integer runningRecordId;
-
 
 
 }

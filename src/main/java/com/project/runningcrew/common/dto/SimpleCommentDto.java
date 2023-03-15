@@ -2,7 +2,6 @@ package com.project.runningcrew.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.runningcrew.comment.entity.Comment;
-import com.project.runningcrew.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
