@@ -62,7 +62,7 @@ public class CommentController {
 
     @Value("${domain.name}")
     private String host;
-    private final int pagingSize = 10;
+    private final int pagingSize = 15;
 
 
 

@@ -30,7 +30,7 @@ public class SimpleBoardDto {
     @Schema(description = "게시글 댓글 수", example = "3")
     private int commentCount;
 
-    public SimpleBoardDto(Board board, int commentCount) {
+    public SimpleBoardDto(Board board, String imgUrl, int commentCount) {
         this.id = board.getId();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -38,7 +38,7 @@ public class SimpleBoardDto {
 
         this.title = board.getTitle();
         this.detail = board.getDetail();
-        // this.imgUrl = board. xxx
+        this.imgUrl = imgUrl;
         this.simpleMemberDto = new SimpleMemberDto(board.getMember());
         this.commentCount = commentCount;
     }
