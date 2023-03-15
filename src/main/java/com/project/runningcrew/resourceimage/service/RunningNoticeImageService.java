@@ -1,5 +1,6 @@
 package com.project.runningcrew.resourceimage.service;
 
+import com.project.runningcrew.exception.notFound.ImageNotFoundException;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
@@ -18,6 +19,17 @@ public class RunningNoticeImageService {
 
     private final RunningNoticeImageRepository runningNoticeImageRepository;
     private final String defaultImageUrl = "defaultImageUrl";
+
+    /**
+     * 입력받은 id 를 가진 RunningNoticeImage 를 찾아 반환한다. 없다면 ImageNotFoundException 을 throw 한다.
+     *
+     * @param runningNoticeImageId 찾는 RunningNoticeImage 의 id
+     * @return runningNoticeImageId 를 id 로 가지는 RunningNoticeImage
+     * @throws ImageNotFoundException runningNoticeImageId 에 해당하는 RunningNoticeImage 가 존재하지 않을 때
+     */
+    public RunningNoticeImage findById(Long runningNoticeImageId) {
+        return runningNoticeImageRepository.findById(runningNoticeImageId).orElseThrow(ImageNotFoundException::new);
+    }
 
     /**
      * RunningNotice 에 포함된 모든 RunningNoticeImage 를 반환한다.
@@ -44,7 +56,7 @@ public class RunningNoticeImageService {
                 .findImagesByRunningNoticeIds(runningNoticeIds);
         for (Long runningNoticeId : runningNoticeIds) {
             RunningNoticeImage first = images.stream()
-                    .filter(image -> image.getRunningNotice().getId() == runningNoticeId)
+                    .filter(image -> image.getRunningNotice().getId().equals(runningNoticeId))
                     .findFirst().orElseGet(() -> new RunningNoticeImage(defaultImageUrl, null));
             maps.put(runningNoticeId, first);
         }

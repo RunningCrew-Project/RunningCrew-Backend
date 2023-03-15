@@ -1,8 +1,8 @@
 package com.project.runningcrew.resourceimage.service;
 
+import com.project.runningcrew.exception.notFound.ImageNotFoundException;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.member.entity.Member;
-import com.project.runningcrew.resourceimage.service.RunningNoticeImageService;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
@@ -18,8 +18,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +32,35 @@ class RunningNoticeImageServiceTest {
 
     @InjectMocks
     private RunningNoticeImageService runningNoticeImageService;
+
+    @DisplayName("id 로 RunningNoticeImage 반환 성공 테스트")
+    @Test
+    public void findByIdTest1(@Mock RunningNotice runningNotice) {
+        //given
+        Long runningNoticeImageId = 1L;
+        RunningNoticeImage runningNoticeImage = new RunningNoticeImage("image", runningNotice);
+        when(runningNoticeImageRepository.findById(runningNoticeImageId)).thenReturn(Optional.of(runningNoticeImage));
+
+        ///when
+        RunningNoticeImage findRunningNoticeImage = runningNoticeImageService.findById(runningNoticeImageId);
+
+        //then
+        assertThat(findRunningNoticeImage).isEqualTo(runningNoticeImage);
+        verify(runningNoticeImageRepository, times(1)).findById(runningNoticeImageId);
+    }
+
+    @DisplayName("id 로 RunningNoticeImage 반환 예외 테스트")
+    @Test
+    public void findByIdTest2() {
+        //given
+        Long runningNoticeImageId = 1L;
+        when(runningNoticeImageRepository.findById(runningNoticeImageId)).thenReturn(Optional.empty());
+
+        ///when
+        //then
+        assertThatThrownBy(() -> runningNoticeImageService.findById(runningNoticeImageId))
+                .isInstanceOf(ImageNotFoundException.class);
+    }
 
     @DisplayName("런닝공지에 포함된 모든 이미지 반환 테스트")
     @Test
