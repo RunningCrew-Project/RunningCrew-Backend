@@ -2,6 +2,7 @@ package com.project.runningcrew.resourceimage.repository;
 
 import com.project.runningcrew.resourceimage.entity.RunningRecordImage;
 import com.project.runningcrew.runningrecord.entity.RunningRecord;
+import com.project.runningcrew.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -38,5 +39,16 @@ public interface RunningRecordImageRepository extends JpaRepository<RunningRecor
      */
     @Query("select r from RunningRecordImage r where r.runningRecord.id in (:runningRecordIds)")
     List<RunningRecordImage> findImagesByRunningRecordIds(@Param("runningRecordIds") List<Long> runningRecordIds);
+
+
+    /**
+     * user 에 의해 생성된 모든 RunningRecordImage 삭제
+     *
+     * @param user
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from RunningRecordImage i where i in " +
+            "(select img from RunningRecordImage img where img.runningRecord.user = :user)")
+    void deleteAllByUser(@Param("user") User user);
 
 }

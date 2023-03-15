@@ -2,10 +2,10 @@ package com.project.runningcrew.resourceimage.service;
 
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.board.entity.FreeBoard;
+import com.project.runningcrew.exception.notFound.ImageNotFoundException;
 import com.project.runningcrew.resourceimage.entity.BoardImage;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
-import com.project.runningcrew.resourceimage.service.BoardImageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,8 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +30,35 @@ class BoardImageServiceTest {
 
     @InjectMocks
     private BoardImageService boardImageService;
+
+    @DisplayName("id 로 BoardImage 반환 성공 테스트")
+    @Test
+    public void findByIdTest1(@Mock Board board) {
+        //given
+        Long boardImageId = 1L;
+        BoardImage boardImage = new BoardImage("image", board);
+        when(boardImageRepository.findById(boardImageId)).thenReturn(Optional.of(boardImage));
+
+        ///when
+        BoardImage findBoardImage = boardImageService.findById(boardImageId);
+
+        //then
+        assertThat(findBoardImage).isEqualTo(boardImage);
+        verify(boardImageRepository, times(1)).findById(boardImageId);
+    }
+
+    @DisplayName("id 로 BoardImage 반환 예외 테스트")
+    @Test
+    public void findByIdTest2() {
+        //given
+        Long boardImageId = 1L;
+        when(boardImageRepository.findById(boardImageId)).thenReturn(Optional.empty());
+
+        ///when
+        //then
+        assertThatThrownBy(() -> boardImageService.findById(boardImageId))
+                .isInstanceOf(ImageNotFoundException.class);
+    }
 
     @DisplayName("게시글에 포함된 모든 이미지 반환 테스트")
     @Test

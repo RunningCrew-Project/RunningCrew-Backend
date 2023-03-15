@@ -199,4 +199,51 @@ class RunningNoticeImageRepositoryTest {
         assertThat(images2.size()).isSameAs(5);
     }
 
+    @DisplayName("member 가 생성한 모든 RunningNoticeImage 삭제 테스트")
+    @Test
+    public void deleteAllByMemberTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
+        for (int i = 0; i < 10; i++) {
+            RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage" + i, runningNotice);
+            runningNoticeImageRepository.save(runningNoticeImage);
+        }
+
+        ///when
+        runningNoticeImageRepository.deleteAllByMember(member);
+
+        //then
+        List<RunningNoticeImage> runningNoticeImages = runningNoticeImageRepository.findAllByRunningNotice(runningNotice);
+        assertThat(runningNoticeImages.isEmpty()).isTrue();
+    }
+
+    @DisplayName("crew 에 포함된 모든 RunningNoticeImage 삭제 테스트")
+    @Test
+    public void deleteAllByCrewTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
+        for (int i = 0; i < 10; i++) {
+            RunningNoticeImage runningNoticeImage = new RunningNoticeImage("runningNoticeImage" + i, runningNotice);
+            runningNoticeImageRepository.save(runningNoticeImage);
+        }
+
+        ///when
+        runningNoticeImageRepository.deleteAllByCrew(crew);
+
+        //then
+        List<RunningNoticeImage> runningNoticeImages = runningNoticeImageRepository.findAllByRunningNotice(runningNotice);
+        assertThat(runningNoticeImages.isEmpty()).isTrue();
+    }
 }

@@ -1,7 +1,7 @@
 package com.project.runningcrew.resourceimage.service;
 
+import com.project.runningcrew.exception.notFound.ImageNotFoundException;
 import com.project.runningcrew.resourceimage.entity.RunningRecordImage;
-import com.project.runningcrew.resourceimage.service.RunningRecordImageService;
 import com.project.runningcrew.runningrecord.entity.PersonalRunningRecord;
 import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import com.project.runningcrew.user.entity.User;
@@ -17,8 +17,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,6 +31,35 @@ class RunningRecordImageServiceTest {
 
     @InjectMocks
     private RunningRecordImageService runningRecordImageService;
+
+    @DisplayName("id 로 RunningRecordImage 반환 성공 테스트")
+    @Test
+    public void findByIdTest1(@Mock RunningRecord runningRecord) {
+        //given
+        Long runningRecordImageId = 1L;
+        RunningRecordImage runningRecordImage = new RunningRecordImage("image", runningRecord);
+        when(runningRecordImageRepository.findById(runningRecordImageId)).thenReturn(Optional.of(runningRecordImage));
+
+        ///when
+        RunningRecordImage findRunningRecordImage = runningRecordImageService.findById(runningRecordImageId);
+
+        //then
+        assertThat(findRunningRecordImage).isEqualTo(runningRecordImage);
+        verify(runningRecordImageRepository, times(1)).findById(runningRecordImageId);
+    }
+
+    @DisplayName("id 로 RunningRecordImage 반환 예외 테스트")
+    @Test
+    public void findByIdTest2() {
+        //given
+        Long runningRecordImageId = 1L;
+        when(runningRecordImageRepository.findById(runningRecordImageId)).thenReturn(Optional.empty());
+
+        ///when
+        //then
+        assertThatThrownBy(() -> runningRecordImageService.findById(runningRecordImageId))
+                .isInstanceOf(ImageNotFoundException.class);
+    }
 
     @DisplayName("런닝기록에 포함된 모든 이미지 반환 테스트")
     @Test
