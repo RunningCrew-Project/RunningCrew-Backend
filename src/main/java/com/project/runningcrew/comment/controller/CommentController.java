@@ -19,6 +19,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.service.RunningNoticeService;
@@ -32,6 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -43,6 +45,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,10 +63,11 @@ public class CommentController {
     private final MemberService memberService;
     private final CrewService crewService;
 
+    private final MemberAuthorizationChecker memberAuthorizationChecker;
+
     @Value("${domain.name}")
     private String host;
-    private final int pagingSize = 10;
-
+    private final int pagingSize = 15;
 
 
 
@@ -80,8 +84,15 @@ public class CommentController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/comments/{commentId}")
-    public ResponseEntity<GetCommentResponse> getComment(@PathVariable("commentId") Long commentId) {
+    public ResponseEntity<GetCommentResponse> getComment(
+            @PathVariable("commentId") Long commentId,
+            @CurrentUser User user
+    ) {
         Comment comment = commentService.findById(commentId);
+        Crew crew = comment.getMember().getCrew();
+        memberAuthorizationChecker.checkMember(user, crew);
+        //note 요청 user 의 크루 회원 여부 검증
+
         return ResponseEntity.ok(new GetCommentResponse(comment));
     }
 
@@ -101,29 +112,24 @@ public class CommentController {
     @PostMapping("/api/boards/{boardId}/comments")
     public ResponseEntity<Void> createBoardComment(
             @PathVariable("boardId") Long boardId,
-            @ModelAttribute @Valid CreateBoardCommentRequest request,
+            @RequestBody @Valid CreateBoardCommentRequest request,
             @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
         Crew crew = board.getMember().getCrew();
-        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        memberAuthorizationChecker.checkMember(user, crew);
+        //note 요청 user 의 크루 회원 여부 검증
 
-        if(crewOfUser.contains(crew)) {
-            //note 요청 user 의 크루 회원 여부 검증
-            Member member = memberService.findByUserAndCrew(user, board.getMember().getCrew());
-            BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
+        Member member = memberService.findByUserAndCrew(user, crew);
+        BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
 
-            Long commentId = commentService.saveComment(boardComment);
-            URI uri = UriComponentsBuilder
-                    .fromHttpUrl(host)
-                    .path("/api/comments/{id}")
-                    .build(commentId);
+        Long commentId = commentService.saveComment(boardComment);
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl(host)
+                .path("/api/comments/{id}")
+                .build(commentId);
 
-            return ResponseEntity.created(uri).build();
-        } else {
-            throw new AccessDeniedException("댓글 생성은 크루원 전용 기능입니다.");
-        }
-
+        return ResponseEntity.created(uri).build();
     }
 
 
@@ -142,29 +148,24 @@ public class CommentController {
     @PostMapping("/api/running-notices/{runningNoticeId}/comments")
     public ResponseEntity<Void> createRunningNoticeComment(
             @PathVariable("runningNoticeId") Long runningNoticeId,
-            @ModelAttribute @Valid CreateRunningNoticeCommentRequest request,
+            @RequestBody @Valid CreateRunningNoticeCommentRequest request,
             @CurrentUser User user
     ) {
         RunningNotice runningNotice =  runningNoticeService.findById(runningNoticeId);
         Crew crew = runningNotice.getMember().getCrew();
-        List<Crew> crewOfUser = crewService.findAllByUser(user);
+        memberAuthorizationChecker.checkMember(user, crew);
+        //note 요청 user 의 크루 회원 여부 검증
 
-        if(crewOfUser.contains(crew)) {
-            //note 요청 user 의 크루 회원 여부 검증
-            Member member = memberService.findByUserAndCrew(user, runningNotice.getMember().getCrew());
-            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, request.getDetail(), runningNotice);
+        Member member = memberService.findByUserAndCrew(user, crew);
+        RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, request.getDetail(), runningNotice);
 
-            Long commentId = commentService.saveComment(runningNoticeComment);
-            URI uri = UriComponentsBuilder
-                    .fromHttpUrl(host)
-                    .path("/api/comments/{id}")
-                    .build(commentId);
+        Long commentId = commentService.saveComment(runningNoticeComment);
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl(host)
+                .path("/api/comments/{id}")
+                .build(commentId);
 
-            return ResponseEntity.created(uri).build();
-        } else {
-            throw new AccessDeniedException("댓글 생성은 크루원 전용 기능입니다.");
-        }
-
+        return ResponseEntity.created(uri).build();
     }
 
 
@@ -183,21 +184,17 @@ public class CommentController {
     @PutMapping("/api/comments/{commentId}")
     public ResponseEntity<Void> changeComment(
             @PathVariable("commentId") Long commentId,
-            @ModelAttribute @Valid ChangeCommentRequest request,
+            @RequestBody @Valid ChangeCommentRequest request,
             @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);
-        User writer = comment.getMember().getUser();
-        //note writer : 댓글 작성자
+        Crew crew = comment.getMember().getCrew();
+        Long memberId = comment.getMember().getId();
+        memberAuthorizationChecker.checkAuthOnlyUser(user, crew, memberId);
+        //note 요청 user 의 크루 회원 여부 && 댓글 권한 검증
 
-        if(user.equals(writer)) {
-            //note 요청 user 의 writer 여부 검증
-            commentService.changeComment(comment, request.getDetail());
-            return ResponseEntity.noContent().build();
-        } else {
-            throw new AccessDeniedException("댓글 작성자만 수정할 수 있습니다.");
-        }
-
+        commentService.changeComment(comment, request.getDetail());
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -217,16 +214,13 @@ public class CommentController {
             @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);
-        User writer = comment.getMember().getUser();
-        //note writer : 댓글 작성자
+        Crew crew = comment.getMember().getCrew();
+        Long memberId = comment.getMember().getId();
+        memberAuthorizationChecker.checkAuthOnlyUser(user, crew, memberId);
+        //note 요청 user 의 크루 회원 여부 && 댓글 권한 검증
 
-        if(user.equals(writer)) {
-            //note 요청 user 의 writer 여부 검증
-            commentService.deleteComment(comment);
-            return ResponseEntity.noContent().build();
-        } else {
-            throw new AccessDeniedException("댓글 작성자만 삭제할 수 있습니다.");
-        }
+        commentService.deleteComment(comment);
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -234,7 +228,8 @@ public class CommentController {
             , description = "특정 게시글의 모든 댓글을 가져온다."
             , security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentListResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -244,16 +239,19 @@ public class CommentController {
     })
     @GetMapping("/api/boards/{boardId}/comments")
     public ResponseEntity<CommentListResponse<SimpleCommentDto>> getCommentListOfBoard(
-            @PathVariable("boardId") Long boardId
+            @PathVariable("boardId") Long boardId,
+            @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
+        Crew crew = board.getMember().getCrew();
+        memberAuthorizationChecker.checkMember(user, crew);
+        //note 요청 user 의 크루 회원 여부 검증
+
         List<BoardComment> commentList = commentService.findAllByBoard(board);
         int commentCount = commentService.countCommentAtBoard(board);
 
-        List<SimpleCommentDto> simpleCommentDtos = commentList.stream().map(SimpleCommentDto::new)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new CommentListResponse<>(commentCount, simpleCommentDtos));
+        List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
+        return ResponseEntity.ok(new CommentListResponse<>(commentCount, dtoList));
     }
 
 
@@ -261,7 +259,8 @@ public class CommentController {
             , description = "특정 런닝 공지의 모든 댓글을 가져온다."
             , security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentListResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -271,16 +270,19 @@ public class CommentController {
     })
     @GetMapping("/api/running-notices/{runningNoticeId}/comments")
     public ResponseEntity<CommentListResponse<SimpleCommentDto>> getCommentListOfRunningNotice(
-            @PathVariable("runningNoticeId") Long runningNoticeId
+            @PathVariable("runningNoticeId") Long runningNoticeId,
+            @CurrentUser User user
     ) {
         RunningNotice runningNotice = runningNoticeService.findById(runningNoticeId);
+        Crew crew = runningNotice.getMember().getCrew();
+        memberAuthorizationChecker.checkMember(user, crew);
+        //note 요청 user 의 크루 회원 여부 검증
+
         List<RunningNoticeComment> commentList = commentService.findAllByRunningNotice(runningNotice);
         int commentCount = commentService.countCommentAtRunningNotice(runningNotice);
 
-        List<SimpleCommentDto> simpleCommentDtos = commentList.stream().map(SimpleCommentDto::new)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new CommentListResponse<>(commentCount, simpleCommentDtos));
+        List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
+        return ResponseEntity.ok(new CommentListResponse<>(commentCount, dtoList));
     }
 
 
@@ -297,19 +299,17 @@ public class CommentController {
     })
     @GetMapping("/members/{memberId}/comments")
     public ResponseEntity<PagingResponse<SimpleCommentDto>> getCommentPageOfMember(
-            @RequestParam("page") int page,
+            @Positive @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
             @CurrentUser User user
     ) {
         Member member = memberService.findById(memberId);
+
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<Comment> commentSlice = commentService.findAllByMember(member, pageRequest);
 
-        SliceImpl<SimpleCommentDto> responseSlice = commentSlice.stream().map(SimpleCommentDto::new).collect(Collectors.collectingAndThen(
-                Collectors.toList(),
-                list -> new SliceImpl<>(list, pageRequest, commentSlice.hasNext())
-        ));
-
+        List<SimpleCommentDto> dtoList = commentSlice.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
+        Slice<SimpleCommentDto> responseSlice = new SliceImpl<>(dtoList, commentSlice.getPageable(), commentSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(responseSlice));
     }
 

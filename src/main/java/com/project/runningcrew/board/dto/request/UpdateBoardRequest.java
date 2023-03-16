@@ -1,15 +1,18 @@
 package com.project.runningcrew.board.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class UpdateBoardRequest {
 
     @Schema(description = "수정 게시글 제목", example = "new_title")
@@ -29,8 +32,8 @@ public class UpdateBoardRequest {
     private List<Long> deleteFiles = new ArrayList<>();
 
     @Schema(description = "수정 런닝 기록 아이디")
+    @Positive(message = "런닝 기록 아이디는 1 이상의 수입니다.")
     private Integer runningRecordId;
-
 
 
 }
