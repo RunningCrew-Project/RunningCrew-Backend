@@ -112,7 +112,7 @@ public class CommentController {
     @PostMapping("/api/boards/{boardId}/comments")
     public ResponseEntity<Void> createBoardComment(
             @PathVariable("boardId") Long boardId,
-            @ModelAttribute @Valid CreateBoardCommentRequest request,
+            @RequestBody @Valid CreateBoardCommentRequest request,
             @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
@@ -148,7 +148,7 @@ public class CommentController {
     @PostMapping("/api/running-notices/{runningNoticeId}/comments")
     public ResponseEntity<Void> createRunningNoticeComment(
             @PathVariable("runningNoticeId") Long runningNoticeId,
-            @ModelAttribute @Valid CreateRunningNoticeCommentRequest request,
+            @RequestBody @Valid CreateRunningNoticeCommentRequest request,
             @CurrentUser User user
     ) {
         RunningNotice runningNotice =  runningNoticeService.findById(runningNoticeId);
@@ -184,7 +184,7 @@ public class CommentController {
     @PutMapping("/api/comments/{commentId}")
     public ResponseEntity<Void> changeComment(
             @PathVariable("commentId") Long commentId,
-            @ModelAttribute @Valid ChangeCommentRequest request,
+            @RequestBody @Valid ChangeCommentRequest request,
             @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);

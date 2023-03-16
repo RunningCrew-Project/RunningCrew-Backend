@@ -120,7 +120,7 @@ public class BoardController {
     public ResponseEntity<Void> createFreeBoard(
             @PathVariable("crewId") Long crewId,
             @CurrentUser User user,
-            @ModelAttribute @Valid CreateNotReviewBoardRequest request
+            @RequestBody @Valid CreateNotReviewBoardRequest request
     ) {
 
         Crew crew = crewService.findById(crewId);
@@ -155,7 +155,7 @@ public class BoardController {
     public ResponseEntity<Void> createNoticeBoard(
             @PathVariable("crewId") Long crewId,
             @CurrentUser User user,
-            @ModelAttribute @Valid CreateNotReviewBoardRequest request
+            @RequestBody @Valid CreateNotReviewBoardRequest request
     ) {
 
         Crew crew = crewService.findById(crewId);
@@ -189,7 +189,7 @@ public class BoardController {
     public ResponseEntity<Void> createReviewBoard(
             @PathVariable("crewId") Long crewId,
             @CurrentUser User user,
-            @ModelAttribute @Valid CreateReviewBoardRequest request
+            @RequestBody @Valid CreateReviewBoardRequest request
     ) {
 
         Crew crew = crewService.findById(crewId);

@@ -27,6 +27,4 @@ public class CreateNotReviewBoardRequest {
     @Schema(description = "게시글 이미지 url 리스트")
     private List<MultipartFile> files = new ArrayList<>();
 
-
-
 }
