@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "recruitAnswer", description = "가입 답변에 관한 api")
 @RestController
 @RequiredArgsConstructor
 public class RecruitAnswerController {
@@ -43,8 +45,8 @@ public class RecruitAnswerController {
     private String host;
 
 
-    @Operation(summary = "가입 답변 생성하기",
-            description = "크루 가입 답변을 생성 후 저장한다.",
+    @Operation(summary = "가입 답변 묶음 생성하기",
+            description = "가입 답변 묶음을 생성한다.",
             security = {@SecurityRequirement(name = "Bearer-Key")}
     )
     @ApiResponses({
@@ -77,8 +79,8 @@ public class RecruitAnswerController {
 
 
 
-    @Operation(summary = "가입 답변 삭제하기",
-            description = "유저가 작성한 크루 가입 답변을 삭제한다.",
+    @Operation(summary = "가입 답변 모두 삭제하기",
+            description = "유저가 작성한 크루 가입 답변을 모두 삭제한다.",
             security = {@SecurityRequirement(name = "Bearer-Key")}
     )
     @ApiResponses({
@@ -106,7 +108,7 @@ public class RecruitAnswerController {
 
 
     @Operation(summary = "가입 답변 조회하기",
-            description = "유저가 작성한 크루 가입 답변을 조회한다.",
+            description = "유저가 특정 크루에 작성한 가입 답변들을 묶음 조회한다.",
             security = {@SecurityRequirement(name = "Bearer-Key")}
     )
     @ApiResponses({
