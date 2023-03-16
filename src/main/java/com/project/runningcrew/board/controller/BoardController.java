@@ -20,6 +20,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.resourceimage.entity.BoardImage;
 import com.project.runningcrew.resourceimage.service.BoardImageService;
@@ -63,7 +64,7 @@ public class BoardController {
     private final BoardImageService boardImageService;
     private final MemberService memberService;
     private final CrewService crewService;
-
+    private final MemberAuthorizationChecker memberAuthorizationChecker;
 
     private final FreeBoardService freeBoardService;
     private final NoticeBoardService noticeBoardService;
