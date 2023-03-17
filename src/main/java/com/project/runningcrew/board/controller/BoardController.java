@@ -464,7 +464,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfNoticeBoards(
             @PathVariable("crewId") Long crewId,
             @Positive @RequestParam("page") int page,
-            @Parameter(hidden = true) @CurrentUser User user
+            @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
@@ -512,7 +512,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfReviewBoards(
             @PathVariable("crewId") Long crewId,
             @Positive @RequestParam("page") int page,
-            @Parameter(hidden = true) @CurrentUser User user
+            @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
