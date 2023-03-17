@@ -14,6 +14,7 @@ import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -59,11 +60,11 @@ public class RecruitAnswerController {
     @PostMapping("/api/crews/{crewId}/recruit-answers")
     public ResponseEntity<Void> createRecruitAnswer(
             @PathVariable("crewId") Long crewId,
-            @CurrentUser User user,
-            @RequestBody @Valid CreateRecruitAnswerList<CreateRecruitAnswerDto> request
+            @Parameter(hidden = true) @CurrentUser User user,
+            @RequestBody @Valid CreateRecruitAnswerList<CreateRecruitAnswerDto> createRecruitAnswerList
     ) {
         Crew crew = crewService.findById(crewId);
-        List<CreateRecruitAnswerDto> requestDtoList = request.getAnswers();
+        List<CreateRecruitAnswerDto> requestDtoList = createRecruitAnswerList.getAnswers();
 
         List<RecruitAnswer> answerList = new ArrayList<>();
         //note 입력받은 dtoList 를 기반으로 생성한 RecruitAnswerList
@@ -96,7 +97,7 @@ public class RecruitAnswerController {
     public ResponseEntity<Void> deleteRecruitAnswer(
             @PathVariable("crewId") Long crewId,
             @PathVariable("userId") Long userId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         User findUser = userService.findById(userId);
         Crew findCrew = crewService.findById(crewId);
@@ -125,7 +126,7 @@ public class RecruitAnswerController {
     public ResponseEntity<GetRecruitAnswerList<GetRecruitAnswerDto>> getRecruitAnswer(
         @PathVariable("crewId") Long crewId,
         @PathVariable("userId") Long userId,
-        @CurrentUser User user
+        @Parameter(hidden = true) @CurrentUser User user
     ) {
         User findUser = userService.findById(userId);
         Crew findCrew = crewService.findById(crewId);

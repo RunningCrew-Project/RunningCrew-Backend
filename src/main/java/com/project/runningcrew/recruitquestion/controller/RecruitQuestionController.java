@@ -12,6 +12,7 @@ import com.project.runningcrew.recruitquestion.entity.RecruitQuestion;
 import com.project.runningcrew.recruitquestion.service.RecruitQuestionService;
 import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,14 +58,14 @@ public class RecruitQuestionController {
     @PostMapping("/api/crews/{crewId}/recruit-questions")
     public ResponseEntity<Void> createOneRecruitQuestion(
             @PathVariable("crewId") Long crewId,
-            @RequestBody @Valid CreateRecruitQuestionDto request,
-            @CurrentUser User user
+            @RequestBody @Valid CreateRecruitQuestionDto createRecruitQuestionDto,
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkLeader(user, crew);
         //note 요청 user 의 크루 Leader 자격 검증
 
-        RecruitQuestion recruitQuestion = new RecruitQuestion(crew, request.getQuestion(), request.getQuestionOffset());
+        RecruitQuestion recruitQuestion = new RecruitQuestion(crew, createRecruitQuestionDto.getQuestion(), createRecruitQuestionDto.getQuestionOffset());
         Long questionId = recruitQuestionService.saveOneQuestion(recruitQuestion);
 
         URI uri = UriComponentsBuilder
@@ -90,7 +91,7 @@ public class RecruitQuestionController {
     @DeleteMapping("/api/recruit-questions/{recruitQuestionId}")
     public ResponseEntity<Void> deleteOneRecruitQuestion(
             @PathVariable("recruitQuestionId") Long recruitQuestionId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         RecruitQuestion recruitQuestion = recruitQuestionService.findById(recruitQuestionId);
         Crew crew = recruitQuestion.getCrew();
@@ -121,7 +122,7 @@ public class RecruitQuestionController {
     @GetMapping("/api/crews/{crewId}/recruit-questions")
     public ResponseEntity<GetRecruitQuestionList<GetRecruitQuestionDto>> getRecruitQuestionsOfCrew(
             @PathVariable("crewId") Long crewId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         List<RecruitQuestion> findQuestions = recruitQuestionService.findAllByCrew(crew);

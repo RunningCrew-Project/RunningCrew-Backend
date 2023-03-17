@@ -27,6 +27,7 @@ import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import com.project.runningcrew.runningrecord.service.RunningRecordService;
 import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -87,7 +88,7 @@ public class BoardController {
     @GetMapping("/api/boards/{boardId}")
     public ResponseEntity<GetBoardResponse> getBoard(
             @PathVariable("boardId") Long boardId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
 
         List<Crew> crewOfUser = crewService.findAllByUser(user);
@@ -119,8 +120,8 @@ public class BoardController {
     @PostMapping(value = "/api/crews/{crewId}/boards/free", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createFreeBoard(
             @PathVariable("crewId") Long crewId,
-            @CurrentUser User user,
-            @RequestBody @Valid CreateNotReviewBoardRequest request
+            @Parameter(hidden = true) @CurrentUser User user,
+            @ModelAttribute @Valid CreateNotReviewBoardRequest createNotReviewBoardRequest
     ) {
 
         Crew crew = crewService.findById(crewId);
@@ -128,9 +129,9 @@ public class BoardController {
         //note 요청 user 의 크루 회원 여부 검증
 
         Member member = memberService.findByUserAndCrew(user, crew);
-        FreeBoard freeBoard = new FreeBoard(member, request.getTitle(), request.getDetail());
+        FreeBoard freeBoard = new FreeBoard(member, createNotReviewBoardRequest.getTitle(), createNotReviewBoardRequest.getDetail());
 
-        Long boardId = boardService.saveBoard(freeBoard, request.getFiles());
+        Long boardId = boardService.saveBoard(freeBoard, createNotReviewBoardRequest.getFiles());
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
                 .path("/api/boards/{id}")
@@ -151,11 +152,11 @@ public class BoardController {
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/api/crews/{crewId}/boards/notice")
+    @PostMapping(value = "/api/crews/{crewId}/boards/notice", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createNoticeBoard(
             @PathVariable("crewId") Long crewId,
-            @CurrentUser User user,
-            @RequestBody @Valid CreateNotReviewBoardRequest request
+            @Parameter(hidden = true) @CurrentUser User user,
+            @ModelAttribute @Valid CreateNotReviewBoardRequest createNotReviewBoardRequest
     ) {
 
         Crew crew = crewService.findById(crewId);
@@ -164,8 +165,8 @@ public class BoardController {
 
         Member member = memberService.findByUserAndCrew(user, crew);
 
-        NoticeBoard noticeBoard = new NoticeBoard(member, request.getTitle(), request.getDetail());
-        Long boardId = noticeBoardService.saveNoticeBoard(noticeBoard, request.getFiles());
+        NoticeBoard noticeBoard = new NoticeBoard(member, createNotReviewBoardRequest.getTitle(), createNotReviewBoardRequest.getDetail());
+        Long boardId = noticeBoardService.saveNoticeBoard(noticeBoard, createNotReviewBoardRequest.getFiles());
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
                 .path("/api/boards/{id}")
@@ -185,11 +186,11 @@ public class BoardController {
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/api/crews/{crewId}/boards/review")
+    @PostMapping(value = "/api/crews/{crewId}/boards/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createReviewBoard(
             @PathVariable("crewId") Long crewId,
-            @CurrentUser User user,
-            @RequestBody @Valid CreateReviewBoardRequest request
+            @Parameter(hidden = true) @CurrentUser User user,
+            @RequestBody @Valid CreateReviewBoardRequest createReviewBoardRequest
     ) {
 
         Crew crew = crewService.findById(crewId);
@@ -197,10 +198,10 @@ public class BoardController {
         //note 요청 user 의 크루 회원 여부 검증
 
         Member member = memberService.findByUserAndCrew(user, crew);
-        RunningRecord runningRecord = runningRecordService.findById(request.getRunningRecordId());
-        ReviewBoard reviewBoard = new ReviewBoard(member, request.getTitle(), request.getDetail(), runningRecord);
+        RunningRecord runningRecord = runningRecordService.findById(createReviewBoardRequest.getRunningRecordId());
+        ReviewBoard reviewBoard = new ReviewBoard(member, createReviewBoardRequest.getTitle(), createReviewBoardRequest.getDetail(), runningRecord);
 
-        Long boardId = boardService.saveBoard(reviewBoard, request.getFiles());
+        Long boardId = boardService.saveBoard(reviewBoard, createReviewBoardRequest.getFiles());
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
                 .path("/api/boards/{id}")
@@ -226,8 +227,8 @@ public class BoardController {
     @PutMapping(value = "/api/boards/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> changeBoard(
             @PathVariable("boardId") Long boardId,
-            @CurrentUser User user,
-            @ModelAttribute @Valid UpdateBoardRequest request
+            @Parameter(hidden = true) @CurrentUser User user,
+            @ModelAttribute @Valid UpdateBoardRequest updateBoardRequest
     ) {
 
         Board board = boardService.findById(boardId);
@@ -239,26 +240,26 @@ public class BoardController {
             memberAuthorizationChecker.checkAuthOnlyUser(user, crew, memberId);
             //note 해당 유저의 크루 가입 여부 && 게시글 수정 권한 확인
 
-            FreeBoard newBoard = new FreeBoard(board.getMember(), request.getTitle(), request.getDetail());
-            List<Long> deleteIds = request.getDeleteFiles();
+            FreeBoard newBoard = new FreeBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail());
+            List<Long> deleteIds = updateBoardRequest.getDeleteFiles();
             List<BoardImage> deleteFiles = deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList());
-            boardService.updateBoard(board, newBoard, request.getAddFiles(), deleteFiles);
+            boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
         } else if (board instanceof NoticeBoard) {
             memberAuthorizationChecker.checkAuthUserAndManger(user, crew, memberId);
             //note 해당 유저의 크루 가입 여부 && 게시글 수정 권한 && 매니저 이상 등급 확인
 
-            NoticeBoard newBoard = new NoticeBoard(board.getMember(), request.getTitle(), request.getDetail());
-            List<Long> deleteIds = request.getDeleteFiles();
+            NoticeBoard newBoard = new NoticeBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail());
+            List<Long> deleteIds = updateBoardRequest.getDeleteFiles();
             List<BoardImage> deleteFiles = deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList());
-            boardService.updateBoard(board, newBoard, request.getAddFiles(), deleteFiles);
+            boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
         } else if (board instanceof ReviewBoard) {
             memberAuthorizationChecker.checkAuthOnlyUser(user, crew, memberId);
             //note 해당 유저의 크루 가입 여부 && 게시글 수정 권한 확인
 
-            ReviewBoard newBoard = new ReviewBoard(board.getMember(), request.getTitle(), request.getDetail(), ((ReviewBoard) board).getRunningRecord());
-            List<Long> deleteIds = request.getDeleteFiles();
+            ReviewBoard newBoard = new ReviewBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail(), ((ReviewBoard) board).getRunningRecord());
+            List<Long> deleteIds = updateBoardRequest.getDeleteFiles();
             List<BoardImage> deleteFiles = deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList());
-            boardService.updateBoard(board, newBoard, request.getAddFiles(), deleteFiles);
+            boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
         }
 
         return ResponseEntity.noContent().build();
@@ -280,7 +281,7 @@ public class BoardController {
     @DeleteMapping("/api/boards/{boardId}")
     public ResponseEntity<Void> deleteBoard(
             @PathVariable("boardId") Long boardId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
         Crew crew = board.getMember().getCrew();
@@ -313,7 +314,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getBoardsOfMember(
             @Positive @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Member member = memberService.findById(memberId);
 
@@ -363,7 +364,7 @@ public class BoardController {
             @Positive @RequestParam("page") int page,
             @RequestParam("keyword") String keyword,
             @PathVariable("crewId") Long crewId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
 
         Crew crew = crewService.findById(crewId);
@@ -414,7 +415,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfFreeBoards(
         @PathVariable("crewId") Long crewId,
         @Positive @RequestParam("page") int page,
-        @CurrentUser User user
+        @Parameter(hidden = true) @CurrentUser User user
     ){
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
@@ -463,7 +464,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfNoticeBoards(
             @PathVariable("crewId") Long crewId,
             @Positive @RequestParam("page") int page,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
@@ -511,7 +512,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfReviewBoards(
             @PathVariable("crewId") Long crewId,
             @Positive @RequestParam("page") int page,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);

@@ -17,7 +17,7 @@ public class UpdateBoardRequest {
 
     @Schema(description = "수정 게시글 제목", example = "new_title")
     @NotBlank(message = "게시글 제목은 필수 값입니다.")
-    @Size(min = 1, max = 50, message = "게시글 제목은 1자 이상 1000자 이하입니다.")
+    @Size(min = 1, max = 50, message = "게시글 제목은 1자 이상 50자 이하입니다.")
     private String title;
 
     @Schema(description = "수정 게시글 내용", example = "new_detail")
