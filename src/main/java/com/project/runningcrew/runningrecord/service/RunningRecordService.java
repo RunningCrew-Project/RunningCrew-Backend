@@ -1,5 +1,6 @@
 package com.project.runningcrew.runningrecord.service;
 
+import com.project.runningcrew.exception.badinput.YearMonthFormatException;
 import com.project.runningcrew.resourceimage.entity.RunningRecordImage;
 import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import com.project.runningcrew.user.entity.User;
@@ -14,10 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -95,32 +98,44 @@ public class RunningRecordService {
 
     /**
      * 입력받은 user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 거리의 합
-     * 
+     *
      * @param user
-     * @param year 찾는 년도
+     * @param year  찾는 년도
      * @param month 찾는 월
-     * @return  user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 거리의 합
+     * @return user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 거리의 합
+     * @throws YearMonthFormatException 잘못된 형식의 년, 월을 입력받을 때
      */
-    public Double getSumOfRunningDistanceOfMonth(User user, int year, int month) {
-        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
-        LocalDateTime end = start.plusMonths(1);
+    public double getSumOfRunningDistanceOfMonth(User user, int year, int month) {
+        try {
+            LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+            LocalDateTime end = start.plusMonths(1);
 
-        return runningRecordRepository.getSumOfRunningDistanceByUserAndStartDateTimes(user, start, end);
+            Double totalRunningDistance = runningRecordRepository.getSumOfRunningDistanceByUserAndStartDateTimes(user, start, end);
+            return Objects.requireNonNullElse(totalRunningDistance, 0).doubleValue();
+        } catch (DateTimeException e) {
+            throw new YearMonthFormatException(year, month);
+        }
     }
 
     /**
      * 입력받은 user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 시간의 합
      *
      * @param user
-     * @param year 찾는 년도
+     * @param year  찾는 년도
      * @param month 찾는 월
-     * @return  user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 시간의 합
+     * @return user 가 특정 년도 특정 월에 시행한 모든 RunningRecord 의 런닝 시간의 합
+      @throws YearMonthFormatException 잘못된 형식의 년, 월을 입력받을 때
      */
-    public Integer getSumOfRunningTimeOfMonth(User user, int year, int month) {
-        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
-        LocalDateTime end = start.plusMonths(1);
+    public int getSumOfRunningTimeOfMonth(User user, int year, int month) {
+        try {
+            LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+            LocalDateTime end = start.plusMonths(1);
 
-        return runningRecordRepository.getSumOfRunningTimeByUserAndStartDateTimes(user, start, end);
+            Integer totalRunningTime = runningRecordRepository.getSumOfRunningTimeByUserAndStartDateTimes(user, start, end);
+            return Objects.requireNonNullElse(totalRunningTime, 0);
+        } catch (DateTimeException e) {
+            throw new YearMonthFormatException(year, month);
+        }
     }
 
 }

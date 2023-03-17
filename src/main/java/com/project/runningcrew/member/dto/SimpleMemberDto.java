@@ -14,11 +14,7 @@ public class SimpleMemberDto {
     @Schema(description = "멤버 아이디", example = "2")
     private Long id;
 
-    @Schema(description = "멤버의 유저", example = " {\n" +
-            "    \"id\": 1,\n" +
-            "    \"nickname\": \"admin\",\n" +
-            "    \"imgUrl\": \"imgUrl\"\n" +
-            "  }")
+    @Schema(description = "멤버의 유저")
     private SimpleUserDto user;
 
     @Schema(description = "멤버 권한", example = "MEMBER_NORMAL")

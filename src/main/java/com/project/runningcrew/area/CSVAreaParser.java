@@ -9,6 +9,8 @@ import com.project.runningcrew.area.repository.GuAreaRepository;
 import com.project.runningcrew.area.repository.SidoAreaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
@@ -24,7 +26,8 @@ public class CSVAreaParser {
     private final SidoAreaRepository sidoAreaRepository;
     private final GuAreaRepository guAreaRepository;
     private final DongAreaRepository dongAreaRepository;
-    private String path = "C:\\Users\\alsrn\\Desktop\\Coding\\runningcrew\\src\\main\\resources\\area\\seoul.csv";
+    @Value("${area.file.path}")
+    private String path;
 
     /**
      * 법정동 정보를 가진 csv 로 시/도, 구, 동 엔티티를 생성한다.
@@ -34,8 +37,9 @@ public class CSVAreaParser {
         Map<Long, Map<String, GuArea>> guMap = new HashMap<>();
         Map<Long, Map<String, DongArea>> dongMap = new HashMap<>();
 
+        ClassPathResource resource = new ClassPathResource(path);
         String[] areaInfo;
-        try (CSVReader csvReader = new CSVReader(new FileReader(path))) {
+        try (CSVReader csvReader = new CSVReader(new FileReader(resource.getFile()))) {
             while ((areaInfo = csvReader.readNext()) != null) {
                 String sidoName = areaInfo[0];
                 if (!sidoMap.containsKey(sidoName)) {

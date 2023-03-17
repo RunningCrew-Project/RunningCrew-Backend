@@ -41,6 +41,10 @@ fcm:
   key:
     path: fcm/running-crew-project-firebase-adminsdk-ta9q7-fa58725efe.json
 
+area:
+  file:
+    path: area/seoul.csv
+
 jwt:
   secret-key: 6B64DCA4E72F58EDIKU9AAB215FE7
 
