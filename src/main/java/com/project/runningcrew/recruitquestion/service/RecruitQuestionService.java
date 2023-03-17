@@ -1,6 +1,9 @@
 package com.project.runningcrew.recruitquestion.service;
 
+import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.exception.notFound.CommentNotFoundException;
+import com.project.runningcrew.exception.notFound.RecruitQuestionNotFoundException;
 import com.project.runningcrew.recruitquestion.entity.RecruitQuestion;
 import com.project.runningcrew.recruitquestion.repository.RecruitQuestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,17 @@ import java.util.List;
 public class RecruitQuestionService {
 
     private final RecruitQuestionRepository recruitQuestionRepository;
+
+
+    /**
+     * 입력받은 id 로 찾아낸 recruitQuestion 을 반환한다.
+     * @param id 입력받은 id
+     * @return recruitQuestion
+     */
+    public RecruitQuestion findById(Long id) {
+        return recruitQuestionRepository.findById(id).orElseThrow(RecruitQuestionNotFoundException::new);
+    }
+
 
     /**
      * 입력받은 recruitQuestion 하나를 저장하고 id 값을 반환한다.

@@ -14,11 +14,13 @@ import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "recruitAnswer", description = "가입 답변에 관한 api")
 @RestController
 @RequiredArgsConstructor
 public class RecruitAnswerController {
@@ -43,8 +46,8 @@ public class RecruitAnswerController {
     private String host;
 
 
-    @Operation(summary = "가입 답변 생성하기",
-            description = "크루 가입 답변을 생성 후 저장한다.",
+    @Operation(summary = "가입 답변 묶음 생성하기",
+            description = "가입 답변 묶음을 생성한다.",
             security = {@SecurityRequirement(name = "Bearer-Key")}
     )
     @ApiResponses({
@@ -57,11 +60,11 @@ public class RecruitAnswerController {
     @PostMapping("/api/crews/{crewId}/recruit-answers")
     public ResponseEntity<Void> createRecruitAnswer(
             @PathVariable("crewId") Long crewId,
-            @CurrentUser User user,
-            @RequestBody @Valid CreateRecruitAnswerList<CreateRecruitAnswerDto> request
+            @Parameter(hidden = true) @CurrentUser User user,
+            @RequestBody @Valid CreateRecruitAnswerList<CreateRecruitAnswerDto> createRecruitAnswerList
     ) {
         Crew crew = crewService.findById(crewId);
-        List<CreateRecruitAnswerDto> requestDtoList = request.getAnswers();
+        List<CreateRecruitAnswerDto> requestDtoList = createRecruitAnswerList.getAnswers();
 
         List<RecruitAnswer> answerList = new ArrayList<>();
         //note 입력받은 dtoList 를 기반으로 생성한 RecruitAnswerList
@@ -77,8 +80,8 @@ public class RecruitAnswerController {
 
 
 
-    @Operation(summary = "가입 답변 삭제하기",
-            description = "유저가 작성한 크루 가입 답변을 삭제한다.",
+    @Operation(summary = "가입 답변 모두 삭제하기",
+            description = "유저가 작성한 크루 가입 답변을 모두 삭제한다.",
             security = {@SecurityRequirement(name = "Bearer-Key")}
     )
     @ApiResponses({
@@ -94,7 +97,7 @@ public class RecruitAnswerController {
     public ResponseEntity<Void> deleteRecruitAnswer(
             @PathVariable("crewId") Long crewId,
             @PathVariable("userId") Long userId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         User findUser = userService.findById(userId);
         Crew findCrew = crewService.findById(crewId);
@@ -106,7 +109,7 @@ public class RecruitAnswerController {
 
 
     @Operation(summary = "가입 답변 조회하기",
-            description = "유저가 작성한 크루 가입 답변을 조회한다.",
+            description = "유저가 특정 크루에 작성한 가입 답변들을 묶음 조회한다.",
             security = {@SecurityRequirement(name = "Bearer-Key")}
     )
     @ApiResponses({
@@ -123,7 +126,7 @@ public class RecruitAnswerController {
     public ResponseEntity<GetRecruitAnswerList<GetRecruitAnswerDto>> getRecruitAnswer(
         @PathVariable("crewId") Long crewId,
         @PathVariable("userId") Long userId,
-        @CurrentUser User user
+        @Parameter(hidden = true) @CurrentUser User user
     ) {
         User findUser = userService.findById(userId);
         Crew findCrew = crewService.findById(crewId);

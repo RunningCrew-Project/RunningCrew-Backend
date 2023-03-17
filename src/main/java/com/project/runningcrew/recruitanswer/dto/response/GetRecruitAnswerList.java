@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GetRecruitAnswerList<T> {
 
-    @Schema(description = "조회된 가입 답변 목록")
+    @Schema(description = "조회 가입 답변 목록")
     List<T> answers = new ArrayList<>();
 
 }
