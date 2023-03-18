@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -185,24 +187,34 @@ public class CommentService {
 
 
     /**
-     * 입력받은 runningNoticeIdList 정보로 commentCountList 를 만들어 반환한다.
-     * @param idList
-     * @return commentCountList
+     * boardIdList 로 commentCountList 받아오기
+     *
+     * -사용 : boardCommentRepository.countAllByBoardIds() 에서 댓글 수가 0개인 경우 0이 입력되지 않고 아예 값 할당이 되지않음.
+     *        Maps.getOrDefault(boardId, 0L) 등의 방식으로 디폴드 값 할당 요구함.
+     *
      */
-    public List<Integer> countByRunningNoticeIdList(List<Long> idList) {
-        return runningNoticeCommentRepository.countByRunningNoticeId(idList);
+    public Map<Long, Long> countAllByBoardIds(List<Long> boardIds) {
+        return boardCommentRepository.countAllByBoardIds(boardIds).stream()
+                .collect(
+                        Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1])
+                );
     }
+
+
 
     /**
-     * 입력받은 boardIdList 정보로 commentCountList 를 만들어 반환한다.
-     * @param idList
-     * @return commentCountList
+     * runningNoticeIdList 로 commentCountList 받아오기
+     *
+     * -사용 : runningNoticeCommentRepository.countAllByRunningNoticeIds() 에서 댓글 수가 0개인 경우 0이 입력되지 않고 아예 값 할당이 되지않음.
+     *        Maps.getOrDefault(runningNoticeId, 0L) 등의 방식으로 디폴드 값 할당 요구함.
+     *
      */
-    public List<Integer> countByBoardIdList(List<Long> idList) {
-        return boardCommentRepository.countByBoardId(idList);
+    public Map<Long, Long> countAllByRunningNoticeIds(List<Long> runningNoticeIds) {
+        return runningNoticeCommentRepository.countAllByRunningNoticeIds(runningNoticeIds).stream()
+                .collect(
+                        Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1])
+                );
     }
-
-
 
 
 

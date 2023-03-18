@@ -55,7 +55,7 @@ class ImageS3ServiceImplTest {
     @Test
     void deleteImageTest() throws Exception {
 
-        imageService.deleteImage("JPA.png");
+        imageService.deleteImage("JPffA.png");
 
     }
 

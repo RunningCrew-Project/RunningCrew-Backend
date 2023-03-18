@@ -26,10 +26,10 @@ public class UpdateBoardRequest {
     private String detail;
 
     @Schema(description = "추가 이미지 파일 url 리스트 정보")
-    private List<MultipartFile> addFiles = new ArrayList<>();
+    private List<MultipartFile> addFiles;
 
     @Schema(description = "삭제 이미지 아아디 리스트정보")
-    private List<Long> deleteFiles = new ArrayList<>();
+    private List<Long> deleteFiles;
 
     @Schema(description = "수정 런닝 기록 아이디")
     @Positive(message = "런닝 기록 아이디는 1 이상의 수입니다.")

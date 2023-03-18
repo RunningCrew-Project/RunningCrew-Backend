@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @Getter
 public class SimpleBoardDto {
@@ -31,9 +32,9 @@ public class SimpleBoardDto {
     private SimpleMemberDto simpleMemberDto;
 
     @Schema(description = "게시글 댓글 수", example = "3")
-    private int commentCount;
+    private Long commentCount;
 
-    public SimpleBoardDto(Board board, String imgUrl, int commentCount) {
+    public SimpleBoardDto(Board board, String imgUrl, Long commentCount) {
         this.id = board.getId();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -44,6 +45,7 @@ public class SimpleBoardDto {
         this.imgUrl = imgUrl;
         this.simpleMemberDto = new SimpleMemberDto(board.getMember());
         this.commentCount = commentCount;
+
     }
 
 }
