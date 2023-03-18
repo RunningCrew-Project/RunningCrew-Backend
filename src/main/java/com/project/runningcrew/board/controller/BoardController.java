@@ -239,11 +239,9 @@ public class BoardController {
 
             FreeBoard newBoard = new FreeBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail());
 
-            List<Long> idList =
-                    Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
+            List<Long> idList = Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
+            List<BoardImage> deleteFiles = idList.stream().map(boardImageService::findById).collect(Collectors.toList());
 
-            List<BoardImage> deleteFiles =
-                    Optional.of(idList.stream().map(boardImageService::findById).collect(Collectors.toList())).orElse(Collections.emptyList());
 
             boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
 
@@ -338,25 +336,16 @@ public class BoardController {
 
 
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
-        // [463, 464, ,,, 467]
-        log.info("bordIds size ={}", boardIds.size());
+        Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
+        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
 
-        List<Integer> commentCountList = commentService.countByBoardIdList(boardIds);
-        log.info("commentCountList size={}", commentCountList.size());
-        //note 빈 리스트 반환문제
-
-        Map<Long, BoardImage> maps = boardImageService.findFirstImages(boardIds);
-        log.info("maps size={}", maps.size());
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
-        for (int i = 0; i < boardIds.size(); i++) {
-            Board board = boardService.findById(boardIds.get(i));
-
-            String fileName = maps.get(boardIds.get(i)).getFileName();
-
-            int commentCount = commentCountList.get(i);
-
+        for (Long boardId : boardIds) {
+            Board board = boardService.findById(boardId);
+            String fileName = imageMaps.get(boardId).getFileName();
+            Long commentCount = countMaps.getOrDefault(boardId, 0L);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
 
@@ -396,20 +385,19 @@ public class BoardController {
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<Board> boardSlice = boardService.findBoardByCrewAndKeyWord(crew, keyword);
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
 
-        //note idList 를 만들어 commentCountList 를 뽑아낸다.
-        List<Integer> commentCountList = commentService.countByBoardIdList(boardIds);
-        Map<Long, BoardImage> maps = boardImageService.findFirstImages(boardIds);
+        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
+        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
-        for (int i = 0; i < boardIds.size(); i++) {
-            Board board = boardService.findById(boardIds.get(i));
-            String fileName = maps.get(boardIds.get(i)).getFileName();
-            int commentCount = commentCountList.get(i);
+        for (Long boardId : boardIds) {
+            Board board = boardService.findById(boardId);
+            String fileName = imageMaps.get(boardId).getFileName();
+            Long commentCount = countMaps.getOrDefault(boardId, 0L);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-            //note input dtoList
         }
 
         //note dtoList -> Slice
@@ -445,19 +433,19 @@ public class BoardController {
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<FreeBoard> boardSlice = freeBoardService.findFreeBoardByCrew(crew, pageRequest);
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
 
-        List<Integer> commentCountList = commentService.countByBoardIdList(boardIds);
-        Map<Long, BoardImage> maps = boardImageService.findFirstImages(boardIds);
+        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
+        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
-        for (int i = 0; i < boardIds.size(); i++) {
-            Board board = boardService.findById(boardIds.get(i));
-            String fileName = maps.get(boardIds.get(i)).getFileName();
-            int commentCount = commentCountList.get(i);
+        for (Long boardId : boardIds) {
+            Board board = boardService.findById(boardId);
+            String fileName = imageMaps.get(boardId).getFileName();
+            Long commentCount = countMaps.getOrDefault(boardId, 0L);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-            //note input dtoList
         }
 
         //note dtoList -> Slice
@@ -486,7 +474,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfNoticeBoards(
             @PathVariable("crewId") Long crewId,
             @RequestParam("page") int page,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
@@ -494,19 +482,19 @@ public class BoardController {
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<NoticeBoard> boardSlice = noticeBoardService.findNoticeBoardByCrew(crew, pageRequest);
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
 
-        List<Integer> commentCountList = commentService.countByBoardIdList(boardIds);
-        Map<Long, BoardImage> maps = boardImageService.findFirstImages(boardIds);
+        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
+        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
-        for (int i = 0; i < boardIds.size(); i++) {
-            Board board = boardService.findById(boardIds.get(i));
-            String fileName = maps.get(boardIds.get(i)).getFileName();
-            int commentCount = commentCountList.get(i);
+        for (Long boardId : boardIds) {
+            Board board = boardService.findById(boardId);
+            String fileName = imageMaps.get(boardId).getFileName();
+            Long commentCount = countMaps.getOrDefault(boardId, 0L);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-            //note input dtoList
         }
 
         //note dtoList -> Slice
@@ -534,7 +522,7 @@ public class BoardController {
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfReviewBoards(
             @PathVariable("crewId") Long crewId,
             @RequestParam("page") int page,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
@@ -542,19 +530,19 @@ public class BoardController {
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<ReviewBoard> boardSlice = reviewBoardService.findReviewBoardByCrew(crew, pageRequest);
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
 
-        List<Integer> commentCountList = commentService.countByBoardIdList(boardIds);
-        Map<Long, BoardImage> maps = boardImageService.findFirstImages(boardIds);
+        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
+        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
-        for (int i = 0; i < boardIds.size(); i++) {
-            Board board = boardService.findById(boardIds.get(i));
-            String fileName = maps.get(boardIds.get(i)).getFileName();
-            int commentCount = commentCountList.get(i);
+        for (Long boardId : boardIds) {
+            Board board = boardService.findById(boardId);
+            String fileName = imageMaps.get(boardId).getFileName();
+            Long commentCount = countMaps.getOrDefault(boardId, 0L);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-            //note input dtoList
         }
 
         //note dtoList -> Slice
