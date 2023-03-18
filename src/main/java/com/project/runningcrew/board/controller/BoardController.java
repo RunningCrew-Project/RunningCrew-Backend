@@ -36,6 +36,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -49,14 +51,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Tag(name = "board", description = "게시글에 관한 api")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class BoardController {
 
     private final CommentService commentService;
@@ -91,18 +92,13 @@ public class BoardController {
             @PathVariable("boardId") Long boardId,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
-
-        List<Crew> crewOfUser = crewService.findAllByUser(user);
         Board board = boardService.findById(boardId);
+        Crew crew = board.getMember().getCrew();
+        memberAuthorizationChecker.checkMember(user, crew);
+        //note 요청 user 의 크루 회원 여부 검증
 
-        if(crewOfUser.contains(board.getMember().getCrew())) {
-            //note 요청 user 의 크루 회원 여부 검증
-            int commentCount = commentService.countCommentAtBoard(board);
-            return ResponseEntity.ok(new GetBoardResponse(board, commentCount));
-        } else {
-            throw new AccessDeniedException("크루 가입자만 확인할 수 있습니다.");
-        }
-
+        int commentCount = commentService.countCommentAtBoard(board);
+        return ResponseEntity.ok(new GetBoardResponse(board, commentCount));
     }
 
 
@@ -242,25 +238,43 @@ public class BoardController {
             //note 해당 유저의 크루 가입 여부 && 게시글 수정 권한 확인
 
             FreeBoard newBoard = new FreeBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail());
-            List<Long> deleteIds = updateBoardRequest.getDeleteFiles();
-            List<BoardImage> deleteFiles = deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList());
+
+            List<Long> idList =
+                    Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
+
+            List<BoardImage> deleteFiles =
+                    Optional.of(idList.stream().map(boardImageService::findById).collect(Collectors.toList())).orElse(Collections.emptyList());
+
             boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
+
         } else if (board instanceof NoticeBoard) {
             memberAuthorizationChecker.checkAuthUserAndManger(user, crew, memberId);
             //note 해당 유저의 크루 가입 여부 && 게시글 수정 권한 && 매니저 이상 등급 확인
 
             NoticeBoard newBoard = new NoticeBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail());
-            List<Long> deleteIds = updateBoardRequest.getDeleteFiles();
-            List<BoardImage> deleteFiles = deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList());
+
+            List<Long> deleteIds =
+                    Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
+
+            List<BoardImage> deleteFiles =
+                    Optional.of(deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList())).orElse(Collections.emptyList());
+
             boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
+
         } else if (board instanceof ReviewBoard) {
             memberAuthorizationChecker.checkAuthOnlyUser(user, crew, memberId);
             //note 해당 유저의 크루 가입 여부 && 게시글 수정 권한 확인
 
             ReviewBoard newBoard = new ReviewBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail(), ((ReviewBoard) board).getRunningRecord());
-            List<Long> deleteIds = updateBoardRequest.getDeleteFiles();
-            List<BoardImage> deleteFiles = deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList());
+
+            List<Long> deleteIds =
+                    Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
+
+            List<BoardImage> deleteFiles =
+                    Optional.of(deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList())).orElse(Collections.emptyList());
+
             boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
+
         }
 
         return ResponseEntity.noContent().build();
@@ -313,7 +327,7 @@ public class BoardController {
     })
     @GetMapping("/api/members/{memberId}/boards")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getBoardsOfMember(
-            @Positive @RequestParam("page") int page,
+            @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
@@ -321,26 +335,33 @@ public class BoardController {
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<Board> boardSlice = boardService.findBoardByMember(member, pageRequest);
+
+
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        // [463, 464, ,,, 467]
+        log.info("bordIds size ={}", boardIds.size());
 
-
-        //note idList 를 만들어 commentCountList 를 뽑아낸다.
         List<Integer> commentCountList = commentService.countByBoardIdList(boardIds);
+        log.info("commentCountList size={}", commentCountList.size());
+        //note 빈 리스트 반환문제
+
         Map<Long, BoardImage> maps = boardImageService.findFirstImages(boardIds);
+        log.info("maps size={}", maps.size());
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
         for (int i = 0; i < boardIds.size(); i++) {
             Board board = boardService.findById(boardIds.get(i));
+
             String fileName = maps.get(boardIds.get(i)).getFileName();
+
             int commentCount = commentCountList.get(i);
+
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-            //note input dtoList
         }
 
-        //note dtoList -> Slice
-        Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext());
-        return ResponseEntity.ok(new PagingResponse<>(responseSlice));
+        return ResponseEntity.ok(new PagingResponse<>(
+                new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext())));
 
     }
 
@@ -362,7 +383,7 @@ public class BoardController {
     })
     @GetMapping("/api/crews/{crewId}/boards")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getBoardsOfKeyword(
-            @Positive @RequestParam("page") int page,
+            @RequestParam("page") int page,
             @RequestParam("keyword") String keyword,
             @PathVariable("crewId") Long crewId,
             @Parameter(hidden = true) @CurrentUser User user
@@ -415,7 +436,7 @@ public class BoardController {
     @GetMapping("/api/crews/{crewId}/boards/free")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfFreeBoards(
         @PathVariable("crewId") Long crewId,
-        @Positive @RequestParam("page") int page,
+        @RequestParam("page") int page,
         @Parameter(hidden = true) @CurrentUser User user
     ){
         Crew crew = crewService.findById(crewId);
@@ -464,7 +485,7 @@ public class BoardController {
     @GetMapping("/api/crews/{crewId}/boards/notice")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfNoticeBoards(
             @PathVariable("crewId") Long crewId,
-            @Positive @RequestParam("page") int page,
+            @RequestParam("page") int page,
             @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
@@ -512,7 +533,7 @@ public class BoardController {
     @GetMapping("/api/crews/{crewId}/boards/review")
     public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfReviewBoards(
             @PathVariable("crewId") Long crewId,
-            @Positive @RequestParam("page") int page,
+            @RequestParam("page") int page,
             @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
