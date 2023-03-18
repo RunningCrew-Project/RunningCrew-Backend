@@ -1,11 +1,14 @@
 package com.project.runningcrew.runningnotice.controller;
 
+import com.project.runningcrew.comment.service.CommentService;
 import com.project.runningcrew.common.annotation.CurrentUser;
+import com.project.runningcrew.common.dto.PagingResponse;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
+import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.resourceimage.service.RunningNoticeImageService;
 import com.project.runningcrew.runningmember.service.RunningMemberService;
@@ -27,6 +30,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,10 +42,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Tag(name = "RunningNotice", description = "런닝 공지에 관한 api")
@@ -51,6 +61,8 @@ public class RunningNoticeController {
     private final CrewService crewService;
     private final RunningRecordService runningRecordService;
     private final RunningNoticeImageService runningNoticeImageService;
+    private final CommentService commentService;
+    private final MemberService memberService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
     @Value("${domain.name}")
     private String host;
@@ -234,9 +246,120 @@ public class RunningNoticeController {
         return ResponseEntity.noContent().build();
     }
 
-    //TODO 모든 정기러닝 공지 가져오기 (페이징)
-    //TODO 모든 번개런닝 공지 가져오기 (페이징)
-    //TODO 검색어로 런닝공지 검색하기 (페이징)
+
+    @Operation(summary = "정기런닝 공지 가져오기", description = "정기런닝 공지를 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/crews/{crewId}/running-notices/regular")
+    public ResponseEntity<PagingResponse> findRegularRunningNotices(@PathVariable("crewId") Long crewId,
+                                                                    @RequestParam("page") @PositiveOrZero int page,
+                                                                    @Parameter(hidden = true) @CurrentUser User user) {
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkMember(user, crew);
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<RunningNotice> regulars = runningNoticeService.findRegularsByCrew(crew, pageRequest);
+        List<Long> runningNoticeIds = regulars.stream().map(RunningNotice::getId).collect(Collectors.toList());
+        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+
+        List<PagingRunningNoticeDto> contents = new ArrayList<>();
+        for (int i = 0; i < regulars.getNumberOfElements(); i++) {
+            RunningNotice runningNotice = regulars.getContent().get(i);
+            contents.add(new PagingRunningNoticeDto(runningNotice,
+                    firstImages.get(runningNotice.getId()).getFileName(),
+                    0));
+//                    commentCountList.get(i)));
+        }
+
+        return ResponseEntity.ok(new PagingResponse(
+                new SliceImpl(contents, regulars.getPageable(), regulars.hasNext())));
+    }
+
+
+    @Operation(summary = "번개런닝 공지 가져오기", description = "번개런닝 공지를 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/crews/{crewId}/running-notices/instant")
+    public ResponseEntity<PagingResponse> findInstantRunningNotices(@PathVariable("crewId") Long crewId,
+                                                                    @RequestParam("page") @PositiveOrZero int page,
+                                                                    @Parameter(hidden = true) @CurrentUser User user) {
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkMember(user, crew);
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<RunningNotice> instants = runningNoticeService.findInstantsByCrew(crew, pageRequest);
+        List<Long> runningNoticeIds = instants.stream().map(RunningNotice::getId).collect(Collectors.toList());
+        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+
+        List<PagingRunningNoticeDto> contents = new ArrayList<>();
+        for (int i = 0; i < instants.getNumberOfElements(); i++) {
+            RunningNotice runningNotice = instants.getContent().get(i);
+            contents.add(new PagingRunningNoticeDto(runningNotice,
+                    firstImages.get(runningNotice.getId()).getFileName(),
+                    0));
+//                    commentCountList.get(i)));
+        }
+
+        return ResponseEntity.ok(new PagingResponse(
+                new SliceImpl(contents, instants.getPageable(), instants.hasNext())));
+    }
+
+
+    @Operation(summary = "검색어로 런닝공지 가져오기", description = "검색어에 해당하는 런닝공지를 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/crews/{crewId}/running-notices")
+    public ResponseEntity<PagingResponse> findRunningNoticesByKeyword(@PathVariable("crewId") Long crewId,
+                                                                      @RequestParam("keyword") @NotBlank String keyword,
+                                                                      @RequestParam("page") @PositiveOrZero int page,
+                                                                      @Parameter(hidden = true) @CurrentUser User user) {
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkMember(user, crew);
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<RunningNotice> runningNotices = runningNoticeService.findByCrewAndKeyword(crew, keyword, pageRequest);
+        List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
+        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+
+        List<PagingRunningNoticeDto> contents = new ArrayList<>();
+        for (int i = 0; i < runningNotices.getNumberOfElements(); i++) {
+            RunningNotice runningNotice = runningNotices.getContent().get(i);
+            contents.add(new PagingRunningNoticeDto(runningNotice,
+                    firstImages.get(runningNotice.getId()).getFileName(),
+                    0));
+//                    commentCountList.get(i)));
+        }
+
+        return ResponseEntity.ok(new PagingResponse(
+                new SliceImpl(contents, runningNotices.getPageable(), runningNotices.hasNext())));
+    }
 
 
     @Operation(summary = "특정 날에 시작하는 크루 런닝공지 가져오기", description = "crewId 에 속하는 크루에서 특정 날에 시작하는 런닝공지를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
@@ -283,18 +406,53 @@ public class RunningNoticeController {
             @Parameter(hidden = true) @CurrentUser User user) {
         List<RunningNotice> runningNotices = runningNoticeService.findReadyRunningNoticesByUser(user);
         List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
-        List<Long> memberCounts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+        Map<Long, Long> memberCounts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
 
-        List<ReadyRunningNoticeDto> readyRunningNoticeDtoList = new ArrayList<>();
-        for (int i = 0; i < runningNotices.size(); i++) {
-            readyRunningNoticeDtoList.add(new ReadyRunningNoticeDto(runningNotices.get(i), memberCounts.get(i)));
-        }
+        List<ReadyRunningNoticeDto> readyRunningNoticeDtoList = runningNotices.stream()
+                .map(r -> new ReadyRunningNoticeDto(r, memberCounts.get(r.getId())))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(new RunningNoticeListResponse<>(readyRunningNoticeDtoList));
     }
 
 
-    //TODO 멤버가 작성한 모든 런닝공지 가져오기 (페이징)
+    @Operation(summary = "멤버가 작성한 런닝공지 가져오기", description = "멤버가 작성한 런닝공지를 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RunningNoticeListResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/members/{memberId}/running-notices")
+    public ResponseEntity<PagingResponse> findRunningNoticesByMember(@PathVariable("memberId") Long memberId,
+                                                                     @RequestParam("page") @PositiveOrZero int page,
+                                                                     @Parameter(hidden = true) @CurrentUser User user) {
+        Member member = memberService.findById(memberId);
+        memberAuthorizationChecker.checkMember(user, member.getCrew());
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Slice<RunningNotice> runningNotices = runningNoticeService.findByMember(member, pageRequest);
+        List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
+        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+
+        List<PagingRunningNoticeDto> contents = new ArrayList<>();
+        for (int i = 0; i < runningNotices.getNumberOfElements(); i++) {
+            RunningNotice runningNotice = runningNotices.getContent().get(i);
+            contents.add(new PagingRunningNoticeDto(runningNotice,
+                    firstImages.get(runningNotice.getId()).getFileName(),
+                    0));
+//                    commentCountList.get(i)));
+        }
+
+        return ResponseEntity.ok(new PagingResponse(
+                new SliceImpl(contents, runningNotices.getPageable(), runningNotices.hasNext())));
+
+    }
 
 
     @Operation(summary = "런닝 종료하기", description = "런닝 공지의 상태를 종료로 변경한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
@@ -370,11 +528,24 @@ public class RunningNoticeController {
     }
 
 
-    //TODO 유저의 예정 런닝 체크하기
-//    public ResponseEntity<> checkRunningValid(@PathVariable("runningNoticeId") Long runningNoticeId,
-//                                              @Parameter(hidden = true) @CurrentUser User user) {
-//
-//
-//    }
+    @Operation(summary = "유저의 예정 런닝 체크하기", description = "유저의 예정된 런닝이 시작 가능한 런닝인지 체크한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/running-notices/{runningNoticeId}/valid")
+    public ResponseEntity<RunningNoticeValidResponse> checkRunningValid(
+            @PathVariable("runningNoticeId") Long runningNoticeId,
+            @Parameter(hidden = true) @CurrentUser User user) {
+        RunningNotice runningNotice = runningNoticeService.findById(runningNoticeId);
+        boolean result = runningNoticeService.checkRunningNotice(user, runningNotice);
+
+        return ResponseEntity.ok(new RunningNoticeValidResponse(String.valueOf(result)));
+    }
 
 }
