@@ -6,7 +6,7 @@ import java.util.Map;
 
 @Getter
 public class BadInputException extends RuntimeException{
-    private Map<String, String> badInputMaps;
+    private Map<String, String> badInputMaps = Map.of();
 
     public BadInputException(String message) {
         super(message);
