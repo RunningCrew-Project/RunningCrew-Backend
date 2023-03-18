@@ -2,6 +2,7 @@ package com.project.runningcrew.runningmember.repository;
 
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.TestEntityFactory;
+import com.project.runningcrew.member.repository.MemberRepository;
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +28,9 @@ class RunningMemberRepositoryTest {
 
     @Autowired
     RunningMemberRepository runningMemberRepository;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     TestEntityFactory testEntityFactory;
@@ -293,6 +298,96 @@ class RunningMemberRepositoryTest {
         //then
         List<RunningMember> runningMembers = runningMemberRepository.findAllByRunningNotice(runningNotice);
         assertThat(runningMembers).isEmpty();
+    }
+
+    @DisplayName("Member 가 포함된 모든 RunningMember 삭제")
+    @Test
+    public void deleteAllByMemberTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+
+        for (int i = 1; i < 10; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, i);
+
+            RunningMember tempRunningMember = new RunningMember(runningNotice, member);
+            runningMemberRepository.save(tempRunningMember);
+        }
+
+        ///when
+        runningMemberRepository.deleteAllByMember(member);
+
+        //then
+        List<RunningMember> runningMembers = runningMemberRepository.findAllByMember(member);
+        assertThat(runningMembers).isEmpty();
+    }
+
+    @DisplayName("crew 가 포함된 모든 RunningMember 삭제")
+    @Test
+    public void deleteAllByCrewTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+
+        for (int i = 1; i < 10; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, i);
+            RunningMember runningMember1 = new RunningMember(runningNotice, tempMember);
+            RunningMember runningMember2 = new RunningMember(runningNotice, member);
+            runningMemberRepository.save(runningMember1);
+            runningMemberRepository.save(runningMember2);
+        }
+
+        ///when
+        runningMemberRepository.deleteAllByCrew(crew);
+
+        //then
+        List<RunningMember> runningMembers = new ArrayList<>();
+        memberRepository.findAllByCrew(crew)
+                .forEach(m -> runningMembers.addAll(runningMemberRepository.findAllByMember(m)));
+        assertThat(runningMembers).isEmpty();
+    }
+    
+    @DisplayName("RunningNoticeIds 에 포함된 RunningNotice 의 RunningMember 수 반환 테스트")
+    @Test
+    public void countRunningMemberByRunningNoticeIdsTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        List<Long> runningNoticeIds = new ArrayList<>();
+
+        for (int i = 1; i < 10; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, i);
+            runningNoticeIds.add(runningNotice.getId());
+
+            RunningMember runningMember1 = new RunningMember(runningNotice, tempMember);
+            RunningMember runningMember2 = new RunningMember(runningNotice, member);
+            runningMemberRepository.save(runningMember1);
+            runningMemberRepository.save(runningMember2);
+        }
+
+        ///when
+        List<Long> counts = runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+
+        //then
+        assertThat(counts).allMatch(c -> c.equals(2L));
     }
 
 }

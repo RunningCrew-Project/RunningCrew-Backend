@@ -1,5 +1,6 @@
 package com.project.runningcrew.runningmember.repository;
 
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
@@ -66,5 +67,33 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from RunningMember r where r.runningNotice = :runningNotice")
     void deleteAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
+
+    /**
+     * Member 를 포함하는 모든 RunningMember 삭제
+     *
+     * @param member
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("delete from RunningMember r where r.member = :member")
+    void deleteAllByMember(@Param("member") Member member);
+
+    /**
+     * Crew 에 포함되는 모든 RunningMember 삭제
+     *
+     * @param crew
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("delete from RunningMember r1 where r1 in " +
+            "(select r2 from RunningMember r2 where r2.member.crew = :crew)")
+    void deleteAllByCrew(@Param("crew") Crew crew);
+
+    /**
+     * runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember 수들을 모두 반환
+     *
+     * @param runningNoticeIds RunningNotice 의 id 의 리스트
+     * @return runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember tn
+     */
+    @Query("select count(r) from RunningMember r where r.runningNotice.id in (:runningNoticeIds) group by r.runningNotice")
+    List<Long> countRunningMembersByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
 
 }
