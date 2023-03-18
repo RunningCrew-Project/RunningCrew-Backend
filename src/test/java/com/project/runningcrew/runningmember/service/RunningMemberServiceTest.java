@@ -5,8 +5,8 @@ import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
-import com.project.runningcrew.exception.RunningDateTimeException;
-import com.project.runningcrew.exception.RunningPersonnelException;
+import com.project.runningcrew.exception.badinput.RunningDateTimeAfterException;
+import com.project.runningcrew.exception.badinput.RunningPersonnelException;
 import com.project.runningcrew.exception.alreadyExist.RunningMemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.RunningMemberNotFoundException;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
@@ -83,7 +83,7 @@ class RunningMemberServiceTest {
         ///when
         //then
         assertThatThrownBy(() -> runningMemberService.saveRunningMember(member, runningNotice))
-                .isInstanceOf(RunningDateTimeException.class);
+                .isInstanceOf(RunningDateTimeAfterException.class);
     }
 
     @DisplayName("런닝 참여 신청 인원 초과 예외 테스트")
@@ -181,7 +181,7 @@ class RunningMemberServiceTest {
         ///when
         //then
         assertThatThrownBy(() -> runningMemberService.deleteRunningMember(member, runningNotice))
-                .isInstanceOf(RunningDateTimeException.class);
+                .isInstanceOf(RunningDateTimeAfterException.class);
     }
 
     @DisplayName("런닝 참여 안한 멤버가 취소하는 예외 테스트")
