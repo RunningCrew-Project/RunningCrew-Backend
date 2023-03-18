@@ -6,7 +6,9 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.project.runningcrew.exception.ImageFileCreationException;
 import com.project.runningcrew.exception.s3.S3DeleteException;
 import com.project.runningcrew.exception.s3.S3UploadException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ImageS3ServiceImpl implements ImageService{
 
     @Value("${cloud.aws.s3.bucket}")
@@ -63,6 +66,7 @@ public class ImageS3ServiceImpl implements ImageService{
     @Override
     public void deleteImage(String fileUrl) {
         boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, fileUrl);
+        log.info("fileUrl={}",fileUrl);
         if(isObjectExist) {
             amazonS3Client.deleteObject(bucketName, fileUrl);
         } else {

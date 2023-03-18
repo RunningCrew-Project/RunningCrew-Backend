@@ -1,5 +1,6 @@
 package com.project.runningcrew.board.service;
 
+import com.project.runningcrew.comment.service.CommentService;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.resourceimage.entity.BoardImage;
@@ -26,6 +27,8 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardImageRepository boardImageRepository;
     private final ImageService imageService;
+
+    private final CommentService commentService;
     private final String imageDirName = "board";
 
 
@@ -47,10 +50,14 @@ public class BoardService {
      */
     public Long saveBoard(Board board, List<MultipartFile> multipartFiles) {
         Board savedBoard = boardRepository.save(board);
-        for (MultipartFile multipartFile : multipartFiles) {
-            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-            boardImageRepository.save(new BoardImage(imageUrl, savedBoard));
+
+        if(multipartFiles != null) {
+            for (MultipartFile multipartFile : multipartFiles) {
+                String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
+                boardImageRepository.save(new BoardImage(imageUrl, savedBoard));
+            }
         }
+
         return savedBoard.getId();
     }
 
@@ -67,17 +74,23 @@ public class BoardService {
         if(!originBoard.getTitle().equals(newBoard.getTitle())) {
             originBoard.updateTitle(newBoard.getTitle());
         }
+
         if(!originBoard.getDetail().equals(newBoard.getDetail())) {
             originBoard.updateDetail(newBoard.getDetail());
         }
 
-        for (MultipartFile multipartFile : addFiles) {
-            String imgUrl = imageService.uploadImage(multipartFile, imageDirName);
-            boardImageRepository.save(new BoardImage(imgUrl, originBoard));
+        if(addFiles != null) {
+            for (MultipartFile multipartFile : addFiles) {
+                String imgUrl = imageService.uploadImage(multipartFile, imageDirName);
+                boardImageRepository.save(new BoardImage(imgUrl, originBoard));
+            }
         }
-        for (BoardImage boardImage : deleteFiles) {
-            imageService.deleteImage(boardImage.getFileName());
-            boardImageRepository.delete(boardImage);
+
+        if(deleteFiles != null) {
+            for (BoardImage boardImage : deleteFiles) {
+                imageService.deleteImage(boardImage.getFileName());
+                boardImageRepository.delete(boardImage);
+            }
         }
     }
 
@@ -96,6 +109,9 @@ public class BoardService {
 
         boardImageRepository.deleteAll(deleteBoards);
         // boardImage delete
+
+        commentService.deleteCommentAtBoard(board);
+        // boardComment delete
 
         boardRepository.delete(board);
         // board delete

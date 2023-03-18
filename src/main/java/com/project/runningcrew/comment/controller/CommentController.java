@@ -121,7 +121,7 @@ public class CommentController {
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        Member member = memberService.findByUserAndCrew(user, crew);
+        Member member = memberService.findById(createBoardCommentRequest.getMemberId());
         BoardComment boardComment = new BoardComment(member, createBoardCommentRequest.getDetail(), board);
 
         Long commentId = commentService.saveComment(boardComment);
@@ -157,7 +157,7 @@ public class CommentController {
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        Member member = memberService.findByUserAndCrew(user, crew);
+        Member member = memberService.findById(createRunningNoticeCommentRequest.getMemberId());
         RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, createRunningNoticeCommentRequest.getDetail(), runningNotice);
 
         Long commentId = commentService.saveComment(runningNoticeComment);
@@ -239,7 +239,7 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/boards/{boardId}/comments")
-    public ResponseEntity<CommentListResponse<SimpleCommentDto>> getCommentListOfBoard(
+    public ResponseEntity<CommentListResponse> getCommentListOfBoard(
             @PathVariable("boardId") Long boardId,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
@@ -249,10 +249,10 @@ public class CommentController {
         //note 요청 user 의 크루 회원 여부 검증
 
         List<BoardComment> commentList = commentService.findAllByBoard(board);
-        int commentCount = commentService.countCommentAtBoard(board);
+        int commentCount = commentList.size();
 
         List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
-        return ResponseEntity.ok(new CommentListResponse<>(commentCount, dtoList));
+        return ResponseEntity.ok(new CommentListResponse(commentCount, dtoList));
     }
 
 
@@ -270,7 +270,7 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/running-notices/{runningNoticeId}/comments")
-    public ResponseEntity<CommentListResponse<SimpleCommentDto>> getCommentListOfRunningNotice(
+    public ResponseEntity<CommentListResponse> getCommentListOfRunningNotice(
             @PathVariable("runningNoticeId") Long runningNoticeId,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
@@ -280,10 +280,10 @@ public class CommentController {
         //note 요청 user 의 크루 회원 여부 검증
 
         List<RunningNoticeComment> commentList = commentService.findAllByRunningNotice(runningNotice);
-        int commentCount = commentService.countCommentAtRunningNotice(runningNotice);
+        int commentCount = commentList.size();
 
         List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
-        return ResponseEntity.ok(new CommentListResponse<>(commentCount, dtoList));
+        return ResponseEntity.ok(new CommentListResponse(commentCount, dtoList));
     }
 
 
