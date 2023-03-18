@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -254,20 +255,42 @@ class RunningMemberServiceTest {
 
     @DisplayName("runningNoticeIds 에 포함된 RunningNotice 에 참여한 멤버 수 반환 테스트")
     @Test
-    public void countRunningMembersByRunningNoticeIdsTest() {
+    public void countRunningMembersByRunningNoticeIdsTest1() {
         //given
         List<Long> runningNoticeIds = Arrays.asList(1L, 2L, 3L, 4L);
-        List<Long> runningMembers = Arrays.asList(10L, 32L, 23L, 4L);
-        when(runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds))
-                .thenReturn(runningMembers);
+        List<Object[]> runningMembers = List.of(
+                new Object[]{1L, 10L},
+                new Object[]{2L, 32L},
+                new Object[]{3L, 23L},
+                new Object[]{4L, 4L});
+        when(runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds)).thenReturn(runningMembers);
 
         ///when
-        List<Long> counts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+        Map<Long, Long> counts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
 
         //then
-        for (int i = 0; i < counts.size(); i++) {
-            assertThat(counts.get(i)).isEqualTo(runningMembers.get(i));
+        for (int i = 0; i < runningNoticeIds.size(); i++) {
+            assertThat(counts.get(runningNoticeIds.get(i))).isEqualTo(runningMembers.get(i)[1]);
         }
+        verify(runningMemberRepository, times(1)).countRunningMembersByRunningNoticeIds(runningNoticeIds);
+    }
+
+    @DisplayName("runningNoticeIds 에 포함된 RunningNotice 에 참여한 멤버 수 반환 테스트2")
+    @Test
+    public void countRunningMembersByRunningNoticeIdsTest2() {
+        //given
+        List<Long> runningNoticeIds = Arrays.asList(1L, 2L, 3L, 4L);
+        List<Object[]> runningMembers = List.of(
+                new Object[]{1L, 10L},
+                new Object[]{3L, 23L},
+                new Object[]{4L, 4L});
+        when(runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds)).thenReturn(runningMembers);
+
+        ///when
+        Map<Long, Long> counts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+
+        //then
+        assertThat(counts.size()).isEqualTo(runningNoticeIds.size());
         verify(runningMemberRepository, times(1)).countRunningMembersByRunningNoticeIds(runningNoticeIds);
     }
 

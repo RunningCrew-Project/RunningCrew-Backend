@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -105,13 +108,19 @@ public class RunningMemberService {
     }
 
     /**
-     * runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember 수들을 모두 반환
+     * RunningNotice 의 id 들을 받아, key 가 RunningNotice 의 id 이고 value 가 해당 RunningNotice 에
+     * 참여한 RunningMember 수들인 Map 을 반환한다.
      *
      * @param runningNoticeIds RunningNotice 의 id 의 리스트
-     * @return runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember 수
+     * @return key 가 RunningNotice 의 id 이고 value 가 해당 RunningNotice 에 참여한 RunningMember 수들인 Map
      */
-    public List<Long> countRunningMembersByRunningNoticeIds(List<Long> runningNoticeIds) {
-        return runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+    public Map<Long, Long> countRunningMembersByRunningNoticeIds(List<Long> runningNoticeIds) {
+        Map<Long, Long> countMap = runningMemberRepository
+                .countRunningMembersByRunningNoticeIds(runningNoticeIds)
+                .stream().collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
+
+        return runningNoticeIds.stream()
+                .collect(Collectors.toMap(r -> r, r -> Objects.requireNonNullElse(countMap.get(r), 0L)));
     }
 
 }

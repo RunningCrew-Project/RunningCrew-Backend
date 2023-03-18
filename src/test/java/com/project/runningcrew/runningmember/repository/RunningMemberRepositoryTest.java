@@ -358,10 +358,10 @@ class RunningMemberRepositoryTest {
                 .forEach(m -> runningMembers.addAll(runningMemberRepository.findAllByMember(m)));
         assertThat(runningMembers).isEmpty();
     }
-    
+
     @DisplayName("RunningNoticeIds 에 포함된 RunningNotice 의 RunningMember 수 반환 테스트")
     @Test
-    public void countRunningMemberByRunningNoticeIdsTest() {
+    public void countRunningMemberByRunningNoticeIdsTest1() {
         //given
         SidoArea sidoArea = testEntityFactory.getSidoArea(0);
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
@@ -384,10 +384,34 @@ class RunningMemberRepositoryTest {
         }
 
         ///when
-        List<Long> counts = runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+        List<Object[]> counts = runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds);
 
         //then
-        assertThat(counts).allMatch(c -> c.equals(2L));
+        assertThat(counts).allMatch(c -> c[1].equals(2L));
+    }
+
+    @DisplayName("RunningNoticeIds 에 포함된 RunningNotice 의 RunningMember 수 반환 테스트")
+    @Test
+    public void countRunningMemberByRunningNoticeIdsTest2() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        List<Long> runningNoticeIds = new ArrayList<>();
+
+        for (int i = 1; i < 10; i++) {
+            RunningNotice runningNotice = testEntityFactory.getRegularRunningNotice(member, i);
+            runningNoticeIds.add(runningNotice.getId());
+        }
+
+        ///when
+        List<Object[]> counts = runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+
+        //then
+        assertThat(counts).allMatch(o-> o.equals(null));
     }
 
 }

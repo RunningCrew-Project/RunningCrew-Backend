@@ -88,12 +88,13 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
     void deleteAllByCrew(@Param("crew") Crew crew);
 
     /**
-     * runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember 수들을 모두 반환
+     * runningNoticeId 의 리스트에 포함된 id 를 가지는 RunningNotice 들의 런닝멤버수를 반환
      *
      * @param runningNoticeIds RunningNotice 의 id 의 리스트
-     * @return runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember tn
+     * @return runningNoticeId 와 RunningNotice 의 멤버수가 담긴 Object[] 의 리스트. Object[0] 에는 Long 타입인
+     * runningNoticeId, Object[1] 에는  Long 타입인 RunningNotice 의 RunningMember 수
      */
-    @Query("select count(r) from RunningMember r where r.runningNotice.id in (:runningNoticeIds) group by r.runningNotice")
-    List<Long> countRunningMembersByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
+    @Query("select r.runningNotice.id, count(r) from RunningMember r where r.runningNotice.id in (:runningNoticeIds) group by r.runningNotice")
+    List<Object[]> countRunningMembersByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
 
 }
