@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -95,6 +96,16 @@ public class RunningMemberService {
      */
     public boolean existsByMemberAndRunningNotice(Member member, RunningNotice runningNotice) {
         return runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice);
+    }
+
+    /**
+     * runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember 수들을 모두 반환
+     *
+     * @param runningNoticeIds RunningNotice 의 id 의 리스트
+     * @return runningNoticeIds 의 id 를 가지고 있는 RunningNotice 에 참여한 RunningMember 수
+     */
+    public List<Long> countRunningMembersByRunningNoticeIds(List<Long> runningNoticeIds) {
+        return runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds);
     }
 
 }

@@ -2,7 +2,6 @@ package com.project.runningcrew.runningmember.service;
 
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.member.entity.Member;
-import com.project.runningcrew.runningmember.service.RunningMemberService;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
@@ -19,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -137,8 +138,17 @@ class RunningMemberServiceTest {
 
     @DisplayName("런닝 참여 취소 성공 테스트")
     @Test
-    public void deleteRunningMemberTest1(@Mock Member member, @Mock RunningNotice runningNotice) {
+    public void deleteRunningMemberTest1(@Mock Member member) {
         //given
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member)
+                .noticeType(NoticeType.INSTANT)
+                .runningDateTime(LocalDateTime.now().plusDays(1))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
         RunningMember runningMember = new RunningMember(runningNotice, member);
         when(runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice))
                 .thenReturn(Optional.of(runningMember));
@@ -176,8 +186,17 @@ class RunningMemberServiceTest {
 
     @DisplayName("런닝 참여 안한 멤버가 취소하는 예외 테스트")
     @Test
-    public void deleteRunningMemberTest3(@Mock Member member, @Mock RunningNotice runningNotice) {
+    public void deleteRunningMemberTest3(@Mock Member member) {
         //given
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member)
+                .noticeType(NoticeType.INSTANT)
+                .runningDateTime(LocalDateTime.now().plusDays(1))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
         when(runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice))
                 .thenReturn(Optional.empty());
 
@@ -231,6 +250,25 @@ class RunningMemberServiceTest {
         assertThat(result).isFalse();
         verify(runningMemberRepository, times(1))
                 .existsByMemberAndRunningNotice(member, runningNotice);
+    }
+
+    @DisplayName("runningNoticeIds 에 포함된 RunningNotice 에 참여한 멤버 수 반환 테스트")
+    @Test
+    public void countRunningMembersByRunningNoticeIdsTest() {
+        //given
+        List<Long> runningNoticeIds = Arrays.asList(1L, 2L, 3L, 4L);
+        List<Long> runningMembers = Arrays.asList(10L, 32L, 23L, 4L);
+        when(runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds))
+                .thenReturn(runningMembers);
+
+        ///when
+        List<Long> counts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+
+        //then
+        for (int i = 0; i < counts.size(); i++) {
+            assertThat(counts.get(i)).isEqualTo(runningMembers.get(i));
+        }
+        verify(runningMemberRepository, times(1)).countRunningMembersByRunningNoticeIds(runningNoticeIds);
     }
 
 }
