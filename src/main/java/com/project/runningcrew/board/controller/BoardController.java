@@ -239,10 +239,8 @@ public class BoardController {
 
             FreeBoard newBoard = new FreeBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail());
 
-            List<Long> idList = Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
+            List<Long> idList = updateBoardRequest.getDeleteFiles();
             List<BoardImage> deleteFiles = idList.stream().map(boardImageService::findById).collect(Collectors.toList());
-
-
             boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
 
         } else if (board instanceof NoticeBoard) {
@@ -251,12 +249,8 @@ public class BoardController {
 
             NoticeBoard newBoard = new NoticeBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail());
 
-            List<Long> deleteIds =
-                    Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
-
-            List<BoardImage> deleteFiles =
-                    Optional.of(deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList())).orElse(Collections.emptyList());
-
+            List<Long> idList = updateBoardRequest.getDeleteFiles();
+            List<BoardImage> deleteFiles = idList.stream().map(boardImageService::findById).collect(Collectors.toList());
             boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
 
         } else if (board instanceof ReviewBoard) {
@@ -265,12 +259,8 @@ public class BoardController {
 
             ReviewBoard newBoard = new ReviewBoard(board.getMember(), updateBoardRequest.getTitle(), updateBoardRequest.getDetail(), ((ReviewBoard) board).getRunningRecord());
 
-            List<Long> deleteIds =
-                    Optional.ofNullable(updateBoardRequest.getDeleteFiles()).orElse(Collections.emptyList());
-
-            List<BoardImage> deleteFiles =
-                    Optional.of(deleteIds.stream().map(boardImageService::findById).collect(Collectors.toList())).orElse(Collections.emptyList());
-
+            List<Long> idList = updateBoardRequest.getDeleteFiles();
+            List<BoardImage> deleteFiles = idList.stream().map(boardImageService::findById).collect(Collectors.toList());
             boardService.updateBoard(board, newBoard, updateBoardRequest.getAddFiles(), deleteFiles);
 
         }
@@ -345,7 +335,7 @@ public class BoardController {
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
             String fileName = imageMaps.get(boardId).getFileName();
-            Long commentCount = countMaps.getOrDefault(boardId, 0L);
+            Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
 
@@ -384,7 +374,7 @@ public class BoardController {
 
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<Board> boardSlice = boardService.findBoardByCrewAndKeyWord(crew, keyword);
+        Slice<Board> boardSlice = boardService.findBoardByCrewAndKeyWord(crew, keyword, pageRequest);
 
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
@@ -396,7 +386,7 @@ public class BoardController {
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
             String fileName = imageMaps.get(boardId).getFileName();
-            Long commentCount = countMaps.getOrDefault(boardId, 0L);
+            Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
 
@@ -444,7 +434,7 @@ public class BoardController {
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
             String fileName = imageMaps.get(boardId).getFileName();
-            Long commentCount = countMaps.getOrDefault(boardId, 0L);
+            Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
 
@@ -493,7 +483,7 @@ public class BoardController {
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
             String fileName = imageMaps.get(boardId).getFileName();
-            Long commentCount = countMaps.getOrDefault(boardId, 0L);
+            Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
 
@@ -541,7 +531,7 @@ public class BoardController {
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
             String fileName = imageMaps.get(boardId).getFileName();
-            Long commentCount = countMaps.getOrDefault(boardId, 0L);
+            Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
 

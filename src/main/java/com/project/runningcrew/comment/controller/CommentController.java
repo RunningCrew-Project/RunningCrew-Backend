@@ -298,9 +298,9 @@ public class CommentController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/members/{memberId}/comments")
+    @GetMapping("/api/members/{memberId}/comments")
     public ResponseEntity<PagingResponse<SimpleCommentDto>> getCommentPageOfMember(
-            @Positive @RequestParam("page") int page,
+            @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
