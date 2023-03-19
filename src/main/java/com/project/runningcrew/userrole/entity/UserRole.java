@@ -19,7 +19,7 @@ public class UserRole {
     @Column(name = "user_role_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

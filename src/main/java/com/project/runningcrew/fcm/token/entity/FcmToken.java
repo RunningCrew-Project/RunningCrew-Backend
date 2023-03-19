@@ -20,7 +20,7 @@ public class FcmToken extends BaseEntity {
     @Column(name = "fcm_token_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
