@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+
 class ImageS3ServiceImplTest {
 
 
@@ -36,6 +37,7 @@ class ImageS3ServiceImplTest {
 
 
         File file = new File("C:\\Users\\USER\\Desktop\\test.png");
+
 
         FileInputStream input = new FileInputStream(file);
 
@@ -55,7 +57,7 @@ class ImageS3ServiceImplTest {
     @Test
     void deleteImageTest() throws Exception {
 
-        imageService.deleteImage("JPffA.png");
+        imageService.deleteImage("JPA.png");
 
     }
 

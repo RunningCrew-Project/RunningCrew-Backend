@@ -4,13 +4,14 @@ import com.project.runningcrew.recruitanswer.entity.RecruitAnswer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class CreateRecruitAnswerDto {
 
     @Schema(description = "가입 답변 내용", example = "answer")
