@@ -2,9 +2,17 @@ package com.project.runningcrew.crew.service;
 
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.board.repository.BoardRepository;
+import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
+import com.project.runningcrew.recruitquestion.repository.RecruitQuestionRepository;
+import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
+import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
+import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
+import com.project.runningcrew.runningnotice.repository.RunningNoticeRepository;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.exception.duplicate.CrewNameDuplicateException;
 import com.project.runningcrew.exception.notFound.CrewNotFoundException;
@@ -26,8 +34,16 @@ import java.util.List;
 public class CrewService {
 
     private final CrewRepository crewRepository;
-    private final ImageService imageService;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
+    private final RunningMemberRepository runningMemberRepository;
+    private final RunningNoticeRepository runningNoticeRepository;
+    private final BoardImageRepository boardImageRepository;
+    private final RunningNoticeImageRepository runningNoticeImageRepository;
     private final MemberRepository memberRepository;
+    private final RecruitAnswerRepository recruitAnswerRepository;
+    private final RecruitQuestionRepository recruitQuestionRepository;
+    private final ImageService imageService;
     private final String imageDirName = "crew";
 
     /**
@@ -97,15 +113,14 @@ public class CrewService {
      */
     @Transactional
     public void deleteCrew(Crew crew) {
-        //TODO recruitAnswer 삭제
-        //TODO recruitQuestion 삭제
+        recruitAnswerRepository.deleteAllByCrew(crew);
+        recruitQuestionRepository.deleteAllByCrew(crew);
+        runningNoticeImageRepository.deleteAllByCrew(crew);
         //TODO runningMember 삭제
         //TODO runningNotice 삭제
-        //TODO board 삭제
-        //TODO comment 삭제
-        //TODO boardImage 삭제
-        //TODO runningNoticeImage 삭제
-        //TODO member 삭제
+        boardImageRepository.deleteAllByCrew(crew);
+        commentRepository.deleteAllByCrew(crew);
+        boardRepository.deleteAllByCrew(crew);
         memberRepository.deleteAllByCrew(crew);
         crewRepository.delete(crew);
         imageService.deleteImage(crew.getCrewImgUrl());
