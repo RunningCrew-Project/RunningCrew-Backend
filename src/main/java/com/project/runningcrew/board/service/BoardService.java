@@ -133,8 +133,8 @@ public class BoardService {
      * @param keyword 검색단어 keyword
      * @return 특정 Crew 의 Board 중 keyword 를 제목 or 내용에 포함하는 Board List
      */
-    public Slice<Board> findBoardByCrewAndKeyWord(Crew crew, String keyword) {
-        return boardRepository.findSliceAllByCrewAndKeyWord(keyword, crew);
+    public Slice<Board> findBoardByCrewAndKeyWord(Crew crew, String keyword, Pageable pageable) {
+        return boardRepository.findSliceAllByCrewAndKeyWord(keyword, crew, pageable);
     }
 
 

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -194,10 +195,11 @@ public class CommentService {
      *
      */
     public Map<Long, Long> countAllByBoardIds(List<Long> boardIds) {
-        return boardCommentRepository.countAllByBoardIds(boardIds).stream()
-                .collect(
-                        Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1])
-                );
+        Map<Long, Long> countMap = boardCommentRepository.countAllByBoardIds(boardIds)
+                .stream().collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
+
+        return boardIds.stream()
+                .collect(Collectors.toMap(o -> o, o -> Objects.requireNonNullElse(countMap.get(o), 0L)));
     }
 
 
@@ -210,10 +212,12 @@ public class CommentService {
      *
      */
     public Map<Long, Long> countAllByRunningNoticeIds(List<Long> runningNoticeIds) {
-        return runningNoticeCommentRepository.countAllByRunningNoticeIds(runningNoticeIds).stream()
-                .collect(
-                        Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1])
-                );
+        Map<Long, Long> countMap = runningNoticeCommentRepository.countAllByRunningNoticeIds(runningNoticeIds)
+                .stream().collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
+
+        return runningNoticeIds.stream()
+                .collect(Collectors.toMap(o -> o, o -> Objects.requireNonNullElse(countMap.get(o), 0L)));
+
     }
 
 

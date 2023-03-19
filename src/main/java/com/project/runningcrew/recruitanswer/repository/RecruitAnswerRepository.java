@@ -51,5 +51,13 @@ public interface RecruitAnswerRepository extends JpaRepository<RecruitAnswer, Lo
     void deleteAllByCrew(@Param("crew") Crew crew);
 
 
+    /**
+     * 특정 user 가 작성한 recruitAnswer 를 모두 삭제한다.
+     * @param user
+     */
+    @Modifying
+    @Query("delete from RecruitAnswer ra where ra.user = :user")
+    void deleteAllByUser(@Param("user") User user);
+
 
 }

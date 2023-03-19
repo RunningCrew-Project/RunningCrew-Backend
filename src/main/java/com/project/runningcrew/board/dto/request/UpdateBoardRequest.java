@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -34,6 +35,21 @@ public class UpdateBoardRequest {
     @Schema(description = "수정 런닝 기록 아이디")
     @Positive(message = "런닝 기록 아이디는 1 이상의 수입니다.")
     private Integer runningRecordId;
+
+
+    public List<MultipartFile> getAddFiles() {
+        if(addFiles == null) {
+            return Collections.emptyList();
+        }
+        return addFiles;
+    }
+
+    public List<Long> getDeleteFiles() {
+        if(deleteFiles == null) {
+            return Collections.emptyList();
+        }
+        return deleteFiles;
+    }
 
 
 }
