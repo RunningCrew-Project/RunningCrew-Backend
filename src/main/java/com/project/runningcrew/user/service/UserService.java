@@ -1,20 +1,29 @@
 package com.project.runningcrew.user.service;
 
 
+import com.project.runningcrew.board.repository.BoardRepository;
+import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.exception.notFound.FcmTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.RefreshTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.duplicate.UserEmailDuplicateException;
 import com.project.runningcrew.exception.duplicate.UserNickNameDuplicateException;
-import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
 import com.project.runningcrew.fcm.token.entity.FcmToken;
 import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
 
 import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.repository.MemberRepository;
+import com.project.runningcrew.member.service.MemberService;
+import com.project.runningcrew.notification.repository.NotificationRepository;
+import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.refreshtoken.entity.RefreshToken;
 import com.project.runningcrew.refreshtoken.repository.RefreshTokenRepository;
+import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
+import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
+import com.project.runningcrew.resourceimage.repository.RunningRecordImageRepository;
+import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
+import com.project.runningcrew.runningnotice.repository.RunningNoticeRepository;
 import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.repository.UserRepository;
@@ -34,14 +43,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
     private final FcmTokenRepository fcmTokenRepository;
+    private final RunningRecordImageRepository runningRecordImageRepository;
     private final RunningRecordRepository runningRecordRepository;
     private final ImageService imageService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRoleRepository userRoleRepository;
+    private final NotificationRepository notificationRepository;
+    private final RecruitAnswerRepository recruitAnswerRepository;
+    private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final String imageDirName = "user";
 
@@ -185,15 +197,17 @@ public class UserService {
     @Transactional
     public void deleteUser(User user) {
         logOut(user);
+        runningRecordImageRepository.deleteAllByUser(user);
         runningRecordRepository.deleteAllByUser(user);
+        notificationRepository.deleteAllByUser(user);
+        recruitAnswerRepository.deleteAllByUser(user);
 
         List<Member> members = memberRepository.findAllByUser(user);
         for (Member member : members) {
-            memberRepository.delete(member);
+            memberService.deleteMember(member);
         }
 
-        UserRole userRole = userRoleRepository.findByUser(user).orElseThrow(UserRoleNotFoundException::new);
-        userRoleRepository.delete(userRole);
+        userRoleRepository.deleteByUser(user);
         
         imageService.deleteImage(user.getImgUrl());
         userRepository.delete(user);

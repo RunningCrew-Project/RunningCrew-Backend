@@ -2,12 +2,11 @@ package com.project.runningcrew.runningmember.service;
 
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.member.entity.Member;
-import com.project.runningcrew.runningmember.service.RunningMemberService;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
-import com.project.runningcrew.exception.RunningDateTimeException;
-import com.project.runningcrew.exception.RunningPersonnelException;
+import com.project.runningcrew.exception.badinput.RunningDateTimeAfterException;
+import com.project.runningcrew.exception.badinput.RunningPersonnelException;
 import com.project.runningcrew.exception.alreadyExist.RunningMemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.RunningMemberNotFoundException;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
@@ -19,6 +18,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -82,7 +84,7 @@ class RunningMemberServiceTest {
         ///when
         //then
         assertThatThrownBy(() -> runningMemberService.saveRunningMember(member, runningNotice))
-                .isInstanceOf(RunningDateTimeException.class);
+                .isInstanceOf(RunningDateTimeAfterException.class);
     }
 
     @DisplayName("런닝 참여 신청 인원 초과 예외 테스트")
@@ -137,8 +139,17 @@ class RunningMemberServiceTest {
 
     @DisplayName("런닝 참여 취소 성공 테스트")
     @Test
-    public void deleteRunningMemberTest1(@Mock Member member, @Mock RunningNotice runningNotice) {
+    public void deleteRunningMemberTest1(@Mock Member member) {
         //given
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member)
+                .noticeType(NoticeType.INSTANT)
+                .runningDateTime(LocalDateTime.now().plusDays(1))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
         RunningMember runningMember = new RunningMember(runningNotice, member);
         when(runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice))
                 .thenReturn(Optional.of(runningMember));
@@ -171,13 +182,22 @@ class RunningMemberServiceTest {
         ///when
         //then
         assertThatThrownBy(() -> runningMemberService.deleteRunningMember(member, runningNotice))
-                .isInstanceOf(RunningDateTimeException.class);
+                .isInstanceOf(RunningDateTimeAfterException.class);
     }
 
     @DisplayName("런닝 참여 안한 멤버가 취소하는 예외 테스트")
     @Test
-    public void deleteRunningMemberTest3(@Mock Member member, @Mock RunningNotice runningNotice) {
+    public void deleteRunningMemberTest3(@Mock Member member) {
         //given
+        RunningNotice runningNotice = RunningNotice.builder()
+                .title("title")
+                .detail("detail")
+                .member(member)
+                .noticeType(NoticeType.INSTANT)
+                .runningDateTime(LocalDateTime.now().plusDays(1))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
         when(runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice))
                 .thenReturn(Optional.empty());
 
@@ -231,6 +251,47 @@ class RunningMemberServiceTest {
         assertThat(result).isFalse();
         verify(runningMemberRepository, times(1))
                 .existsByMemberAndRunningNotice(member, runningNotice);
+    }
+
+    @DisplayName("runningNoticeIds 에 포함된 RunningNotice 에 참여한 멤버 수 반환 테스트")
+    @Test
+    public void countRunningMembersByRunningNoticeIdsTest1() {
+        //given
+        List<Long> runningNoticeIds = Arrays.asList(1L, 2L, 3L, 4L);
+        List<Object[]> runningMembers = List.of(
+                new Object[]{1L, 10L},
+                new Object[]{2L, 32L},
+                new Object[]{3L, 23L},
+                new Object[]{4L, 4L});
+        when(runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds)).thenReturn(runningMembers);
+
+        ///when
+        Map<Long, Long> counts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+
+        //then
+        for (int i = 0; i < runningNoticeIds.size(); i++) {
+            assertThat(counts.get(runningNoticeIds.get(i))).isEqualTo(runningMembers.get(i)[1]);
+        }
+        verify(runningMemberRepository, times(1)).countRunningMembersByRunningNoticeIds(runningNoticeIds);
+    }
+
+    @DisplayName("runningNoticeIds 에 포함된 RunningNotice 에 참여한 멤버 수 반환 테스트2")
+    @Test
+    public void countRunningMembersByRunningNoticeIdsTest2() {
+        //given
+        List<Long> runningNoticeIds = Arrays.asList(1L, 2L, 3L, 4L);
+        List<Object[]> runningMembers = List.of(
+                new Object[]{1L, 10L},
+                new Object[]{3L, 23L},
+                new Object[]{4L, 4L});
+        when(runningMemberRepository.countRunningMembersByRunningNoticeIds(runningNoticeIds)).thenReturn(runningMembers);
+
+        ///when
+        Map<Long, Long> counts = runningMemberService.countRunningMembersByRunningNoticeIds(runningNoticeIds);
+
+        //then
+        assertThat(counts.size()).isEqualTo(runningNoticeIds.size());
+        verify(runningMemberRepository, times(1)).countRunningMembersByRunningNoticeIds(runningNoticeIds);
     }
 
 }

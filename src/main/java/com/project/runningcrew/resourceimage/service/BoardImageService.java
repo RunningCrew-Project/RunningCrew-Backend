@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -18,7 +19,7 @@ import java.util.Map;
 public class BoardImageService {
 
     private final BoardImageRepository boardImageRepository;
-    private final String defaultImageUrl = "defaultImageUrl";
+    private String defaultImageUrl = "defaultImageUrl";
 
 
     /**
@@ -59,6 +60,26 @@ public class BoardImageService {
                     .filter(image -> image.getBoard().getId().equals(boardId))
                     .findFirst().orElseGet(() -> new BoardImage(defaultImageUrl, null));
             maps.put(boardId, first);
+        }
+        return maps;
+    }
+
+    /**
+     * boardId 의 리스트를 받아, boardId 와 BoardImage 의 url 의 Map 을 반환한다. boardId 에 포함된 BoardImage 가
+     * 있다면 BoardImage 중 하나의 url 을 가지고, boardId 에 포함된 BoardImage 가 없다면 "" 를 가진다.
+     *
+     * @param boardIds Board 의 id 를 가진 리스트
+     * @return boardId 와 boardId 에 포함된 BoardImage 의 Map. 포함된 BoardImage 가 없다면
+     * defaultImageUrl 을 가진 BoardImage
+     */
+    public Map<Long, String> findFirstImageUrls(List<Long> boardIds) {
+        Map<Long, String> maps = new HashMap<>();
+        List<BoardImage> images = boardImageRepository.findImagesByBoardIds(boardIds);
+        for (Long boardId : boardIds) {
+            Optional<BoardImage> optionalFirst = images.stream()
+                    .filter(image -> image.getBoard().getId().equals(boardId))
+                    .findFirst();
+            maps.put(boardId, optionalFirst.isPresent() ? optionalFirst.get().getFileName() : "");
         }
         return maps;
     }

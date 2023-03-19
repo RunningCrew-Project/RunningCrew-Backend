@@ -3,6 +3,9 @@ package com.project.runningcrew.userrole.repository;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.userrole.entity.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -17,5 +20,15 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
      * @return 특정 user 의 UserRole. 없다면 Optional.empty()
      */
     Optional<UserRole> findByUser(User user);
+
+
+    /**
+     * 특정 user 의 UserRole 을 삭제한다.
+     *
+     * @param user
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from UserRole u where u.user = :user")
+    void deleteByUser(@Param("user") User user);
 
 }

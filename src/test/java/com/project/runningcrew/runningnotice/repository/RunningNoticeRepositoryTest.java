@@ -619,5 +619,49 @@ class RunningNoticeRepositoryTest {
             Assertions.assertThat(runningNotice.getStatus()).isSameAs(RunningStatus.READY);
         }
     }
+    
+    @DisplayName("특정 멤버가 생성한 모든 런닝 공지 삭제")
+    @Test
+    public void deleteAllByMemberTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 0; i < 10; i++) {
+            testEntityFactory.getInstantRunningNotice(member, i);
+        }
+
+        ///when
+        runningNoticeRepository.deleteAllByMember(member);
+        
+        //then
+        List<RunningNotice> runningNoticeList = runningNoticeRepository.findAll();
+        assertThat(runningNoticeList.isEmpty()).isTrue();
+    }
+
+    @DisplayName("특정 크루에 속한 모든 런닝 공지 삭제")
+    @Test
+    public void deleteAllByCrewTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        for (int i = 0; i < 10; i++) {
+            User user = testEntityFactory.getUser(dongArea, i);
+            Member member = testEntityFactory.getMember(user, crew);
+            testEntityFactory.getInstantRunningNotice(member, i);
+        }
+
+        ///when
+        runningNoticeRepository.deleteAllByCrew(crew);
+        
+        //then
+        List<RunningNotice> runningNoticeList = runningNoticeRepository.findAll();
+        assertThat(runningNoticeList.isEmpty()).isTrue();
+    }
 
 }
