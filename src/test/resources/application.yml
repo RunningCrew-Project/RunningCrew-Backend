@@ -22,8 +22,8 @@ logging.level:
 cloud:
   aws:
     credentials:
-      accessKey: AKIAQP4HH4EEEJAJZBFS # test-user-yongsoo IAM 사용자의 엑세스 키
-      secretKey: bzhtesa6GH+zBojTpK2WKzVCxcwZCiplha+FPVV8 # test-user-yongsoo IAM 사용자의 비밀 키
+      accessKey: AKIAQP4HH4EEM6THDUAJ # test-user-yongsoo IAM 사용자의 엑세스 키
+      secretKey: XqqZ5vaVVyiCswj1kDo6aDgogDhsv+y+Iuy3ezjM # test-user-yongsoo IAM 사용자의 비밀 키
     s3:
       bucket: running-crew-s3
     region:
@@ -35,6 +35,7 @@ cloud:
 fcm:
   key:
     path: fcm/running-crew-project-firebase-adminsdk-ta9q7-fa58725efe.json
+
 
 area:
   file:

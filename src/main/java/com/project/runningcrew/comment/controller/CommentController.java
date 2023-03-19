@@ -26,6 +26,7 @@ import com.project.runningcrew.runningnotice.service.RunningNoticeService;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -86,7 +87,7 @@ public class CommentController {
     @GetMapping("/api/comments/{commentId}")
     public ResponseEntity<GetCommentResponse> getComment(
             @PathVariable("commentId") Long commentId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);
         Crew crew = comment.getMember().getCrew();
@@ -112,16 +113,16 @@ public class CommentController {
     @PostMapping("/api/boards/{boardId}/comments")
     public ResponseEntity<Void> createBoardComment(
             @PathVariable("boardId") Long boardId,
-            @RequestBody @Valid CreateBoardCommentRequest request,
-            @CurrentUser User user
+            @RequestBody @Valid CreateBoardCommentRequest createBoardCommentRequest,
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
         Crew crew = board.getMember().getCrew();
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        Member member = memberService.findByUserAndCrew(user, crew);
-        BoardComment boardComment = new BoardComment(member, request.getDetail(), board);
+        Member member = memberService.findById(createBoardCommentRequest.getMemberId());
+        BoardComment boardComment = new BoardComment(member, createBoardCommentRequest.getDetail(), board);
 
         Long commentId = commentService.saveComment(boardComment);
         URI uri = UriComponentsBuilder
@@ -148,16 +149,16 @@ public class CommentController {
     @PostMapping("/api/running-notices/{runningNoticeId}/comments")
     public ResponseEntity<Void> createRunningNoticeComment(
             @PathVariable("runningNoticeId") Long runningNoticeId,
-            @RequestBody @Valid CreateRunningNoticeCommentRequest request,
-            @CurrentUser User user
+            @RequestBody @Valid CreateRunningNoticeCommentRequest createRunningNoticeCommentRequest,
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         RunningNotice runningNotice =  runningNoticeService.findById(runningNoticeId);
         Crew crew = runningNotice.getMember().getCrew();
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        Member member = memberService.findByUserAndCrew(user, crew);
-        RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, request.getDetail(), runningNotice);
+        Member member = memberService.findById(createRunningNoticeCommentRequest.getMemberId());
+        RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, createRunningNoticeCommentRequest.getDetail(), runningNotice);
 
         Long commentId = commentService.saveComment(runningNoticeComment);
         URI uri = UriComponentsBuilder
@@ -184,8 +185,8 @@ public class CommentController {
     @PutMapping("/api/comments/{commentId}")
     public ResponseEntity<Void> changeComment(
             @PathVariable("commentId") Long commentId,
-            @RequestBody @Valid ChangeCommentRequest request,
-            @CurrentUser User user
+            @RequestBody @Valid ChangeCommentRequest changeCommentRequest,
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);
         Crew crew = comment.getMember().getCrew();
@@ -193,7 +194,7 @@ public class CommentController {
         memberAuthorizationChecker.checkAuthOnlyUser(user, crew, memberId);
         //note 요청 user 의 크루 회원 여부 && 댓글 권한 검증
 
-        commentService.changeComment(comment, request.getDetail());
+        commentService.changeComment(comment, changeCommentRequest.getDetail());
         return ResponseEntity.noContent().build();
     }
 
@@ -211,7 +212,7 @@ public class CommentController {
     @DeleteMapping("/api/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable("commentId") Long commentId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Comment comment = commentService.findById(commentId);
         Crew crew = comment.getMember().getCrew();
@@ -238,9 +239,9 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/boards/{boardId}/comments")
-    public ResponseEntity<CommentListResponse<SimpleCommentDto>> getCommentListOfBoard(
+    public ResponseEntity<CommentListResponse> getCommentListOfBoard(
             @PathVariable("boardId") Long boardId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Board board = boardService.findById(boardId);
         Crew crew = board.getMember().getCrew();
@@ -248,10 +249,10 @@ public class CommentController {
         //note 요청 user 의 크루 회원 여부 검증
 
         List<BoardComment> commentList = commentService.findAllByBoard(board);
-        int commentCount = commentService.countCommentAtBoard(board);
+        int commentCount = commentList.size();
 
         List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
-        return ResponseEntity.ok(new CommentListResponse<>(commentCount, dtoList));
+        return ResponseEntity.ok(new CommentListResponse(commentCount, dtoList));
     }
 
 
@@ -269,9 +270,9 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/running-notices/{runningNoticeId}/comments")
-    public ResponseEntity<CommentListResponse<SimpleCommentDto>> getCommentListOfRunningNotice(
+    public ResponseEntity<CommentListResponse> getCommentListOfRunningNotice(
             @PathVariable("runningNoticeId") Long runningNoticeId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         RunningNotice runningNotice = runningNoticeService.findById(runningNoticeId);
         Crew crew = runningNotice.getMember().getCrew();
@@ -279,10 +280,10 @@ public class CommentController {
         //note 요청 user 의 크루 회원 여부 검증
 
         List<RunningNoticeComment> commentList = commentService.findAllByRunningNotice(runningNotice);
-        int commentCount = commentService.countCommentAtRunningNotice(runningNotice);
+        int commentCount = commentList.size();
 
         List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
-        return ResponseEntity.ok(new CommentListResponse<>(commentCount, dtoList));
+        return ResponseEntity.ok(new CommentListResponse(commentCount, dtoList));
     }
 
 
@@ -297,11 +298,11 @@ public class CommentController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/members/{memberId}/comments")
+    @GetMapping("/api/members/{memberId}/comments")
     public ResponseEntity<PagingResponse<SimpleCommentDto>> getCommentPageOfMember(
-            @Positive @RequestParam("page") int page,
+            @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
-            @CurrentUser User user
+            @Parameter(hidden = true) @CurrentUser User user
     ) {
         Member member = memberService.findById(memberId);
 

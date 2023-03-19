@@ -37,7 +37,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
      * @return slice of Board
      */
     @Query("select b from Board b where b.member.crew = :crew and (b.title like %:keyword% or b.detail like %:keyword%)")
-    Slice<Board> findSliceAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew);
+    Slice<Board> findSliceAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew, Pageable pageable);
 
 
     /**
