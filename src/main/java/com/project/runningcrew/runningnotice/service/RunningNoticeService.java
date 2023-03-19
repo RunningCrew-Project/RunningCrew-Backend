@@ -1,6 +1,7 @@
 package com.project.runningcrew.runningnotice.service;
 
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.exception.badinput.RunningDateTimeBeforeException;
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.member.entity.Member;
@@ -142,6 +143,10 @@ public class RunningNoticeService {
      */
     @Transactional
     public void updateRunningStatusDone(RunningNotice runningNotice) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(runningNotice.getRunningDateTime())) {
+            throw new RunningDateTimeBeforeException(now, runningNotice.getRunningDateTime());
+        }
         runningNotice.updateStatus(RunningStatus.DONE);
     }
 
