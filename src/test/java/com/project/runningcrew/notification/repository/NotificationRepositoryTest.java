@@ -141,4 +141,35 @@ class NotificationRepositoryTest {
         assertThat(notifications.isLast()).isTrue();
     }
 
+    @DisplayName("user 에 포함된 모든 notification 삭제")
+    @Test
+    public void deleteAllByUserTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 0; i < 10; i++) {
+            NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
+            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            notificationRepository.save(notification);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            RunningNotice regularRunningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
+            Notification notification = Notification.createRegularRunningNotification(user, crew, regularRunningNotice);
+            notificationRepository.save(notification);
+        }
+
+        ///when
+        notificationRepository.deleteAllByUser(user);
+
+        //then
+        PageRequest pageRequest = PageRequest.of(0, 12);
+        Slice<Notification> notifications = notificationRepository.findByUser(user, pageRequest);
+        assertThat(notifications.isEmpty()).isTrue();
+    }
+
 }
