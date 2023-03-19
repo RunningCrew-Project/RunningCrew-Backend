@@ -116,8 +116,8 @@ public class CrewService {
         recruitAnswerRepository.deleteAllByCrew(crew);
         recruitQuestionRepository.deleteAllByCrew(crew);
         runningNoticeImageRepository.deleteAllByCrew(crew);
-        //TODO runningMember 삭제
-        //TODO runningNotice 삭제
+        runningMemberRepository.deleteAllByCrew(crew);
+        runningNoticeRepository.deleteAllByCrew(crew);
         boardImageRepository.deleteAllByCrew(crew);
         commentRepository.deleteAllByCrew(crew);
         boardRepository.deleteAllByCrew(crew);

@@ -97,8 +97,8 @@ public class MemberService {
         commentRepository.deleteAllByMember(member);
         boardRepository.deleteAllByMember(member);
         runningNoticeImageRepository.deleteAllByMember(member);
-        //TODO runningMember
-        //TODO runningnotice
+        runningMemberRepository.deleteAllByMember(member);
+        runningNoticeRepository.deleteAllByMember(member);
         memberRepository.delete(member);
     }
 
