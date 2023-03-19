@@ -26,6 +26,9 @@ public class ImageS3ServiceImpl implements ImageService{
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
+    @Value("${s3.host.name}")
+    private String hostName;
+
     private final AmazonS3 amazonS3;
     private final AmazonS3Client amazonS3Client;
 
@@ -65,7 +68,14 @@ public class ImageS3ServiceImpl implements ImageService{
      */
     @Override
     public void deleteImage(String fileUrl) {
-        boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, fileUrl);
+
+        if (!fileUrl.startsWith(hostName)) {
+            throw new S3DeleteException();
+        }
+        String fileName = fileUrl.replace(hostName, "");
+
+
+        boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, fileName);
         log.info("fileUrl={}",fileUrl);
         if(isObjectExist) {
             amazonS3Client.deleteObject(bucketName, fileUrl);
