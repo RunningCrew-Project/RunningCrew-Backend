@@ -1,11 +1,17 @@
 package com.project.runningcrew.member.service;
 
+import com.project.runningcrew.board.repository.BoardRepository;
+import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
+import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
+import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
+import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
+import com.project.runningcrew.runningnotice.repository.RunningNoticeRepository;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
@@ -27,6 +33,12 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final RecruitAnswerRepository recruitAnswerRepository;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
+    private final RunningMemberRepository runningMemberRepository;
+    private final RunningNoticeRepository runningNoticeRepository;
+    private final BoardImageRepository boardImageRepository;
+    private final RunningNoticeImageRepository runningNoticeImageRepository;
 
     /**
      * 입력받은 id 를 가진 Member 를 찾아 반환한다. 없다면 MemberNotFoundException 을 throw 한다.
@@ -81,11 +93,12 @@ public class MemberService {
      */
     @Transactional
     public void deleteMember(Member member) {
-        //TODO board
-        //TODO comment
-        //TODO runningnotice
-        //TODO runningmember
-        //TODO image
+        boardImageRepository.deleteAllByMember(member);
+        commentRepository.deleteAllByMember(member);
+        boardRepository.deleteAllByMember(member);
+        runningNoticeImageRepository.deleteAllByMember(member);
+        runningMemberRepository.deleteAllByMember(member);
+        runningNoticeRepository.deleteAllByMember(member);
         memberRepository.delete(member);
     }
 
@@ -213,6 +226,4 @@ public class MemberService {
                 .collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
     }
     
-    //TODO crew 의 모든 member 삭제
-
 }
