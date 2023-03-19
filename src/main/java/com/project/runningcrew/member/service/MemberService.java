@@ -3,10 +3,14 @@ package com.project.runningcrew.member.service;
 import com.project.runningcrew.board.repository.BoardRepository;
 import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crew.repository.CrewRepository;
+import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
+import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
+import com.project.runningcrew.recruitquestion.repository.RecruitQuestionRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
 import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
@@ -39,6 +43,7 @@ public class MemberService {
     private final RunningNoticeRepository runningNoticeRepository;
     private final BoardImageRepository boardImageRepository;
     private final RunningNoticeImageRepository runningNoticeImageRepository;
+    private final CrewService crewService;
 
     /**
      * 입력받은 id 를 가진 Member 를 찾아 반환한다. 없다면 MemberNotFoundException 을 throw 한다.
@@ -87,19 +92,24 @@ public class MemberService {
     }
 
     /**
-     * 입력받은 Member 를 삭제한다.
+     * 입력받은 Member 를 삭제한다. Member 의 role 이 LEADER 인 경우, 해당 Crew 가 삭제된다.
      *
      * @param member 삭제할 Member
      */
     @Transactional
     public void deleteMember(Member member) {
-        boardImageRepository.deleteAllByMember(member);
-        commentRepository.deleteAllByMember(member);
-        boardRepository.deleteAllByMember(member);
-        runningNoticeImageRepository.deleteAllByMember(member);
-        runningMemberRepository.deleteAllByMember(member);
-        runningNoticeRepository.deleteAllByMember(member);
-        memberRepository.delete(member);
+        if (member.getRole() == MemberRole.ROLE_LEADER) {
+            Crew crew = member.getCrew();
+            crewService.deleteCrew(crew);
+        } else {
+            boardImageRepository.deleteAllByMember(member);
+            commentRepository.deleteAllByMember(member);
+            boardRepository.deleteAllByMember(member);
+            runningNoticeImageRepository.deleteAllByMember(member);
+            runningMemberRepository.deleteAllByMember(member);
+            runningNoticeRepository.deleteAllByMember(member);
+            memberRepository.delete(member);
+        }
     }
 
     /**

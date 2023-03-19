@@ -14,7 +14,9 @@ import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
 import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.repository.MemberRepository;
+import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.notification.repository.NotificationRepository;
+import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.refreshtoken.entity.RefreshToken;
 import com.project.runningcrew.refreshtoken.repository.RefreshTokenRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
@@ -50,12 +52,8 @@ public class UserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRoleRepository userRoleRepository;
     private final NotificationRepository notificationRepository;
-    private final BoardRepository boardRepository;
-    private final CommentRepository commentRepository;
-    private final BoardImageRepository boardImageRepository;
-    private final RunningNoticeRepository runningNoticeRepository;
-    private final RunningNoticeImageRepository runningNoticeImageRepository;
-    private final RunningMemberRepository runningMemberRepository;
+    private final RecruitAnswerRepository recruitAnswerRepository;
+    private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final String imageDirName = "user";
 
@@ -202,17 +200,11 @@ public class UserService {
         runningRecordImageRepository.deleteAllByUser(user);
         runningRecordRepository.deleteAllByUser(user);
         notificationRepository.deleteAllByUser(user);
-        //TODO recruitAnswer
+        recruitAnswerRepository.deleteAllByUser(user);
 
         List<Member> members = memberRepository.findAllByUser(user);
         for (Member member : members) {
-            boardImageRepository.deleteAllByMember(member);
-            commentRepository.deleteAllByMember(member);
-            boardRepository.deleteAllByMember(member);
-            runningNoticeImageRepository.deleteAllByMember(member);
-            //TODO runningMember
-            //TODO runningnotice
-            memberRepository.delete(member);
+            memberService.deleteMember(member);
         }
 
         userRoleRepository.deleteByUser(user);
