@@ -259,9 +259,9 @@ public class RunningNoticeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/api/crews/{crewId}/running-notices/regular")
-    public ResponseEntity<PagingResponse> findRegularRunningNotices(@PathVariable("crewId") Long crewId,
-                                                                    @RequestParam("page") @PositiveOrZero int page,
-                                                                    @Parameter(hidden = true) @CurrentUser User user) {
+    public ResponseEntity<PagingResponse<PagingRunningNoticeDto>> findRegularRunningNotices(@PathVariable("crewId") Long crewId,
+                                                                                            @RequestParam("page") @PositiveOrZero int page,
+                                                                                            @Parameter(hidden = true) @CurrentUser User user) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
 
@@ -269,19 +269,14 @@ public class RunningNoticeController {
         Slice<RunningNotice> regulars = runningNoticeService.findRegularsByCrew(crew, pageRequest);
         List<Long> runningNoticeIds = regulars.stream().map(RunningNotice::getId).collect(Collectors.toList());
         Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
-        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+        Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
-        List<PagingRunningNoticeDto> contents = new ArrayList<>();
-        for (int i = 0; i < regulars.getNumberOfElements(); i++) {
-            RunningNotice runningNotice = regulars.getContent().get(i);
-            contents.add(new PagingRunningNoticeDto(runningNotice,
-                    firstImages.get(runningNotice.getId()).getFileName(),
-                    0));
-//                    commentCountList.get(i)));
-        }
+        List<PagingRunningNoticeDto> contents = regulars.stream()
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new PagingResponse(
-                new SliceImpl(contents, regulars.getPageable(), regulars.hasNext())));
+        return ResponseEntity.ok(new PagingResponse<>(
+                new SliceImpl<>(contents, regulars.getPageable(), regulars.hasNext())));
     }
 
 
@@ -297,9 +292,9 @@ public class RunningNoticeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/api/crews/{crewId}/running-notices/instant")
-    public ResponseEntity<PagingResponse> findInstantRunningNotices(@PathVariable("crewId") Long crewId,
-                                                                    @RequestParam("page") @PositiveOrZero int page,
-                                                                    @Parameter(hidden = true) @CurrentUser User user) {
+    public ResponseEntity<PagingResponse<PagingRunningNoticeDto>> findInstantRunningNotices(@PathVariable("crewId") Long crewId,
+                                                                                            @RequestParam("page") @PositiveOrZero int page,
+                                                                                            @Parameter(hidden = true) @CurrentUser User user) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
 
@@ -307,19 +302,14 @@ public class RunningNoticeController {
         Slice<RunningNotice> instants = runningNoticeService.findInstantsByCrew(crew, pageRequest);
         List<Long> runningNoticeIds = instants.stream().map(RunningNotice::getId).collect(Collectors.toList());
         Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
-        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+        Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
-        List<PagingRunningNoticeDto> contents = new ArrayList<>();
-        for (int i = 0; i < instants.getNumberOfElements(); i++) {
-            RunningNotice runningNotice = instants.getContent().get(i);
-            contents.add(new PagingRunningNoticeDto(runningNotice,
-                    firstImages.get(runningNotice.getId()).getFileName(),
-                    0));
-//                    commentCountList.get(i)));
-        }
+        List<PagingRunningNoticeDto> contents = instants.stream()
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new PagingResponse(
-                new SliceImpl(contents, instants.getPageable(), instants.hasNext())));
+        return ResponseEntity.ok(new PagingResponse<>(
+                new SliceImpl<>(contents, instants.getPageable(), instants.hasNext())));
     }
 
 
@@ -335,10 +325,10 @@ public class RunningNoticeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/api/crews/{crewId}/running-notices")
-    public ResponseEntity<PagingResponse> findRunningNoticesByKeyword(@PathVariable("crewId") Long crewId,
-                                                                      @RequestParam("keyword") @NotBlank String keyword,
-                                                                      @RequestParam("page") @PositiveOrZero int page,
-                                                                      @Parameter(hidden = true) @CurrentUser User user) {
+    public ResponseEntity<PagingResponse<PagingRunningNoticeDto>> findRunningNoticesByKeyword(@PathVariable("crewId") Long crewId,
+                                                                                              @RequestParam("keyword") @NotBlank String keyword,
+                                                                                              @RequestParam("page") @PositiveOrZero int page,
+                                                                                              @Parameter(hidden = true) @CurrentUser User user) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkMember(user, crew);
 
@@ -346,19 +336,14 @@ public class RunningNoticeController {
         Slice<RunningNotice> runningNotices = runningNoticeService.findByCrewAndKeyword(crew, keyword, pageRequest);
         List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
         Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
-        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+        Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
-        List<PagingRunningNoticeDto> contents = new ArrayList<>();
-        for (int i = 0; i < runningNotices.getNumberOfElements(); i++) {
-            RunningNotice runningNotice = runningNotices.getContent().get(i);
-            contents.add(new PagingRunningNoticeDto(runningNotice,
-                    firstImages.get(runningNotice.getId()).getFileName(),
-                    0));
-//                    commentCountList.get(i)));
-        }
+        List<PagingRunningNoticeDto> contents = runningNotices.stream()
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new PagingResponse(
-                new SliceImpl(contents, runningNotices.getPageable(), runningNotices.hasNext())));
+        return ResponseEntity.ok(new PagingResponse<>(
+                new SliceImpl<>(contents, runningNotices.getPageable(), runningNotices.hasNext())));
     }
 
 
@@ -428,9 +413,9 @@ public class RunningNoticeController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/api/members/{memberId}/running-notices")
-    public ResponseEntity<PagingResponse> findRunningNoticesByMember(@PathVariable("memberId") Long memberId,
-                                                                     @RequestParam("page") @PositiveOrZero int page,
-                                                                     @Parameter(hidden = true) @CurrentUser User user) {
+    public ResponseEntity<PagingResponse<PagingRunningNoticeDto>> findRunningNoticesByMember(@PathVariable("memberId") Long memberId,
+                                                                                             @RequestParam("page") @PositiveOrZero int page,
+                                                                                             @Parameter(hidden = true) @CurrentUser User user) {
         Member member = memberService.findById(memberId);
         memberAuthorizationChecker.checkMember(user, member.getCrew());
 
@@ -438,19 +423,14 @@ public class RunningNoticeController {
         Slice<RunningNotice> runningNotices = runningNoticeService.findByMember(member, pageRequest);
         List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
         Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
-        List<Integer> commentCountList = commentService.countByRunningNoticeIdList(runningNoticeIds);
+        Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
-        List<PagingRunningNoticeDto> contents = new ArrayList<>();
-        for (int i = 0; i < runningNotices.getNumberOfElements(); i++) {
-            RunningNotice runningNotice = runningNotices.getContent().get(i);
-            contents.add(new PagingRunningNoticeDto(runningNotice,
-                    firstImages.get(runningNotice.getId()).getFileName(),
-                    0));
-//                    commentCountList.get(i)));
-        }
+        List<PagingRunningNoticeDto> contents = runningNotices.stream()
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new PagingResponse(
-                new SliceImpl(contents, runningNotices.getPageable(), runningNotices.hasNext())));
+        return ResponseEntity.ok(new PagingResponse<>(
+                new SliceImpl<>(contents, runningNotices.getPageable(), runningNotices.hasNext())));
 
     }
 

@@ -41,9 +41,9 @@ public class PagingRunningNoticeDto {
     private int runningPersonnel;
 
     @Schema(description = "런닝공지 댓글 수", example = "1")
-    private int commentCount;
+    private Long commentCount;
 
-    public PagingRunningNoticeDto(RunningNotice runningNotice, String imgUrl, int commentCount) {
+    public PagingRunningNoticeDto(RunningNotice runningNotice, String imgUrl, Long commentCount) {
         this.id = runningNotice.getId();
         this.createdDate = runningNotice.getCreatedDate();
         this.title = runningNotice.getTitle();
