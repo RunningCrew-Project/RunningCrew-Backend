@@ -9,6 +9,7 @@ import com.project.runningcrew.user.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -99,5 +100,24 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
     @Query("select rm.runningNotice from RunningMember rm " +
             "where rm.member.user = :user and rm.runningNotice.status = :status")
     List<RunningNotice> findAllByUserAndStatus(@Param("user") User user, @Param("status") RunningStatus status);
+
+    /**
+     * member 가 생성한 모든 RunningNotice 삭제
+     *
+     * @param member
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from RunningNotice r where r.member = :member")
+    void deleteAllByMember(@Param("member") Member member);
+
+    /**
+     * crew 에 포함된 모든 RunningNotice 삭제
+     *
+     * @param crew
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from RunningNotice r1 where r1 in " +
+            "(select r2 from RunningNotice r2 where r2.member.crew = :crew)")
+    void deleteAllByCrew(@Param("crew") Crew crew);
 
 }
