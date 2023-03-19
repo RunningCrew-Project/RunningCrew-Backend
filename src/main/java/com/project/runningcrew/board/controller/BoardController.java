@@ -327,14 +327,14 @@ public class BoardController {
 
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
-        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+        Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId).getFileName();
+            String fileName = imageMaps.get(boardId);
             Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
@@ -378,14 +378,14 @@ public class BoardController {
 
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
-        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+        Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId).getFileName();
+            String fileName = imageMaps.get(boardId);
             Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
@@ -426,14 +426,14 @@ public class BoardController {
 
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
-        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+        Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId).getFileName();
+            String fileName = imageMaps.get(boardId);
             Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
@@ -475,14 +475,14 @@ public class BoardController {
 
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
-        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+        Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId).getFileName();
+            String fileName = imageMaps.get(boardId);
             Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }
@@ -523,14 +523,14 @@ public class BoardController {
 
         List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
-        Map<Long, BoardImage> imageMaps = boardImageService.findFirstImages(boardIds);
+        Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
 
         List<SimpleBoardDto> dtoList = new ArrayList<>();
 
         for (Long boardId : boardIds) {
             Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId).getFileName();
+            String fileName = imageMaps.get(boardId);
             Long commentCount = countMaps.get(boardId);
             dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
         }

@@ -268,11 +268,11 @@ public class RunningNoticeController {
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<RunningNotice> regulars = runningNoticeService.findRegularsByCrew(crew, pageRequest);
         List<Long> runningNoticeIds = regulars.stream().map(RunningNotice::getId).collect(Collectors.toList());
-        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
         List<PagingRunningNoticeDto> contents = regulars.stream()
-                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()), commentCountMap.get(r.getId())))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new PagingResponse<>(
@@ -301,11 +301,11 @@ public class RunningNoticeController {
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<RunningNotice> instants = runningNoticeService.findInstantsByCrew(crew, pageRequest);
         List<Long> runningNoticeIds = instants.stream().map(RunningNotice::getId).collect(Collectors.toList());
-        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
         List<PagingRunningNoticeDto> contents = instants.stream()
-                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()), commentCountMap.get(r.getId())))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new PagingResponse<>(
@@ -335,11 +335,11 @@ public class RunningNoticeController {
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<RunningNotice> runningNotices = runningNoticeService.findByCrewAndKeyword(crew, keyword, pageRequest);
         List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
-        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
         List<PagingRunningNoticeDto> contents = runningNotices.stream()
-                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()), commentCountMap.get(r.getId())))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new PagingResponse<>(
@@ -422,11 +422,11 @@ public class RunningNoticeController {
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<RunningNotice> runningNotices = runningNoticeService.findByMember(member, pageRequest);
         List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
-        Map<Long, RunningNoticeImage> firstImages = runningNoticeImageService.findFirstImages(runningNoticeIds);
+        Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
         List<PagingRunningNoticeDto> contents = runningNotices.stream()
-                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()).getFileName(), commentCountMap.get(r.getId())))
+                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()), commentCountMap.get(r.getId())))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new PagingResponse<>(
