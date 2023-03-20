@@ -6,9 +6,7 @@ import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -28,12 +26,13 @@ public class UpdateRunningNoticeRequest {
     @Schema(description = "런닝 공지 내용", example = "detail")
     private String detail;
 
+    @Future
     @NotNull
-    @Schema(description = "런닝 시작 일자", example = "2023-03-03 11:11:11")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "런닝 시작 일자", example = "2023-03-03 11:11")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime runningDateTime;
 
-    @Schema(description = "첨부한 이전 런닝 기록의 id")
+    @Schema(description = "첨부한 이전 런닝 기록의 id", example = "3")
     private Long preRunningRecordId;
 
     @Schema(description = "추가할 이미지 파일들")
