@@ -16,9 +16,10 @@ import java.util.Objects;
 @AllArgsConstructor
 public class CreateCrewRunningRequest {
 
+    @Past
     @NotNull
-    @Schema(description = "런닝 시작 시간", example = "2023-03-03 11:11:11")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "런닝 시작 시간", example = "2023-03-03 11:11")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime startDateTime;
 
     @Schema(description = "런닝 장소", example = "서울특별시 성동구")
