@@ -34,4 +34,13 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("delete from Notification n where n.user = :user")
     void deleteAllByUser(@Param("user") User user);
 
+    /**
+     * 특정 crew 의 모든 Notification 를 삭제한다.
+     *
+     * @param crew
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Notification n where n.crew = :crew")
+    void deleteAllByCrew(@Param("crew") Crew crew);
+
 }

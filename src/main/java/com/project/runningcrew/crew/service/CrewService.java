@@ -7,6 +7,7 @@ import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.notification.repository.NotificationRepository;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.recruitquestion.repository.RecruitQuestionRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
@@ -43,6 +44,7 @@ public class CrewService {
     private final MemberRepository memberRepository;
     private final RecruitAnswerRepository recruitAnswerRepository;
     private final RecruitQuestionRepository recruitQuestionRepository;
+    private final NotificationRepository notificationRepository;
     private final ImageService imageService;
     private final String imageDirName = "crew";
 
@@ -117,11 +119,12 @@ public class CrewService {
         recruitQuestionRepository.deleteAllByCrew(crew);
         runningNoticeImageRepository.deleteAllByCrew(crew);
         runningMemberRepository.deleteAllByCrew(crew);
+        commentRepository.deleteAllByCrew(crew);
         runningNoticeRepository.deleteAllByCrew(crew);
         boardImageRepository.deleteAllByCrew(crew);
-        commentRepository.deleteAllByCrew(crew);
         boardRepository.deleteAllByCrew(crew);
         memberRepository.deleteAllByCrew(crew);
+        notificationRepository.deleteAllByCrew(crew);
         crewRepository.delete(crew);
         imageService.deleteImage(crew.getCrewImgUrl());
     }
