@@ -2,7 +2,9 @@ package com.project.runningcrew.runningnotice.controller;
 
 import com.project.runningcrew.comment.service.CommentService;
 import com.project.runningcrew.common.annotation.CurrentUser;
+import com.project.runningcrew.common.dto.ApplyResponse;
 import com.project.runningcrew.common.dto.PagingResponse;
+import com.project.runningcrew.runningnotice.dto.ReadyResponse;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
@@ -46,7 +48,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -201,8 +202,10 @@ public class RunningNoticeController {
         Member writeMember = originRunningNotice.getMember();
         memberAuthorizationChecker.checkAuthOnlyUser(user, writeMember.getCrew(), writeMember.getId());
 
-        RunningRecord newPreRunningRecord = runningRecordService
-                .findById(updateRunningNoticeRequest.getPreRunningRecordId());
+        RunningRecord newPreRunningRecord = null;
+        if (updateRunningNoticeRequest.getPreRunningRecordId() != null) {
+            newPreRunningRecord = runningRecordService.findById(updateRunningNoticeRequest.getPreRunningRecordId());
+        }
         List<RunningNoticeImage> deleteImages = updateRunningNoticeRequest.getDeleteFiles().stream()
                 .map(runningNoticeImageService::findById)
                 .collect(Collectors.toList());
@@ -510,7 +513,8 @@ public class RunningNoticeController {
 
     @Operation(summary = "유저의 예정 런닝 체크하기", description = "유저의 예정된 런닝이 시작 가능한 런닝인지 체크한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReadyResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -518,14 +522,37 @@ public class RunningNoticeController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping(value = "/api/running-notices/{runningNoticeId}/valid")
-    public ResponseEntity<RunningNoticeValidResponse> checkRunningValid(
+    @GetMapping(value = "/api/running-notices/{runningNoticeId}/check-ready")
+    public ResponseEntity<ReadyResponse> checkRunningReady(
             @PathVariable("runningNoticeId") Long runningNoticeId,
             @Parameter(hidden = true) @CurrentUser User user) {
         RunningNotice runningNotice = runningNoticeService.findById(runningNoticeId);
         boolean result = runningNoticeService.checkRunningNotice(user, runningNotice);
 
-        return ResponseEntity.ok(new RunningNoticeValidResponse(String.valueOf(result)));
+        return ResponseEntity.ok(new ReadyResponse(String.valueOf(result)));
+    }
+
+
+    @Operation(summary = "유저의 런닝 참여여부 체크하기", description = "유저의 런닝 참여여부를 체크한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApplyResponse.class))),            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/running-notices/{runningNoticeId}/apply")
+    public ResponseEntity<ApplyResponse> checkRunningApply(
+            @PathVariable("runningNoticeId") Long runningNoticeId,
+            @Parameter(hidden = true) @CurrentUser User user) {
+        RunningNotice runningNotice = runningNoticeService.findById(runningNoticeId);
+        Member member = memberAuthorizationChecker.checkMember(user, runningNotice.getMember().getCrew());
+
+        boolean result = runningMemberService.existsByMemberAndRunningNotice(member, runningNotice);
+
+        return ResponseEntity.ok(new ApplyResponse(String.valueOf(result)));
     }
 
 }

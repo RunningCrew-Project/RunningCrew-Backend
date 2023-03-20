@@ -1,16 +1,12 @@
 package com.project.runningcrew.runningnotice.dto;
 
-import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -34,12 +30,13 @@ public class CreateRunningNoticeRequest {
     @Schema(description = "런닝 최대 인원 수", example = "30")
     private int runningPersonnel;
 
+    @Future
     @NotNull
-    @Schema(description = "런닝 시작 일자", example = "2023-03-03 11:11:11")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "런닝 시작 일자", example = "2023-03-03 11:11")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime runningDateTime;
 
-    @Schema(description = "첨부한 이전 런닝 기록의 id")
+    @Schema(description = "첨부한 이전 런닝 기록의 id", example = "3")
     private Long preRunningRecordId;
 
     @Schema(description = "첨부한 이미지 파일")

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RunningNoticeValidResponse {
+public class ReadyResponse {
 
     private String isValid;
 
