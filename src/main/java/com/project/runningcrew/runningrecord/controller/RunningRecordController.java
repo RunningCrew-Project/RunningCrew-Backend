@@ -40,6 +40,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -180,7 +181,7 @@ public class RunningRecordController {
     })
     @GetMapping(value = "/api/users/{userId}/running-notices")
     public ResponseEntity<PagingResponse> getRunningRecordsByUser(@PathVariable("userId") Long userId,
-                                                                  @RequestParam("page") @Positive int page) {
+                                                                  @RequestParam("page") @PositiveOrZero int page) {
         User user = userService.findById(userId);
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<RunningRecord> runningRecordSlice = runningRecordService.findByUser(user, pageRequest);
