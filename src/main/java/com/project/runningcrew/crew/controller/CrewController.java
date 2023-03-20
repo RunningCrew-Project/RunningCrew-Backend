@@ -13,6 +13,8 @@ import com.project.runningcrew.exception.duplicate.CrewNameDuplicateException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.member.service.MemberService;
+import com.project.runningcrew.recruitanswer.entity.RecruitAnswer;
+import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
 import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +51,7 @@ public class CrewController {
     private final MemberService memberService;
     private final DongAreaService dongAreaService;
     private final GuAreaService guAreaService;
+    private final RecruitAnswerService recruitAnswerService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
     @Value("${domain.name}")
     private String host;
@@ -177,8 +181,9 @@ public class CrewController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class)))
     })
     @GetMapping(value = "/api/crews")
-    public ResponseEntity<PagingResponse<SimpleCrewDto>> findCrewsByKeyword(@RequestParam("page") int page,
-                                                                   @RequestParam("keyword") String keyword) {
+    public ResponseEntity<PagingResponse<SimpleCrewDto>> findCrewsByKeyword(
+            @RequestParam("page") @PositiveOrZero int page,
+            @RequestParam("keyword") String keyword) {
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<Crew> crewSlice = crewService.findByKeyword(pageRequest, keyword);
         List<Long> crewIds = crewSlice.stream().map(Crew::getId).collect(Collectors.toList());
@@ -225,6 +230,49 @@ public class CrewController {
                 .map(c -> new SimpleCrewDto(c, crewIdMemberCountMap.get(c.getId())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new CrewListResponse<>(simpleCrewDtoList));
+    }
+
+
+    @Operation(summary = "유저의 크루 가입여부", description = "유저의 크루 가입여부를 확인한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = JoinResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/crews/{crewId}/join")
+    public ResponseEntity<JoinResponse> checkCrewJoin(@PathVariable("crewId") Long crewId,
+                                                      @Parameter(hidden = true) @CurrentUser User user) {
+        Crew crew = crewService.findById(crewId);
+        List<Crew> crews = crewService.findAllByUser(user);
+        boolean result = crews.stream().anyMatch(c -> c.equals(crew));
+
+        return ResponseEntity.ok(new JoinResponse(String.valueOf(result)));
+    }
+
+
+    @Operation(summary = "유저의 크루 가입 신청여부", description = "유저의 크루 가입 신청 여부를 확인한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = JoinResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/crews/{crewId}/apply")
+    public ResponseEntity<JoinResponse> checkCrewApply(@PathVariable("crewId") Long crewId,
+                                                       @Parameter(hidden = true) @CurrentUser User user) {
+        Crew crew = crewService.findById(crewId);
+        List<RecruitAnswer> recruitAnswers = recruitAnswerService.findAllByUserAndCrew(user, crew);
+
+        return ResponseEntity.ok(new JoinResponse(String.valueOf(!recruitAnswers.isEmpty())));
     }
 
 }
