@@ -104,12 +104,9 @@ public class UserService {
      */
     @Transactional
     public Long saveNormalUser(User user, MultipartFile multipartFile) {
-        if (duplicateEmail(user.getEmail())) {
-            throw new UserEmailDuplicateException(user.getEmail());
-        }
-        if (duplicateNickname(user.getNickname())) {
-            throw new UserNickNameDuplicateException(user.getNickname());
-        }
+
+        duplicateEmail(user.getEmail());
+        duplicateNickname(user.getNickname());
 
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         user.updateImgUrl(imageUrl);
@@ -129,12 +126,9 @@ public class UserService {
      */
     @Transactional
     public Long saveAdminUser(User user, MultipartFile multipartFile) {
-        if (duplicateEmail(user.getEmail())) {
-            throw new UserEmailDuplicateException(user.getEmail());
-        }
-        if (duplicateNickname(user.getNickname())) {
-            throw new UserNickNameDuplicateException(user.getNickname());
-        }
+
+        duplicateEmail(user.getEmail());
+        duplicateNickname(user.getNickname());
 
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         user.updateImgUrl(imageUrl);
@@ -155,7 +149,7 @@ public class UserService {
     @Transactional
     public void updateUser(User originUser, User newUser, MultipartFile multipartFile) {
         if (!originUser.getNickname().equals(newUser.getNickname())) {
-            if (duplicateNickname(newUser.getNickname())) {
+            if (userRepository.existsByNickname(newUser.getNickname())) {
                 throw new UserNickNameDuplicateException(newUser.getNickname());
             } else {
                 originUser.updateNickname(newUser.getNickname());
@@ -219,7 +213,13 @@ public class UserService {
      * @param email 확인할 email
      */
     public boolean duplicateEmail(String email) {
-        return userRepository.existsByEmail(email);
+
+        if(userRepository.existsByEmail(email)) {
+            throw new UserEmailDuplicateException(email);
+        } else {
+            return false;
+        }
+
     }
 
     /**
@@ -228,7 +228,13 @@ public class UserService {
      * @param nickname 확인할 nickname
      */
     public boolean duplicateNickname(String nickname) {
-        return userRepository.existsByNickname(nickname);
+
+        if(userRepository.existsByNickname(nickname)) {
+            throw new UserNickNameDuplicateException(nickname);
+        } else {
+            return false;
+        }
+
     }
 
 }

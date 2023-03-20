@@ -27,7 +27,7 @@ public class GetUserResponse {
     @Schema(description = "유저 로그인 타입", example = "EMAIL")
     private LoginType loginType;
 
-    @Schema(description = "유저 휴대폰 번호 정보", example = "010-1234-5678")
+    @Schema(description = "유저 휴대폰 번호 정보", example = "01012345678")
     private String phoneNumber;
 
     @Schema(description = "유저 성별 정보", example = "MAN")
