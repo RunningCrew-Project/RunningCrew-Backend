@@ -4,11 +4,9 @@ import com.project.runningcrew.area.service.DongAreaService;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.exception.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
-import com.project.runningcrew.user.dto.request.CheckEmailRequest;
-import com.project.runningcrew.user.dto.request.CheckNicknameRequest;
-import com.project.runningcrew.user.dto.request.CreateUserRequest;
-import com.project.runningcrew.user.dto.request.UpdateUserRequest;
+import com.project.runningcrew.user.dto.request.*;
 import com.project.runningcrew.user.dto.response.GetUserResponse;
+import com.project.runningcrew.user.entity.Sex;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +28,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 @Tag(description = "user 에 관한 api", name = "user")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
 
@@ -42,7 +44,7 @@ public class UserController {
     private String host;
 
 
-    @Operation(summary = "유저 정보 가져오기", description = "유저 정보를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @Operation(summary = "유저 정보 가져오기", description = "유저 정보를 가져온다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserResponse.class))),
@@ -50,10 +52,7 @@ public class UserController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/users/{userId}")
-    public ResponseEntity<GetUserResponse> getUser(
-            @PathVariable("userId") Long userId,
-            @Parameter(hidden = true) @CurrentUser User user
-    ) {
+    public ResponseEntity<GetUserResponse> getUser(@PathVariable("userId") Long userId) {
         User findUser = userService.findById(userId);
         return ResponseEntity.ok(new GetUserResponse(findUser));
     }
@@ -76,6 +75,8 @@ public class UserController {
             throw new PasswordCheckFailException();
         }
 
+
+        //note 필수 값 Build
         User user = User.builder()
                 .email(createUserRequest.getEmail())
                 .name(createUserRequest.getName())
@@ -84,12 +85,28 @@ public class UserController {
                 .phoneNumber(createUserRequest.getPhoneNumber())
                 .dongArea(dongAreaService.findById(createUserRequest.getDongId()))
                 .login_type(createUserRequest.getLoginType())
-                .sex(createUserRequest.getSex())
-                .birthday(createUserRequest.getBirthday())
-                .height(createUserRequest.getHeight())
-                .weight(createUserRequest.getWeight())
                 .build();
 
+
+        //note 필수 아닌 값 Update
+        if(createUserRequest.getSex() != null) {
+            user.updateSex(createUserRequest.getSex());
+        }
+
+        if(createUserRequest.getBirthday() != null) {
+            user.updateBirthday(createUserRequest.getBirthday());
+        }
+
+        if(createUserRequest.getHeight() != null) {
+            user.updateHeight(createUserRequest.getHeight());
+        }
+
+        if(createUserRequest.getWeight() != null) {
+            user.updateWeight(createUserRequest.getWeight());
+        }
+
+
+        //note Save
         Long userId = userService.saveNormalUser(user, createUserRequest.getFile());
 
         URI uri = UriComponentsBuilder
@@ -97,13 +114,14 @@ public class UserController {
                 .path("/api/users/{id}")
                 .build(userId);
 
+        //note Return URL
         return ResponseEntity.created(uri).build();
 
     }
 
 
 
-    @Operation(summary = "유저 수정하기", description = "유저 정보를 수정한다.")
+    @Operation(summary = "유저 수정하기", description = "유저 정보를 수정한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",
@@ -129,18 +147,40 @@ public class UserController {
             throw new PasswordCheckFailException();
         }
 
+        User originUSer = userService.findById(userId);
+
+
+        //note 필수 값 Build
         User updateUser = User.builder()
-                .nickname(updateUserRequest.getNickname())
+                .email(originUSer.getEmail()) // 변경 불가
+                .name(originUSer.getName()) // 변경 불가
                 .password(updateUserRequest.getPassword())
+                .nickname(updateUserRequest.getNickname())
                 .phoneNumber(updateUserRequest.getPhoneNumber())
                 .dongArea(dongAreaService.findById(updateUserRequest.getDongId()))
-                .sex(updateUserRequest.getSex())
-                .birthday(updateUserRequest.getBirthday())
-                .height(updateUserRequest.getHeight())
-                .weight(updateUserRequest.getWeight())
+                .login_type(originUSer.getLogin_type()) // 변경 불가
                 .build();
 
-        userService.updateUser(userService.findById(userId), updateUser, updateUserRequest.getFile());
+
+        //note 필수 아닌 값 Update
+        if(updateUserRequest.getSex() != null) {
+            updateUser.updateSex(updateUserRequest.getSex());
+        }
+
+        if(updateUserRequest.getBirthday() != null) {
+            updateUser.updateBirthday(updateUserRequest.getBirthday());
+        }
+
+        if(updateUserRequest.getHeight() != null) {
+            updateUser.updateHeight(updateUserRequest.getHeight());
+        }
+
+        if(updateUserRequest.getWeight() != null) {
+            updateUser.updateWeight(updateUserRequest.getWeight());
+        }
+
+
+        userService.updateUser(originUSer, updateUser, updateUserRequest.getFile());
         return ResponseEntity.noContent().build();
 
     }
@@ -148,17 +188,50 @@ public class UserController {
 
 
 
+    @Operation(summary = "유저 삭제하기", description = "유저 정보를 삭제한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/api/users/{userId}")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable("userId") Long userId,
+            @Parameter(hidden = true) @CurrentUser User user
+    )
+    {
+        User findUser = userService.findById(userId);
+        userService.deleteUser(findUser);
+        return ResponseEntity.noContent().build();
+    }
 
 
 
+    @Operation(summary = "유저 로그아웃", description = "유저 상태를 로그아웃으로 변경.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/api/logout")
+    public ResponseEntity<Void> logoutUser(@Parameter(hidden = true) @CurrentUser User user) {
+
+        log.info("current user={}", user);
+        log.info("current userId={}", user.getId());
+        userService.logOut(user);
+        return ResponseEntity.noContent().build();
+    }
 
 
 
+    //TODO 크루 가입신청한 유저 가져오기
 
 
-
-
-
+    //TODO 로그인 한 유저정보 가져오기
 
 
 
