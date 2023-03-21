@@ -64,12 +64,12 @@ public class RefreshTokenService {
 
         long expiration = claims.getExpiration().getTime();
         long now = new Date().getTime();
-        long diffTime = now - expiration;
+        long diffTime = expiration - now;
 
         if (diffTime < 86400000) {
             String newRefreshToken = jwtProvider.createRefreshToken(user);
             refreshTokenEntity.updateRefreshToken(newRefreshToken);
-            tokensDto.setRefreshToken(refreshToken);
+            tokensDto.setRefreshToken(newRefreshToken);
         }
 
         return tokensDto;
