@@ -1,15 +1,14 @@
 package com.project.runningcrew.user.controller;
 
 import com.project.runningcrew.area.service.DongAreaService;
-import com.project.runningcrew.comment.dto.response.GetCommentResponse;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.exception.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.user.dto.request.CheckEmailRequest;
 import com.project.runningcrew.user.dto.request.CheckNicknameRequest;
 import com.project.runningcrew.user.dto.request.CreateUserRequest;
+import com.project.runningcrew.user.dto.request.UpdateUserRequest;
 import com.project.runningcrew.user.dto.response.GetUserResponse;
-import com.project.runningcrew.user.entity.Sex;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,13 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import java.net.URI;
-import java.time.LocalDate;
 
 @Tag(description = "user 에 관한 api", name = "user")
 @RestController
@@ -75,12 +71,10 @@ public class UserController {
     @PostMapping(value = "/api/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createUser(@ModelAttribute @Valid CreateUserRequest createUserRequest) {
 
-
         if(!createUserRequest.getPassword().equals(createUserRequest.getPasswordCheck())) {
             //note 비밀번호 & 비밀번호 재입력 Equal Check -> 일치하지 않으면 예외 발생
             throw new PasswordCheckFailException();
         }
-
 
         User user = User.builder()
                 .email(createUserRequest.getEmail())
@@ -109,6 +103,64 @@ public class UserController {
 
 
 
+    @Operation(summary = "유저 수정하기", description = "유저 정보를 수정한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "CONFLICT",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping(value = "/api/users/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateUser(
+            @PathVariable("userId") Long userId,
+            @ModelAttribute @Valid UpdateUserRequest updateUserRequest,
+            @Parameter(hidden = true) @CurrentUser User user
+    ) {
+
+        if (!updateUserRequest.getPassword().equals(updateUserRequest.getPasswordCheck())) {
+            //note 비밀번호 & 비밀번호 재입력 Equal Check -> 일치하지 않으면 예외 발생
+            throw new PasswordCheckFailException();
+        }
+
+        User updateUser = User.builder()
+                .nickname(updateUserRequest.getNickname())
+                .password(updateUserRequest.getPassword())
+                .phoneNumber(updateUserRequest.getPhoneNumber())
+                .dongArea(dongAreaService.findById(updateUserRequest.getDongId()))
+                .sex(updateUserRequest.getSex())
+                .birthday(updateUserRequest.getBirthday())
+                .height(updateUserRequest.getHeight())
+                .weight(updateUserRequest.getWeight())
+                .build();
+
+        userService.updateUser(userService.findById(userId), updateUser, updateUserRequest.getFile());
+        return ResponseEntity.noContent().build();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Operation(summary = "유저 이메일 중복체크하기", description = "유저 이메일 중복체크한다.")
@@ -127,7 +179,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
         //note 중복 체크 통과 -> 204 No Content
     }
-
 
     @Operation(summary = "유저 닉네임 중복체크하기", description = "유저 닉네임 중복체크한다.")
     @ApiResponses({
