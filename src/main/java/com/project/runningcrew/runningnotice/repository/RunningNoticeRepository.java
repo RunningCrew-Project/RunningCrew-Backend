@@ -20,14 +20,28 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
 
 
     /**
-     * 특정 Crew 의 하루 간격의 날짜를 변수로 받아 그 날의 런닝 공지를 모두 반환한다.
+     * 특정 Crew 에서 특정 날짜 사이에 런닝을 시행한 런닝공지를 모두 반환한다.
      *
      * @param start
      * @param end
      * @return list of RunningNotice
      */
-    @Query("select rn from RunningNotice rn where rn.member.crew = :crew and rn.runningDateTime >= :start and rn.runningDateTime < :end")
+    @Query("select rn from RunningNotice rn where rn.member.crew = :crew and " +
+            "rn.runningDateTime >= :start and rn.runningDateTime < :end")
     List<RunningNotice> findAllByCrewAndRunningDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("crew") Crew crew);
+
+    /**
+     * 특정 Crew 에서 특정 날짜 사이에 런닝을 시행한 특정 종류의 런닝공지를 모두 반환한다.
+     *
+     * @param start
+     * @param end
+     * @return list of RunningNotice
+     */
+    @Query("select rn from RunningNotice rn where rn.member.crew = :crew and " +
+            "rn.noticeType = :noticeType and " +
+            "rn.runningDateTime >= :start and rn.runningDateTime < :end")
+    List<RunningNotice> findAllByCrewAndRunningDateAndNoticeType(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end,
+                                                                 @Param("crew") Crew crew, @Param("noticeType") NoticeType noticeType);
 
 
     /**

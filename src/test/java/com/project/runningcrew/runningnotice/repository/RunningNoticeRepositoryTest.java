@@ -527,6 +527,57 @@ class RunningNoticeRepositoryTest {
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
     }
 
+    @DisplayName("특정 날에 시작하는 런닝의 RunningNotice 출력 테스트")
+    @Test
+    void findAllByCrewAndRunningDateAndNoticeTypeTest() throws Exception {
+        //given
+        LocalDateTime start = LocalDateTime.of(2023, 2, 11, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2023, 2, 14, 0, 0);
+        List<LocalDateTime> times = List.of(
+                LocalDateTime.of(2023, 2, 11, 0, 0),
+                LocalDateTime.of(2023, 2, 13, 23, 59),
+                LocalDateTime.of(2023, 2, 14, 0, 0)
+                );
+
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+
+        for (int i = 0; i < 3; i++) {
+            runningNoticeRepository.save(
+                    RunningNotice.builder().title("title" + i)
+                            .detail("detail" + i)
+                            .member(member)
+                            .noticeType(NoticeType.REGULAR)
+                            .runningDateTime(times.get(i))
+                            .runningPersonnel(4)
+                            .status(RunningStatus.READY)
+                            .build());
+        }
+
+        for (int i = 0; i < 3; i++) {
+            runningNoticeRepository.save(
+                    RunningNotice.builder().title("title" + i)
+                            .detail("detail" + i)
+                            .member(member)
+                            .noticeType(NoticeType.INSTANT)
+                            .runningDateTime(times.get(i))
+                            .runningPersonnel(4)
+                            .status(RunningStatus.READY)
+                            .build());
+        }
+
+        //when
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository
+                .findAllByCrewAndRunningDateAndNoticeType(start, end, member.getCrew(), NoticeType.REGULAR);
+
+        //then
+        Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
+    }
+
 
     @DisplayName("특정 Crew 의 RunningNotice 를 status 에 따라 RunningDate 순으로 출력 테스트")
     @Test
