@@ -751,4 +751,57 @@ class RunningNoticeServiceTest {
                 .isInstanceOf(YearMonthFormatException.class);
     }
 
+    @DisplayName("특정 멤버가 참여한 런닝공지 성공 테스트")
+    @Test
+    public void findRunningNoticesByApplyMemberTest1(@Mock Member member) {
+        //given
+        PageRequest pageRequest = PageRequest.of(0, 7);
+        List<RunningNotice> runningNotices = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            RunningNotice runningNotice = RunningNotice.builder()
+                    .title("title" + i)
+                    .detail("detail" + i)
+                    .member(member)
+                    .noticeType(NoticeType.REGULAR)
+                    .runningDateTime(LocalDateTime.of(2023, 3, 11, 11, 11))
+                    .runningPersonnel(10)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNotices.add(runningNotice);
+        }
+
+        for (int i = 0; i < 2; i++) {
+            RunningNotice runningNotice = RunningNotice.builder()
+                    .title("title" + i)
+                    .detail("detail" + i)
+                    .member(member)
+                    .noticeType(NoticeType.INSTANT)
+                    .runningDateTime(LocalDateTime.of(2023, 3, 11, 11, 11))
+                    .runningPersonnel(10)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNotices.add(runningNotice);
+        }
+        SliceImpl<RunningNotice> runningNoticeSlice = new SliceImpl<>(runningNotices, pageRequest, true);
+        when(runningNoticeRepository.findRunningNoticesByApplyMember(member, pageRequest))
+                .thenReturn(runningNoticeSlice);
+
+
+        ///when
+        Slice<RunningNotice> result = runningNoticeService.findRunningNoticesByApplyMember(member, pageRequest);
+
+        //then
+        for (RunningNotice runningNotice : result) {
+            assertThat(runningNotice.getMember()).isEqualTo(member);
+        }
+        assertThat(result.getNumber()).isSameAs(0);
+        assertThat(result.getSize()).isSameAs(7);
+        assertThat(result.getNumberOfElements()).isSameAs(7);
+        assertThat(result.hasPrevious()).isFalse();
+        assertThat(result.hasNext()).isTrue();
+        assertThat(result.isFirst()).isTrue();
+        verify(runningNoticeRepository, times(1))
+                .findRunningNoticesByApplyMember(member, pageRequest);
+    }
+
 }

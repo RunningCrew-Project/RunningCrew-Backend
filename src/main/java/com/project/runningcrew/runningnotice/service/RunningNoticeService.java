@@ -305,4 +305,16 @@ public class RunningNoticeService {
         }
     }
 
+    /**
+     * 특정 멤버가 참여한 런닝공지들을 페이징하여 반환한다.
+     *
+     * @param member
+     * @param pageable
+     * @return 특정 멤버가 참여한 페이징된 런닝공지들
+     */
+    public Slice<RunningNotice> findRunningNoticesByApplyMember(Member member, Pageable pageable) {
+        return runningNoticeRepository.findRunningNoticesByApplyMember(member, pageable);
+    }
+
+
 }
