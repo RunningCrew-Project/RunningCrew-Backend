@@ -2,10 +2,19 @@ package com.project.runningcrew.user.controller;
 
 import com.project.runningcrew.area.service.DongAreaService;
 import com.project.runningcrew.common.annotation.CurrentUser;
+import com.project.runningcrew.common.dto.SimpleCommentDto;
+import com.project.runningcrew.common.dto.SimpleUserDto;
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exception.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
+import com.project.runningcrew.member.service.MemberAuthorizationChecker;
+import com.project.runningcrew.member.service.MemberService;
+import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
 import com.project.runningcrew.user.dto.request.*;
+import com.project.runningcrew.user.dto.response.GetMyDataResponse;
 import com.project.runningcrew.user.dto.response.GetUserResponse;
+import com.project.runningcrew.user.dto.response.UserListResponse;
 import com.project.runningcrew.user.entity.Sex;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
@@ -28,7 +37,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Tag(description = "user 에 관한 api", name = "user")
 @RestController
@@ -39,12 +50,16 @@ public class UserController {
 
     private final UserService userService;
     private final DongAreaService dongAreaService;
+    private final CrewService crewService;
+    private final MemberService memberService;
+    private final RecruitAnswerService recruitAnswerService;
+    private final MemberAuthorizationChecker memberAuthorizationChecker;
 
     @Value("${domain.name}")
     private String host;
 
 
-    @Operation(summary = "유저 정보 가져오기", description = "유저 정보를 가져온다.")
+    @Operation(summary = "특정 유저 정보 가져오기", description = "유저 아이디에 맞는 유저의 정보를 가져온다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserResponse.class))),
@@ -227,11 +242,60 @@ public class UserController {
     }
 
 
+    @Operation(summary = "크루 가입신청한 유저 가져오기",
+            description = "크루에 가입신청한 유저 정보를 가져온다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserListResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/crews/{crewId}/users")
+    public ResponseEntity<UserListResponse> getUsersOfCrewApplier(
+            @PathVariable("crewId") Long crewId,
+            @Parameter(hidden = true) @CurrentUser User user
+    ) {
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkManager(user, crew);
+        //note 요청 user 의 크루 매니저 권한 검증
 
-    //TODO 크루 가입신청한 유저 가져오기
+        List<SimpleUserDto> dtoList = recruitAnswerService.findUserByCrew(crew).stream()
+                .map(SimpleUserDto::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new UserListResponse(dtoList));
+    }
 
 
-    //TODO 로그인 한 유저정보 가져오기
+    @Operation(summary = "로그인상태의 본인 계정 정보 가져오기",
+            description = "현재 로그인중인 본인 계정 정보를 가져온다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetMyDataResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/me")
+    public ResponseEntity<GetMyDataResponse> getMyData(@Parameter(hidden = true) @CurrentUser User user) {
+        return ResponseEntity.ok(new GetMyDataResponse(user));
+    }
+
+
+
+
+
+
+
 
 
 
