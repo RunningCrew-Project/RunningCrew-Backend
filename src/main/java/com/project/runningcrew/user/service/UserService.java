@@ -148,6 +148,8 @@ public class UserService {
      */
     @Transactional
     public void updateUser(User originUser, User newUser, MultipartFile multipartFile) {
+
+        //note NotNull
         if (!originUser.getNickname().equals(newUser.getNickname())) {
             if (userRepository.existsByNickname(newUser.getNickname())) {
                 throw new UserNickNameDuplicateException(newUser.getNickname());
@@ -156,26 +158,32 @@ public class UserService {
             }
         }
 
+        //note NotNull
         if (!originUser.getDongArea().equals(newUser.getDongArea())) {
             originUser.updateDongArea(newUser.getDongArea());
         }
 
-        if (originUser.getHeight() != newUser.getHeight()) {
+        //note Nullable
+        if(newUser.getHeight() != null) {
             originUser.updateHeight(newUser.getHeight());
         }
 
-        if (originUser.getWeight() != newUser.getWeight()) {
+        //note Nullable
+        if (newUser.getWeight() != null) {
             originUser.updateWeight(newUser.getWeight());
         }
 
-        if (!originUser.getBirthday().equals(newUser.getBirthday())) {
+        //note Nullable
+        if (newUser.getBirthday() != null) {
             originUser.updateBirthday(newUser.getBirthday());
         }
 
-        if (!originUser.getSex().equals(newUser.getSex())) {
+        //note Nullable
+        if (newUser.getSex() != null) {
             originUser.updateSex(newUser.getSex());
         }
 
+        //note NotNull
         if (!multipartFile.isEmpty()) {
             imageService.deleteImage(originUser.getImgUrl());
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);

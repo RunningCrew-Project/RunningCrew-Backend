@@ -1,8 +1,8 @@
 package com.project.runningcrew.member.dto;
 
+import com.project.runningcrew.common.dto.SimpleUserDto;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
-import com.project.runningcrew.user.dto.SimpleUserDto;
 import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class SimpleMemberDto {
     public SimpleMemberDto(Member member) {
         User user = member.getUser();
         this.id = member.getId();
-        this.user = new SimpleUserDto(user.getId(), user.getNickname(), user.getImgUrl());
+        this.user = new SimpleUserDto(member.getUser());
         this.role = member.getRole();
     }
 

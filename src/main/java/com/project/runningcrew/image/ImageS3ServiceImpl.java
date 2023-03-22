@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
@@ -54,7 +56,7 @@ public class ImageS3ServiceImpl implements ImageService{
         try {
             amazonS3.putObject(bucketName, s3FileName, multipartFile.getInputStream(), obj);
         } catch (Exception e) {
-            // 이미지 업로드 에러 발생
+            //note 이미지 업로드 에러 발생
             throw new S3UploadException();
         }
 
@@ -69,18 +71,19 @@ public class ImageS3ServiceImpl implements ImageService{
     @Override
     public void deleteImage(String fileUrl) {
 
-        if (!fileUrl.startsWith(hostName)) {
-            throw new S3DeleteException();
-        }
-        String fileName = fileUrl.replace(hostName, "");
+        if (!fileUrl.startsWith(hostName)) { throw new S3DeleteException(); }
 
+        String decodeURL = URLDecoder.decode(
+                fileUrl.replace(hostName, "").replaceAll("\\p{Z}", ""),
+                StandardCharsets.UTF_8
+                //note 한글 파일 Decoding & 공백 제거
+        );
 
-        boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, fileName);
-        log.info("fileUrl={}",fileUrl);
-        if(isObjectExist) {
-            amazonS3Client.deleteObject(bucketName, fileUrl);
-        } else {
-            throw new S3DeleteException();
-        }
+        boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, decodeURL);
+        log.info("fileUrl={}",decodeURL);
+
+        if(isObjectExist) { amazonS3Client.deleteObject(bucketName, decodeURL); }
+        else { throw new S3DeleteException(); }
+
     }
 }

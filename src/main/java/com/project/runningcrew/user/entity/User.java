@@ -18,6 +18,9 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
+
+    //note 필수 값
+
     @Id
     @GeneratedValue
     @Column(name = "user_id")
@@ -56,21 +59,25 @@ public class User extends BaseEntity {
     @NotNull
     private String password;
 
-    @NotNull
+
+
+
+    //note 필수 아닌 값
+
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column()
     private Sex sex;
 
-    @Column(nullable = false)
+    @Column()
     private LocalDate birthday;
 
     @PositiveOrZero(message = "키는 0 이상입니다.")
-    @Column(nullable = false)
-    private int height;
+    @Column()
+    private Integer height;
 
     @PositiveOrZero(message = "몸무게는 0 이상입니다.")
-    @Column(nullable = false)
-    private int weight;
+    @Column()
+    private Integer weight;
 
     public static User createBasicUser(String email, String name, String nickname, String imgUrl,
                                   LoginType login_type, String phoneNumber) {

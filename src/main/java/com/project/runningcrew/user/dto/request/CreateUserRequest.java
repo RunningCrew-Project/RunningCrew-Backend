@@ -19,6 +19,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CreateUserRequest {
 
+
+    //note 필수 값
+
     @Email
     @Schema(description = "생성 유저 이메일", example = "example@gmail.com")
     @NotBlank(message = "이메일은 필수 값입니다.")
@@ -49,21 +52,23 @@ public class CreateUserRequest {
     private String passwordCheck;
 
     @Schema(description = "생성 유저 동네 아이디", example = "1")
+    @NotNull(message = "동네 아이디는 필수 값입니다.")
     @Positive(message = "동네 아이디는 1 이상의 수입니다.")
     private Long dongId;
-
-
 
     @Schema(description = "생성 유저 로그인 타입", example = "EMAIL")
     private LoginType loginType;
 
 
-    @Schema(description = "생성 유저 성별", example = "MAN")
-    private Sex sex;
+
+    //note 필수 아닌 값
 
     @Schema(description = "생성 유저 생년월일", example = "1998-08-26")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
+
+    @Schema(description = "생성 유저 성별", example = "MAN")
+    private Sex sex;
 
     @Schema(description = "생성 유저 신장", example = "180")
     private Integer height;
