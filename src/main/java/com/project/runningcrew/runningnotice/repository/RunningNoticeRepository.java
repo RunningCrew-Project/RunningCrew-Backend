@@ -134,4 +134,13 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
             "(select r2 from RunningNotice r2 where r2.member.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
+    /**
+     * 특정 Member 의 RunningMember 들에 포함된 RunningNotice 반환
+     *
+     * @param member 런닝에 참가한 멤버
+     * @return 특정 Member 의 RunningMember 들에 포함된 RunningNotice
+     */
+    @Query("select r.runningNotice from RunningMember r where r.member = :member")
+    Slice<RunningNotice> findRunningNoticesByApplyMember(@Param("member") Member member, Pageable pageable);
+
 }

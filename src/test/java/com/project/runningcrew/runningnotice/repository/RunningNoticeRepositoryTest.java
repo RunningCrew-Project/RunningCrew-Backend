@@ -715,4 +715,64 @@ class RunningNoticeRepositoryTest {
         assertThat(runningNoticeList.isEmpty()).isTrue();
     }
 
+    @DisplayName("멤버가 참여한 런닝공지 반환")
+    @Test
+    public void findRunningNoticeByMemberTest1() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 1; i < 11; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningNotice runningNotice = testEntityFactory.getInstantRunningNotice(tempMember, i);
+            testEntityFactory.getRunningMember(runningNotice, member);
+        }
+
+        ///when
+        PageRequest pageRequest = PageRequest.of(0, 7);
+        Slice<RunningNotice> slice1 = runningNoticeRepository
+                .findRunningNoticesByApplyMember(member, pageRequest);
+
+        //then
+        Assertions.assertThat(slice1.getSize()).isEqualTo(7);
+        Assertions.assertThat(slice1.getNumber()).isEqualTo(0);
+        Assertions.assertThat(slice1.getNumberOfElements()).isEqualTo(7);
+        Assertions.assertThat(slice1.isFirst()).isTrue();
+        Assertions.assertThat(slice1.hasNext()).isTrue();
+    }
+
+    @DisplayName("멤버가 참여한 런닝공지 반환")
+    @Test
+    public void findRunningNoticeByMemberTest2() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 1; i < 11; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningNotice runningNotice = testEntityFactory.getInstantRunningNotice(tempMember, i);
+            testEntityFactory.getRunningMember(runningNotice, member);
+        }
+
+        ///when
+        PageRequest pageRequest = PageRequest.of(1, 7);
+        Slice<RunningNotice> slice1 = runningNoticeRepository
+                .findRunningNoticesByApplyMember(member, pageRequest);
+
+        //then
+        Assertions.assertThat(slice1.getSize()).isEqualTo(7);
+        Assertions.assertThat(slice1.getNumber()).isEqualTo(1);
+        Assertions.assertThat(slice1.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(slice1.isLast()).isTrue();
+        Assertions.assertThat(slice1.hasNext()).isFalse();
+    }
+
 }
