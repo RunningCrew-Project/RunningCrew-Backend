@@ -1,5 +1,7 @@
 package com.project.runningcrew.board.service;
 
+import com.project.runningcrew.board.entity.InfoBoard;
+import com.project.runningcrew.board.entity.ReviewBoard;
 import com.project.runningcrew.comment.service.CommentService;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.Board;
@@ -10,10 +12,12 @@ import com.project.runningcrew.board.repository.BoardRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
 import com.project.runningcrew.image.ImageService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -79,19 +83,31 @@ public class BoardService {
             originBoard.updateDetail(newBoard.getDetail());
         }
 
-        if(addFiles != null) {
+        if(originBoard instanceof ReviewBoard && newBoard instanceof ReviewBoard) {
+            //note 리뷰 게시글의 경우 런닝기록 수정이 가능하다.
+            ((ReviewBoard) originBoard).updateRunningRecord(((ReviewBoard) newBoard).getRunningRecord());
+        }
+
+        if(originBoard instanceof InfoBoard && newBoard instanceof InfoBoard) {
+            //note 정보 게시글의 경우 런닝기록 수정이 가능하다.
+            ((InfoBoard) originBoard).updateRunningRecord(((InfoBoard) newBoard).getRunningRecord());
+        }
+
+
+        if(!CollectionUtils.isEmpty(addFiles)) {
             for (MultipartFile multipartFile : addFiles) {
                 String imgUrl = imageService.uploadImage(multipartFile, imageDirName);
                 boardImageRepository.save(new BoardImage(imgUrl, originBoard));
             }
         }
 
-        if(deleteFiles != null) {
+        if(!CollectionUtils.isEmpty(deleteFiles)) {
             for (BoardImage boardImage : deleteFiles) {
                 imageService.deleteImage(boardImage.getFileName());
                 boardImageRepository.delete(boardImage);
             }
         }
+
     }
 
     /**

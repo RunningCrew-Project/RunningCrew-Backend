@@ -6,6 +6,7 @@ import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.recruitquestion.dto.request.CreateRecruitQuestionDto;
+import com.project.runningcrew.recruitquestion.dto.response.GetExistOfRecruitQuestion;
 import com.project.runningcrew.recruitquestion.dto.response.GetRecruitQuestionDto;
 import com.project.runningcrew.recruitquestion.dto.response.GetRecruitQuestionList;
 import com.project.runningcrew.recruitquestion.entity.RecruitQuestion;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 @Tag(name = "recruitQuestion", description = "가입 질문에 관한 api")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class RecruitQuestionController {
 
     private final CrewService crewService;
@@ -103,11 +106,6 @@ public class RecruitQuestionController {
     }
 
 
-
-
-
-
-
     @Operation(summary = "가입 질문 전체 조회하기", description = "가입 질문 전체를 조회한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
@@ -128,6 +126,39 @@ public class RecruitQuestionController {
         List<RecruitQuestion> findQuestions = recruitQuestionService.findAllByCrew(crew);
         List<GetRecruitQuestionDto> dtoList = findQuestions.stream().map(GetRecruitQuestionDto::new).collect(Collectors.toList());
         return ResponseEntity.ok(new GetRecruitQuestionList<>(dtoList));
+    }
+
+
+
+
+    @Operation(summary = "특정 크루의 가입 질문 설정 여부",
+            description = "크루의 가입 질문 설정 여부를 확인한다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetExistOfRecruitQuestion.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/crews/{crewId}/set-questions")
+    public ResponseEntity<GetExistOfRecruitQuestion> getExistOfRecruitQuestion(
+            @PathVariable("crewId") Long crewId,
+            @Parameter(hidden = true) @CurrentUser User user
+    ) {
+        Crew crew = crewService.findById(crewId);
+        List<RecruitQuestion> questionList = recruitQuestionService.findAllByCrew(crew);
+
+        if(!questionList.isEmpty()) {
+            return ResponseEntity.ok(new GetExistOfRecruitQuestion(true));
+        } else {
+            return ResponseEntity.ok(new GetExistOfRecruitQuestion(false));
+        }
+
     }
 
 

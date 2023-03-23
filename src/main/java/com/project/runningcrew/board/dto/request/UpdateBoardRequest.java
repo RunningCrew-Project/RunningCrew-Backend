@@ -34,7 +34,7 @@ public class UpdateBoardRequest {
 
     @Schema(description = "수정 런닝 기록 아이디")
     @Positive(message = "런닝 기록 아이디는 1 이상의 수입니다.")
-    private Integer runningRecordId;
+    private Long runningRecordId;
 
 
     public List<MultipartFile> getAddFiles() {
