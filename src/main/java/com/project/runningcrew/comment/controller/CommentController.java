@@ -7,6 +7,7 @@ import com.project.runningcrew.comment.dto.request.ChangeCommentRequest;
 import com.project.runningcrew.comment.dto.request.CreateBoardCommentRequest;
 import com.project.runningcrew.comment.dto.request.CreateRunningNoticeCommentRequest;
 import com.project.runningcrew.comment.dto.response.CommentListResponse;
+import com.project.runningcrew.comment.dto.response.GetCommentOfMemberResponse;
 import com.project.runningcrew.comment.dto.response.GetCommentResponse;
 import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.comment.entity.Comment;
@@ -121,7 +122,7 @@ public class CommentController {
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        Member member = memberService.findById(createBoardCommentRequest.getMemberId());
+        Member member = memberService.findByUserAndCrew(user, crew);
         BoardComment boardComment = new BoardComment(member, createBoardCommentRequest.getDetail(), board);
 
         Long commentId = commentService.saveComment(boardComment);
@@ -157,7 +158,7 @@ public class CommentController {
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        Member member = memberService.findById(createRunningNoticeCommentRequest.getMemberId());
+        Member member = memberService.findByUserAndCrew(user, crew);
         RunningNoticeComment runningNoticeComment = new RunningNoticeComment(member, createRunningNoticeCommentRequest.getDetail(), runningNotice);
 
         Long commentId = commentService.saveComment(runningNoticeComment);
@@ -299,7 +300,7 @@ public class CommentController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/members/{memberId}/comments")
-    public ResponseEntity<PagingResponse<SimpleCommentDto>> getCommentPageOfMember(
+    public ResponseEntity<PagingResponse<GetCommentOfMemberResponse>> getCommentPageOfMember(
             @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
             @Parameter(hidden = true) @CurrentUser User user
@@ -309,8 +310,8 @@ public class CommentController {
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
         Slice<Comment> commentSlice = commentService.findAllByMember(member, pageRequest);
 
-        List<SimpleCommentDto> dtoList = commentSlice.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
-        Slice<SimpleCommentDto> responseSlice = new SliceImpl<>(dtoList, commentSlice.getPageable(), commentSlice.hasNext());
+        List<GetCommentOfMemberResponse> dtoList = commentSlice.stream().map(GetCommentOfMemberResponse::new).collect(Collectors.toList());
+        Slice<GetCommentOfMemberResponse> responseSlice = new SliceImpl<>(dtoList, commentSlice.getPageable(), commentSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(responseSlice));
     }
 

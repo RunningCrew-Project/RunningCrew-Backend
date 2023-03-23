@@ -19,8 +19,4 @@ public class CreateRunningNoticeCommentRequest {
     @Schema(description = "작성한 게시글 댓글 내용", example = "detail")
     private String detail;
 
-    @Positive(message = "아이디 값은 1 이상의 수입니다.")
-    @Schema(description = "작성자 멤버 id", example = "1")
-    private Long memberId;
-
 }
