@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class ReadyRunningNoticeDto {
+public class RunningNoticeInfoDto {
     
     @Schema(description = "런닝 공지 아이디", example = "1")
     private Long id;
@@ -26,7 +26,7 @@ public class ReadyRunningNoticeDto {
     @Schema(description = "런닝 참여 인원수", example = "24")
     private Long runningMemberCount;
 
-    public ReadyRunningNoticeDto(RunningNotice runningNotice, Long runningMemberCount) {
+    public RunningNoticeInfoDto(RunningNotice runningNotice, Long runningMemberCount) {
         this.id = runningNotice.getId();
         this.title = runningNotice.getTitle();
         this.noticeType = runningNotice.getNoticeType().toString();

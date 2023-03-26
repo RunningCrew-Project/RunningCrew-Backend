@@ -2,6 +2,7 @@ package com.project.runningcrew.runningnotice.service;
 
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exception.badinput.RunningDateTimeBeforeException;
+import com.project.runningcrew.exception.badinput.YearMonthFormatException;
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.member.entity.Member;
@@ -27,10 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -60,10 +63,12 @@ public class RunningNoticeService {
 
     /**
      * 입력받은 MultipartFile 들과 noticeType 이 REGULAR 인 RunningNotice 를 저장하고, 부여된 id 를 반환.
+     * 생성하는 멤버가 매니저 이상이 아닐 때 throw AuthorizationException
      *
      * @param runningNotice  저장할 RunningNotice
      * @param multipartFiles 저장할 모든 MultipartFile
      * @return RunningNotice 에 부여된 id
+     * @throws AuthorizationException 생성하는 멤버가 매니저 이상이 아닐 때
      */
     @Transactional
     public Long saveRegularRunningNotice(RunningNotice runningNotice, List<MultipartFile> multipartFiles) {
@@ -124,7 +129,7 @@ public class RunningNoticeService {
         if (!originRunningNotice.getRunningDateTime().equals(newRunningNotice.getRunningDateTime())) {
             originRunningNotice.updateRunningTime(newRunningNotice.getRunningDateTime());
         }
-        if (!originRunningNotice.getPreRunningRecord().equals(newRunningNotice.getPreRunningRecord())) {
+        if (!Objects.equals(originRunningNotice.getPreRunningRecord(), newRunningNotice.getPreRunningRecord())) {
             originRunningNotice.updatePreRunningRecord(newRunningNotice.getPreRunningRecord());
         }
 
@@ -140,9 +145,10 @@ public class RunningNoticeService {
     }
 
     /**
-     * RunningNotice 의 status 를 Done 으로 변경한다.
+     * RunningNotice 의 status 를 Done 으로 변경한다. 런닝 시간 이전이라면 throw RunningDateTimeBeforeException
      *
      * @param runningNotice status 를 변경할 RunningNotice
+     * @throws RunningDateTimeBeforeException 런닝 시간 이전에 종료를 변경하려 했을 때
      */
     @Transactional
     public void updateRunningStatusDone(RunningNotice runningNotice) {
@@ -198,7 +204,7 @@ public class RunningNoticeService {
      * @param crew
      * @param keyword  검색어
      * @param pageable
-     * @return
+     * @return 제목이나 내용에 keyword 가 포함된 특정 크루의 런닝 공지
      */
     public Slice<RunningNotice> findByCrewAndKeyword(Crew crew, String keyword, Pageable pageable) {
         return runningNoticeRepository.findSliceAllByCrewAndKeyWord(keyword, crew, pageable);
@@ -225,6 +231,20 @@ public class RunningNoticeService {
         LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0, 0));
         LocalDateTime nextDateTime = dateTime.plusDays(1);
         return runningNoticeRepository.findAllByCrewAndRunningDate(dateTime, nextDateTime, crew);
+    }
+
+    /**
+     * 입력받은 Crew 에서 특정 날에 런닝이 예정된 noticeType 이 REGULAR 인 모든 RunningNotice 를 반환
+     *
+     * @param crew
+     * @param localDate 런닝 예정 일자
+     * @return 입력받은 Crew 에서 localDate 에 런닝이 예정된 모든 REGULAR RunningNotice
+     */
+    public List<RunningNotice> findRegularsByCrewAndRunningDate(Crew crew, LocalDate localDate) {
+        LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0, 0));
+        LocalDateTime nextDateTime = dateTime.plusDays(1);
+        return runningNoticeRepository.findAllByCrewAndRunningDateAndNoticeType(
+                dateTime, nextDateTime, crew, NoticeType.REGULAR);
     }
 
     /**
@@ -262,5 +282,39 @@ public class RunningNoticeService {
 
         return true;
     }
+
+    /**
+     * 입력받은 crew 에서 특정 년도 특정 월에 시행한 모든 REGULAR RunningRecord 들을 반환. 년, 월의 정보가 잘못되었다면
+     * throw YearMonthFormatException
+     *
+     * @param crew  특정 크루
+     * @param year  찾는 년도
+     * @param month 찾는 월
+     * @return 특정 crew 에서 특정 년도 특정 월에 시행한 모든 REGULAR RunningRecord
+     * @throws YearMonthFormatException 잘못된 형식의 년, 월을 입력받았을 때
+     */
+    public List<RunningNotice> findRegularsByCrewAndMonth(Crew crew, int year, int month) {
+        try {
+            LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+            LocalDateTime end = start.plusMonths(1);
+
+            return runningNoticeRepository
+                    .findAllByCrewAndRunningDateAndNoticeType(start, end, crew, NoticeType.REGULAR);
+        } catch (DateTimeException e) {
+            throw new YearMonthFormatException(year, month);
+        }
+    }
+
+    /**
+     * 특정 멤버가 참여한 런닝공지들을 페이징하여 반환한다.
+     *
+     * @param member
+     * @param pageable
+     * @return 특정 멤버가 참여한 페이징된 런닝공지들
+     */
+    public Slice<RunningNotice> findRunningNoticesByApplyMember(Member member, Pageable pageable) {
+        return runningNoticeRepository.findRunningNoticesByApplyMember(member, pageable);
+    }
+
 
 }

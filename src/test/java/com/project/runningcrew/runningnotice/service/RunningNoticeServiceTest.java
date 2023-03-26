@@ -1,6 +1,7 @@
 package com.project.runningcrew.runningnotice.service;
 
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.exception.badinput.YearMonthFormatException;
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.member.entity.Member;
@@ -140,7 +141,7 @@ class RunningNoticeServiceTest {
 
         //then
         assertThat(runningNoticeId).isSameAs(id);
-        verify(firebaseMessagingService,times(1)).sendRegularRunningNoticeMessages(crew, runningNotice);
+        verify(firebaseMessagingService, times(1)).sendRegularRunningNoticeMessages(crew, runningNotice);
         verify(runningNoticeRepository, times(1)).save(any());
         verify(imageService, times(multipartFiles.size())).uploadImage(any(), any());
         verify(runningNoticeImageRepository, times(multipartFiles.size())).save(any());
@@ -491,6 +492,45 @@ class RunningNoticeServiceTest {
                 crew);
     }
 
+    @DisplayName("크루의 특정날 시행하는 정기런닝공지 반환 테스트")
+    @Test
+    public void findRegularsByCrewAndRunningDateTest(@Mock Crew crew, @Mock Member member) {
+        //given
+        LocalDate runningDate = LocalDate.of(2023, 2, 27);
+        List<LocalDateTime> startDates = List.of(
+                LocalDateTime.of(2023, 2, 27, 0, 0),
+                LocalDateTime.of(2023, 2, 27, 11, 20),
+                LocalDateTime.of(2023, 2, 27, 23, 59));
+
+        List<RunningNotice> runningNotices = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            RunningNotice runningNotice = RunningNotice.builder()
+                    .title("title" + i)
+                    .detail("detail" + i)
+                    .member(member)
+                    .noticeType(NoticeType.REGULAR)
+                    .runningDateTime(startDates.get(i))
+                    .runningPersonnel(10)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNotices.add(runningNotice);
+        }
+        when(runningNoticeRepository.findAllByCrewAndRunningDate(
+                LocalDateTime.of(2023, 2, 27, 0, 0),
+                LocalDateTime.of(2023, 2, 28, 0, 0),
+                crew)).thenReturn(runningNotices);
+
+        ///when
+        List<RunningNotice> result = runningNoticeService.findAllByCrewAndRunningDate(crew, runningDate);
+
+        //then
+        assertThat(result.size()).isSameAs(3);
+        verify(runningNoticeRepository, times(1)).findAllByCrewAndRunningDate(
+                LocalDateTime.of(2023, 2, 27, 0, 0),
+                LocalDateTime.of(2023, 2, 28, 0, 0),
+                crew);
+    }
+
     @DisplayName("특정 멤버가 작성한 모든 런닝공지 페이징 테스트")
     @Test
     public void findAllByMemberTest(@Mock Member member) {
@@ -660,5 +700,108 @@ class RunningNoticeServiceTest {
                 .existsByMemberAndRunningNotice(member2, runningNotice);
     }
 
+    @DisplayName("특정 달에 시행한 모든 정기러닝공지 반환 성공 테스트")
+    @Test
+    public void findRegularsByCrewAndMonthTest1(@Mock Crew crew, @Mock Member member) {
+        List<LocalDateTime> startDates = List.of(
+                LocalDateTime.of(2023, 3, 1, 0, 0),
+                LocalDateTime.of(2023, 3, 27, 11, 20),
+                LocalDateTime.of(2023, 3, 31, 23, 59));
+
+        List<RunningNotice> runningNotices = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            RunningNotice runningNotice = RunningNotice.builder()
+                    .title("title" + i)
+                    .detail("detail" + i)
+                    .member(member)
+                    .noticeType(NoticeType.REGULAR)
+                    .runningDateTime(startDates.get(i))
+                    .runningPersonnel(10)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNotices.add(runningNotice);
+        }
+        when(runningNoticeRepository.findAllByCrewAndRunningDateAndNoticeType(
+                LocalDateTime.of(2023, 3, 1, 0, 0),
+                LocalDateTime.of(2023, 4, 1, 0, 0),
+                crew, NoticeType.REGULAR))
+                .thenReturn(runningNotices);
+
+        //when
+        List<RunningNotice> regulars = runningNoticeService.findRegularsByCrewAndMonth(crew, 2023, 3);
+
+        //then
+        assertThat(regulars.size()).isEqualTo(3);
+        verify(runningNoticeRepository, times(1)).findAllByCrewAndRunningDateAndNoticeType(
+                LocalDateTime.of(2023, 3, 1, 0, 0),
+                LocalDateTime.of(2023, 4, 1, 0, 0),
+                crew, NoticeType.REGULAR);
+    }
+
+    @DisplayName("특정 달에 시행한 모든 정기러닝공지 반환 예외 테스트")
+    @Test
+    public void findRegularsByCrewAndMonthTest2(@Mock Crew crew) {
+        //given
+        int year = 2023;
+        int month = 14;
+
+        ///when
+        //then
+        assertThatThrownBy(() -> runningNoticeService.findRegularsByCrewAndMonth(crew, year, month))
+                .isInstanceOf(YearMonthFormatException.class);
+    }
+
+    @DisplayName("특정 멤버가 참여한 런닝공지 성공 테스트")
+    @Test
+    public void findRunningNoticesByApplyMemberTest1(@Mock Member member) {
+        //given
+        PageRequest pageRequest = PageRequest.of(0, 7);
+        List<RunningNotice> runningNotices = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            RunningNotice runningNotice = RunningNotice.builder()
+                    .title("title" + i)
+                    .detail("detail" + i)
+                    .member(member)
+                    .noticeType(NoticeType.REGULAR)
+                    .runningDateTime(LocalDateTime.of(2023, 3, 11, 11, 11))
+                    .runningPersonnel(10)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNotices.add(runningNotice);
+        }
+
+        for (int i = 0; i < 2; i++) {
+            RunningNotice runningNotice = RunningNotice.builder()
+                    .title("title" + i)
+                    .detail("detail" + i)
+                    .member(member)
+                    .noticeType(NoticeType.INSTANT)
+                    .runningDateTime(LocalDateTime.of(2023, 3, 11, 11, 11))
+                    .runningPersonnel(10)
+                    .status(RunningStatus.READY)
+                    .build();
+            runningNotices.add(runningNotice);
+        }
+        SliceImpl<RunningNotice> runningNoticeSlice = new SliceImpl<>(runningNotices, pageRequest, true);
+        when(runningNoticeRepository.findRunningNoticesByApplyMember(member, pageRequest))
+                .thenReturn(runningNoticeSlice);
+
+
+        ///when
+        Slice<RunningNotice> result = runningNoticeService.findRunningNoticesByApplyMember(member, pageRequest);
+
+        //then
+        for (RunningNotice runningNotice : result) {
+            assertThat(runningNotice.getMember()).isEqualTo(member);
+        }
+        assertThat(result.getNumber()).isSameAs(0);
+        assertThat(result.getSize()).isSameAs(7);
+        assertThat(result.getNumberOfElements()).isSameAs(7);
+        assertThat(result.hasPrevious()).isFalse();
+        assertThat(result.hasNext()).isTrue();
+        assertThat(result.isFirst()).isTrue();
+        verify(runningNoticeRepository, times(1))
+                .findRunningNoticesByApplyMember(member, pageRequest);
+    }
 
 }
