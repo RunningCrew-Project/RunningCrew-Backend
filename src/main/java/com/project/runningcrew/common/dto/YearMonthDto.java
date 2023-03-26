@@ -1,4 +1,4 @@
-package com.project.runningcrew.runningrecord.dto;
+package com.project.runningcrew.common.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

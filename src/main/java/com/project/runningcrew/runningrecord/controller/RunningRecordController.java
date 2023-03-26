@@ -3,6 +3,7 @@ package com.project.runningcrew.runningrecord.controller;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.PagingResponse;
 import com.project.runningcrew.common.dto.SimpleRunningRecordDto;
+import com.project.runningcrew.common.dto.YearMonthDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exception.badinput.RunningNoticeDoneException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
@@ -39,7 +40,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.time.LocalDate;
@@ -180,8 +180,10 @@ public class RunningRecordController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/api/users/{userId}/running-notices")
-    public ResponseEntity<PagingResponse> getRunningRecordsByUser(@PathVariable("userId") Long userId,
-                                                                  @RequestParam("page") @PositiveOrZero int page) {
+    public ResponseEntity<PagingResponse<SimpleRunningRecordDto>> getRunningRecordsByUser(
+            @PathVariable("userId") Long userId,
+            @RequestParam("page") @PositiveOrZero int page) {
+
         User user = userService.findById(userId);
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<RunningRecord> runningRecordSlice = runningRecordService.findByUser(user, pageRequest);
@@ -190,8 +192,8 @@ public class RunningRecordController {
                 .map(SimpleRunningRecordDto::new)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new PagingResponse(
-                new SliceImpl<>(simpleRunningRecordDtoList, runningRecordSlice.getPageable(), runningRecordSlice.hasNext())));
+        return ResponseEntity.ok(new PagingResponse<>(new SliceImpl<>(simpleRunningRecordDtoList,
+                runningRecordSlice.getPageable(), runningRecordSlice.hasNext())));
     }
 
 
