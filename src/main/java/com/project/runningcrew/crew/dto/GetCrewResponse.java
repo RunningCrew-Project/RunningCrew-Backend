@@ -2,6 +2,7 @@ package com.project.runningcrew.crew.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -32,7 +33,13 @@ public class GetCrewResponse {
     @Schema(description = "크루 멤버수", example = "33")
     private Long memberCount;
 
-    public GetCrewResponse(Crew crew, Long memberCount) {
+    @Schema(description = "가입 신청 받기 여부", example = "true")
+    private boolean joinApply;
+
+    @Schema(description = "가입 질문 여부", example = "false")
+    private boolean joinQuestion;
+
+    public GetCrewResponse(Crew crew, Long memberCount, CrewCondition crewCondition) {
         this.id = crew.getId();
         this.createdDate = crew.getCreatedDate();
         this.name = crew.getName();
@@ -40,6 +47,8 @@ public class GetCrewResponse {
         this.crewImgUrl = crew.getCrewImgUrl();
         this.dong = crew.getDongArea().getFullName();
         this.memberCount = memberCount;
+        this.joinApply = crewCondition.isJoinApply();
+        this.joinQuestion = crewCondition.isJoinQuestion();
     }
 
 }

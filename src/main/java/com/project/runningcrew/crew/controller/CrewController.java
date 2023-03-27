@@ -9,6 +9,8 @@ import com.project.runningcrew.common.dto.PagingResponse;
 import com.project.runningcrew.crew.dto.*;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
+import com.project.runningcrew.crewcondition.service.CrewConditionService;
 import com.project.runningcrew.exception.duplicate.CrewNameDuplicateException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
@@ -52,6 +54,7 @@ public class CrewController {
     private final DongAreaService dongAreaService;
     private final GuAreaService guAreaService;
     private final RecruitAnswerService recruitAnswerService;
+    private final CrewConditionService crewConditionService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
     @Value("${domain.name}")
     private String host;
@@ -68,7 +71,8 @@ public class CrewController {
     public ResponseEntity<GetCrewResponse> getCrew(@PathVariable("crewId") Long crewId) {
         Crew crew = crewService.findById(crewId);
         Long memberCount = memberService.countAllByCrew(crew);
-        return ResponseEntity.ok(new GetCrewResponse(crew, memberCount));
+        CrewCondition crewCondition = crewConditionService.findByCrew(crew);
+        return ResponseEntity.ok(new GetCrewResponse(crew, memberCount, crewCondition));
     }
 
 

@@ -5,6 +5,8 @@ import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.board.repository.BoardRepository;
 import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
+import com.project.runningcrew.crewcondition.repository.CrewConditionRepository;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.notification.repository.NotificationRepository;
@@ -45,6 +47,7 @@ public class CrewService {
     private final RecruitAnswerRepository recruitAnswerRepository;
     private final RecruitQuestionRepository recruitQuestionRepository;
     private final NotificationRepository notificationRepository;
+    private final CrewConditionRepository crewConditionRepository;
     private final ImageService imageService;
     private final String imageDirName = "crew";
 
@@ -75,6 +78,7 @@ public class CrewService {
         String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
         crew.updateCrewImgUrl(imageUrl);
         Crew savedCrew = crewRepository.save(crew);
+        crewConditionRepository.save(new CrewCondition(savedCrew));
         memberRepository.save(new Member(user, crew, MemberRole.ROLE_LEADER));
         return savedCrew.getId();
     }
@@ -125,6 +129,7 @@ public class CrewService {
         boardRepository.deleteAllByCrew(crew);
         memberRepository.deleteAllByCrew(crew);
         notificationRepository.deleteAllByCrew(crew);
+        crewConditionRepository.deleteByCrew(crew);
         crewRepository.delete(crew);
         imageService.deleteImage(crew.getCrewImgUrl());
     }
