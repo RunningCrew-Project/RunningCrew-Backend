@@ -3,7 +3,10 @@ package com.project.runningcrew.member.controller;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
+import com.project.runningcrew.crewcondition.service.CrewConditionService;
 import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.badinput.CrewJoinApplyException;
 import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.dto.CreateMemberRequest;
@@ -43,6 +46,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final CrewService crewService;
+    private final CrewConditionService crewConditionService;
     private final UserService userService;
     private final RunningNoticeService runningNoticeService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
@@ -85,7 +89,14 @@ public class MemberController {
                                              @RequestBody @Valid CreateMemberRequest createMemberRequest,
                                              @Parameter(hidden = true) @CurrentUser User user) {
         Crew crew = crewService.findById(crewId);
-        memberAuthorizationChecker.checkManager(user, crew);
+        CrewCondition crewCondition = crewConditionService.findByCrew(crew);
+        if (!crewCondition.isJoinApply()) {
+            throw new CrewJoinApplyException();
+        }
+
+        if (crewCondition.isJoinQuestion()) {
+            memberAuthorizationChecker.checkManager(user, crew);
+        }
 
         User joinUser = userService.findById(createMemberRequest.getUserId());
         Long memberId = memberService.acceptMember(new Member(joinUser, crew, MemberRole.ROLE_NORMAL));
