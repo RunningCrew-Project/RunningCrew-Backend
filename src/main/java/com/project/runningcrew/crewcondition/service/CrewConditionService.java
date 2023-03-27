@@ -33,6 +33,7 @@ public class CrewConditionService {
      *
      * @param crewCondition
      */
+    @Transactional
     public void updateJoinApplyTrue(CrewCondition crewCondition) {
         crewCondition.updateJoinApply(true);
     }
@@ -42,6 +43,7 @@ public class CrewConditionService {
      *
      * @param crewCondition
      */
+    @Transactional
     public void updateJoinApplyFalse(CrewCondition crewCondition) {
         crewCondition.updateJoinApply(false);
     }
@@ -51,6 +53,7 @@ public class CrewConditionService {
      *
      * @param crewCondition
      */
+    @Transactional
     public void updateJoinQuestionTrue(CrewCondition crewCondition) {
         crewCondition.updateJoinQuestion(true);
     }
@@ -60,6 +63,7 @@ public class CrewConditionService {
      *
      * @param crewCondition
      */
+    @Transactional
     public void updateJoinQuestionFalse(CrewCondition crewCondition) {
         crewCondition.updateJoinQuestion(false);
     }
