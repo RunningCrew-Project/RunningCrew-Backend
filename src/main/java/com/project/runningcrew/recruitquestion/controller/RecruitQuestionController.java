@@ -3,6 +3,9 @@ package com.project.runningcrew.recruitquestion.controller;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
+import com.project.runningcrew.crewcondition.service.CrewConditionService;
+import com.project.runningcrew.exception.badinput.CrewJoinQuestionException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.recruitquestion.dto.request.CreateRecruitQuestionDto;
@@ -36,6 +39,7 @@ import java.util.stream.Collectors;
 public class RecruitQuestionController {
 
     private final CrewService crewService;
+    private final CrewConditionService crewConditionService;
     private final RecruitQuestionService recruitQuestionService;
 
     private final MemberAuthorizationChecker memberAuthorizationChecker;
@@ -62,6 +66,11 @@ public class RecruitQuestionController {
             @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
+        CrewCondition crewCondition = crewConditionService.findByCrew(crew);
+        if (!crewCondition.isJoinQuestion()) {
+            throw new CrewJoinQuestionException();
+        }
+
         memberAuthorizationChecker.checkLeader(user, crew);
         //note 요청 user 의 크루 Leader 자격 검증
 
@@ -95,6 +104,11 @@ public class RecruitQuestionController {
     ) {
         RecruitQuestion recruitQuestion = recruitQuestionService.findById(recruitQuestionId);
         Crew crew = recruitQuestion.getCrew();
+        CrewCondition crewCondition = crewConditionService.findByCrew(crew);
+        if (!crewCondition.isJoinQuestion()) {
+            throw new CrewJoinQuestionException();
+        }
+
         memberAuthorizationChecker.checkLeader(user, crew);
         //note 요청 user 의 크루 Leader 자격 검증
 

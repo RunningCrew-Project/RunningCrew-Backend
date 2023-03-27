@@ -3,8 +3,10 @@ package com.project.runningcrew.recruitanswer.controller;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
+import com.project.runningcrew.crewcondition.service.CrewConditionService;
+import com.project.runningcrew.exception.badinput.CrewJoinQuestionException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
-import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.recruitanswer.dto.request.CreateRecruitAnswerList;
 import com.project.runningcrew.recruitanswer.dto.request.CreateRecruitAnswerDto;
 import com.project.runningcrew.recruitanswer.dto.response.GetRecruitAnswerList;
@@ -22,7 +24,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,14 +38,9 @@ import java.util.stream.Collectors;
 public class RecruitAnswerController {
 
     private final CrewService crewService;
+    private final CrewConditionService crewConditionService;
     private final UserService userService;
     private final RecruitAnswerService recruitAnswerService;
-
-    private final MemberAuthorizationChecker memberAuthorizationChecker;
-
-    @Value("${domain.name}")
-    private String host;
-
 
     @Operation(summary = "가입 답변 묶음 생성하기",
             description = "가입 답변 묶음을 생성한다.",
@@ -64,6 +60,11 @@ public class RecruitAnswerController {
             @RequestBody @Valid CreateRecruitAnswerList<CreateRecruitAnswerDto> createRecruitAnswerList
     ) {
         Crew crew = crewService.findById(crewId);
+        CrewCondition crewCondition = crewConditionService.findByCrew(crew);
+        if (!crewCondition.isJoinQuestion()) {
+            throw new CrewJoinQuestionException();
+        }
+
         List<CreateRecruitAnswerDto> requestDtoList = createRecruitAnswerList.getAnswers();
 
         List<RecruitAnswer> answerList = new ArrayList<>();
@@ -101,6 +102,10 @@ public class RecruitAnswerController {
     ) {
         User findUser = userService.findById(userId);
         Crew findCrew = crewService.findById(crewId);
+        CrewCondition crewCondition = crewConditionService.findByCrew(findCrew);
+        if (!crewCondition.isJoinQuestion()) {
+            throw new CrewJoinQuestionException();
+        }
 
         recruitAnswerService.deleteAllRecruitAnswer(findUser, findCrew);
         return ResponseEntity.noContent().build();
