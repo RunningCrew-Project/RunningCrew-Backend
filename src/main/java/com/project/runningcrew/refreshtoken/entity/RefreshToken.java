@@ -1,5 +1,6 @@
 package com.project.runningcrew.refreshtoken.entity;
 
+import com.project.runningcrew.common.BaseEntity;
 import com.project.runningcrew.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,14 +13,14 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Table(name = "refresh_tokens")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken {
+public class RefreshToken extends BaseEntity {
 
     @Id
     @GeneratedValue
     @Column(name = "refresh_token_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

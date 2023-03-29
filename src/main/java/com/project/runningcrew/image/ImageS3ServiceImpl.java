@@ -6,22 +6,30 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.project.runningcrew.exception.ImageFileCreationException;
 import com.project.runningcrew.exception.s3.S3DeleteException;
 import com.project.runningcrew.exception.s3.S3UploadException;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ImageS3ServiceImpl implements ImageService{
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
+
+    @Value("${s3.host.name}")
+    private String hostName;
 
     private final AmazonS3 amazonS3;
     private final AmazonS3Client amazonS3Client;
@@ -48,7 +56,7 @@ public class ImageS3ServiceImpl implements ImageService{
         try {
             amazonS3.putObject(bucketName, s3FileName, multipartFile.getInputStream(), obj);
         } catch (Exception e) {
-            // 이미지 업로드 에러 발생
+            //note 이미지 업로드 에러 발생
             throw new S3UploadException();
         }
 
@@ -62,11 +70,20 @@ public class ImageS3ServiceImpl implements ImageService{
      */
     @Override
     public void deleteImage(String fileUrl) {
-        boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, fileUrl);
-        if(isObjectExist) {
-            amazonS3Client.deleteObject(bucketName, fileUrl);
-        } else {
-            throw new S3DeleteException();
-        }
+
+        if (!fileUrl.startsWith(hostName)) { throw new S3DeleteException(); }
+
+        String decodeURL = URLDecoder.decode(
+                fileUrl.replace(hostName, "").replaceAll("\\p{Z}", ""),
+                StandardCharsets.UTF_8
+                //note 한글 파일 Decoding & 공백 제거
+        );
+
+        boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, decodeURL);
+        log.info("fileUrl={}",decodeURL);
+
+        if(isObjectExist) { amazonS3Client.deleteObject(bucketName, decodeURL); }
+        else { throw new S3DeleteException(); }
+
     }
 }

@@ -185,4 +185,26 @@ class RunningRecordImageRepositoryTest {
         assertThat(images2.size()).isSameAs(5);
     }
 
+    @DisplayName("user 에 의해 생성된 모든 RunningRecordImage 삭제")
+    @Test
+    public void deleteAllByUserTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        PersonalRunningRecord personalRunningRecord = testEntityFactory.getPersonalRunningRecord(user, 0);
+        for (int i = 0; i < 10; i++) {
+            RunningRecordImage runningRecordImage = new RunningRecordImage("fileName" + i, personalRunningRecord);
+            runningRecordImageRepository.save(runningRecordImage);
+        }
+
+        ///when
+        runningRecordImageRepository.deleteAllByUser(user);
+
+        //then
+        List<RunningRecordImage> images = runningRecordImageRepository.findAllByRunningRecord(personalRunningRecord);
+        assertThat(images.isEmpty()).isTrue();
+    }
+
 }

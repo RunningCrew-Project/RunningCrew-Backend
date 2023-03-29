@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -41,7 +42,22 @@ public interface RecruitAnswerRepository extends JpaRepository<RecruitAnswer, Lo
     List<User> findUserByCrew(@Param("crew") Crew crew);
 
 
+    /**
+     * 특정 crew 의 recruitAnswer 를 모두 삭제한다.
+     * @param crew
+     */
+    @Modifying
+    @Query("delete from RecruitAnswer ra where ra.crew = :crew")
+    void deleteAllByCrew(@Param("crew") Crew crew);
 
+
+    /**
+     * 특정 user 가 작성한 recruitAnswer 를 모두 삭제한다.
+     * @param user
+     */
+    @Modifying
+    @Query("delete from RecruitAnswer ra where ra.user = :user")
+    void deleteAllByUser(@Param("user") User user);
 
 
 }

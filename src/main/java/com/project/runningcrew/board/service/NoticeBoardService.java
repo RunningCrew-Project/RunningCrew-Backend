@@ -38,9 +38,12 @@ public class NoticeBoardService {
      */
     public Long saveNoticeBoard(NoticeBoard noticeBoard, List<MultipartFile> multipartFiles) {
         Board savedBoard = noticeBoardRepository.save(noticeBoard);
-        for (MultipartFile multipartFile : multipartFiles) {
-            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-            boardImageRepository.save(new BoardImage(imageUrl, savedBoard));
+
+        if(multipartFiles != null) {
+            for (MultipartFile multipartFile : multipartFiles) {
+                String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
+                boardImageRepository.save(new BoardImage(imageUrl, savedBoard));
+            }
         }
 
         firebaseMessagingService.sendNoticeBoardMessages(noticeBoard.getMember().getCrew(), noticeBoard);

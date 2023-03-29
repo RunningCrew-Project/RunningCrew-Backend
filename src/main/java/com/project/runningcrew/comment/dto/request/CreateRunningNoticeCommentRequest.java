@@ -3,6 +3,7 @@ package com.project.runningcrew.comment.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -10,6 +11,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CreateRunningNoticeCommentRequest {
 
     @NotBlank

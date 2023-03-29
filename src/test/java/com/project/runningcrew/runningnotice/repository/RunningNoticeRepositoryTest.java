@@ -527,6 +527,57 @@ class RunningNoticeRepositoryTest {
         Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
     }
 
+    @DisplayName("특정 날에 시작하는 런닝의 RunningNotice 출력 테스트")
+    @Test
+    void findAllByCrewAndRunningDateAndNoticeTypeTest() throws Exception {
+        //given
+        LocalDateTime start = LocalDateTime.of(2023, 2, 11, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2023, 2, 14, 0, 0);
+        List<LocalDateTime> times = List.of(
+                LocalDateTime.of(2023, 2, 11, 0, 0),
+                LocalDateTime.of(2023, 2, 13, 23, 59),
+                LocalDateTime.of(2023, 2, 14, 0, 0)
+                );
+
+        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
+        User user = testUser(dongArea, 1);
+        Crew crew = testCrew(dongArea, 1);
+        Member member = testMember(user, crew);
+
+        for (int i = 0; i < 3; i++) {
+            runningNoticeRepository.save(
+                    RunningNotice.builder().title("title" + i)
+                            .detail("detail" + i)
+                            .member(member)
+                            .noticeType(NoticeType.REGULAR)
+                            .runningDateTime(times.get(i))
+                            .runningPersonnel(4)
+                            .status(RunningStatus.READY)
+                            .build());
+        }
+
+        for (int i = 0; i < 3; i++) {
+            runningNoticeRepository.save(
+                    RunningNotice.builder().title("title" + i)
+                            .detail("detail" + i)
+                            .member(member)
+                            .noticeType(NoticeType.INSTANT)
+                            .runningDateTime(times.get(i))
+                            .runningPersonnel(4)
+                            .status(RunningStatus.READY)
+                            .build());
+        }
+
+        //when
+        List<RunningNotice> findRunningNoticeList = runningNoticeRepository
+                .findAllByCrewAndRunningDateAndNoticeType(start, end, member.getCrew(), NoticeType.REGULAR);
+
+        //then
+        Assertions.assertThat(findRunningNoticeList.size()).isEqualTo(2);
+    }
+
 
     @DisplayName("특정 Crew 의 RunningNotice 를 status 에 따라 RunningDate 순으로 출력 테스트")
     @Test
@@ -618,6 +669,110 @@ class RunningNoticeRepositoryTest {
         for (RunningNotice runningNotice : runningNotices) {
             Assertions.assertThat(runningNotice.getStatus()).isSameAs(RunningStatus.READY);
         }
+    }
+    
+    @DisplayName("특정 멤버가 생성한 모든 런닝 공지 삭제")
+    @Test
+    public void deleteAllByMemberTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 0; i < 10; i++) {
+            testEntityFactory.getInstantRunningNotice(member, i);
+        }
+
+        ///when
+        runningNoticeRepository.deleteAllByMember(member);
+        
+        //then
+        List<RunningNotice> runningNoticeList = runningNoticeRepository.findAll();
+        assertThat(runningNoticeList.isEmpty()).isTrue();
+    }
+
+    @DisplayName("특정 크루에 속한 모든 런닝 공지 삭제")
+    @Test
+    public void deleteAllByCrewTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        for (int i = 0; i < 10; i++) {
+            User user = testEntityFactory.getUser(dongArea, i);
+            Member member = testEntityFactory.getMember(user, crew);
+            testEntityFactory.getInstantRunningNotice(member, i);
+        }
+
+        ///when
+        runningNoticeRepository.deleteAllByCrew(crew);
+        
+        //then
+        List<RunningNotice> runningNoticeList = runningNoticeRepository.findAll();
+        assertThat(runningNoticeList.isEmpty()).isTrue();
+    }
+
+    @DisplayName("멤버가 참여한 런닝공지 반환")
+    @Test
+    public void findRunningNoticeByMemberTest1() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 1; i < 11; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningNotice runningNotice = testEntityFactory.getInstantRunningNotice(tempMember, i);
+            testEntityFactory.getRunningMember(runningNotice, member);
+        }
+
+        ///when
+        PageRequest pageRequest = PageRequest.of(0, 7);
+        Slice<RunningNotice> slice1 = runningNoticeRepository
+                .findRunningNoticesByApplyMember(member, pageRequest);
+
+        //then
+        Assertions.assertThat(slice1.getSize()).isEqualTo(7);
+        Assertions.assertThat(slice1.getNumber()).isEqualTo(0);
+        Assertions.assertThat(slice1.getNumberOfElements()).isEqualTo(7);
+        Assertions.assertThat(slice1.isFirst()).isTrue();
+        Assertions.assertThat(slice1.hasNext()).isTrue();
+    }
+
+    @DisplayName("멤버가 참여한 런닝공지 반환")
+    @Test
+    public void findRunningNoticeByMemberTest2() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 1; i < 11; i++) {
+            User tempUser = testEntityFactory.getUser(dongArea, i);
+            Member tempMember = testEntityFactory.getMember(tempUser, crew);
+            RunningNotice runningNotice = testEntityFactory.getInstantRunningNotice(tempMember, i);
+            testEntityFactory.getRunningMember(runningNotice, member);
+        }
+
+        ///when
+        PageRequest pageRequest = PageRequest.of(1, 7);
+        Slice<RunningNotice> slice1 = runningNoticeRepository
+                .findRunningNoticesByApplyMember(member, pageRequest);
+
+        //then
+        Assertions.assertThat(slice1.getSize()).isEqualTo(7);
+        Assertions.assertThat(slice1.getNumber()).isEqualTo(1);
+        Assertions.assertThat(slice1.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(slice1.isLast()).isTrue();
+        Assertions.assertThat(slice1.hasNext()).isFalse();
     }
 
 }

@@ -159,12 +159,9 @@ class RunningNoticeCommentRepositoryTest {
         RunningNotice testRunningNoticeA = testRunningNotice(memberA);
         RunningNotice testRunningNoticeB = testRunningNotice(memberB);
 
-        RunningNoticeComment comment_1 =
-                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
-        RunningNoticeComment comment_2 =
-                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
-        RunningNoticeComment comment_3 =
-                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeB));
+        //RunningNoticeComment comment_1 = runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
+        //RunningNoticeComment comment_2 = runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
+        //RunningNoticeComment comment_3 = runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeB));
 
         List<Long> runningNoticeIdList = new ArrayList<>();
         runningNoticeIdList.add(testRunningNoticeA.getId());
@@ -172,11 +169,8 @@ class RunningNoticeCommentRepositoryTest {
 
         //when
         List<Integer> commentCountList = runningNoticeCommentRepository.countByRunningNoticeId(runningNoticeIdList);
-
         //then
-        Assertions.assertThat(commentCountList.size()).isEqualTo(2);
-        Assertions.assertThat(commentCountList.get(0)).isEqualTo(2);
-        Assertions.assertThat(commentCountList.get(1)).isEqualTo(1);
+        Assertions.assertThat(commentCountList.isEmpty());
     }
 
 

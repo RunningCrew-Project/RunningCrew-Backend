@@ -1,5 +1,8 @@
 package com.project.runningcrew.board.service;
 
+import com.project.runningcrew.board.entity.InfoBoard;
+import com.project.runningcrew.board.entity.ReviewBoard;
+import com.project.runningcrew.comment.service.CommentService;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.resourceimage.entity.BoardImage;
@@ -9,10 +12,12 @@ import com.project.runningcrew.board.repository.BoardRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
 import com.project.runningcrew.image.ImageService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -26,6 +31,8 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardImageRepository boardImageRepository;
     private final ImageService imageService;
+
+    private final CommentService commentService;
     private final String imageDirName = "board";
 
 
@@ -47,10 +54,14 @@ public class BoardService {
      */
     public Long saveBoard(Board board, List<MultipartFile> multipartFiles) {
         Board savedBoard = boardRepository.save(board);
-        for (MultipartFile multipartFile : multipartFiles) {
-            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-            boardImageRepository.save(new BoardImage(imageUrl, savedBoard));
+
+        if(multipartFiles != null) {
+            for (MultipartFile multipartFile : multipartFiles) {
+                String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
+                boardImageRepository.save(new BoardImage(imageUrl, savedBoard));
+            }
         }
+
         return savedBoard.getId();
     }
 
@@ -67,18 +78,36 @@ public class BoardService {
         if(!originBoard.getTitle().equals(newBoard.getTitle())) {
             originBoard.updateTitle(newBoard.getTitle());
         }
+
         if(!originBoard.getDetail().equals(newBoard.getDetail())) {
             originBoard.updateDetail(newBoard.getDetail());
         }
 
-        for (MultipartFile multipartFile : addFiles) {
-            String imgUrl = imageService.uploadImage(multipartFile, imageDirName);
-            boardImageRepository.save(new BoardImage(imgUrl, originBoard));
+        if(originBoard instanceof ReviewBoard && newBoard instanceof ReviewBoard) {
+            //note 리뷰 게시글의 경우 런닝기록 수정이 가능하다.
+            ((ReviewBoard) originBoard).updateRunningRecord(((ReviewBoard) newBoard).getRunningRecord());
         }
-        for (BoardImage boardImage : deleteFiles) {
-            imageService.deleteImage(boardImage.getFileName());
-            boardImageRepository.delete(boardImage);
+
+        if(originBoard instanceof InfoBoard && newBoard instanceof InfoBoard) {
+            //note 정보 게시글의 경우 런닝기록 수정이 가능하다.
+            ((InfoBoard) originBoard).updateRunningRecord(((InfoBoard) newBoard).getRunningRecord());
         }
+
+
+        if(!CollectionUtils.isEmpty(addFiles)) {
+            for (MultipartFile multipartFile : addFiles) {
+                String imgUrl = imageService.uploadImage(multipartFile, imageDirName);
+                boardImageRepository.save(new BoardImage(imgUrl, originBoard));
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(deleteFiles)) {
+            for (BoardImage boardImage : deleteFiles) {
+                imageService.deleteImage(boardImage.getFileName());
+                boardImageRepository.delete(boardImage);
+            }
+        }
+
     }
 
     /**
@@ -96,6 +125,9 @@ public class BoardService {
 
         boardImageRepository.deleteAll(deleteBoards);
         // boardImage delete
+
+        commentService.deleteCommentAtBoard(board);
+        // boardComment delete
 
         boardRepository.delete(board);
         // board delete
@@ -117,8 +149,8 @@ public class BoardService {
      * @param keyword 검색단어 keyword
      * @return 특정 Crew 의 Board 중 keyword 를 제목 or 내용에 포함하는 Board List
      */
-    public Slice<Board> findBoardByCrewAndKeyWord(Crew crew, String keyword) {
-        return boardRepository.findSliceAllByCrewAndKeyWord(keyword, crew);
+    public Slice<Board> findBoardByCrewAndKeyWord(Crew crew, String keyword, Pageable pageable) {
+        return boardRepository.findSliceAllByCrewAndKeyWord(keyword, crew, pageable);
     }
 
 

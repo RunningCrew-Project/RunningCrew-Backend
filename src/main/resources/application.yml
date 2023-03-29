@@ -14,20 +14,17 @@ spring:
         format_sql: true
 
 
-
-
 cloud:
   aws:
     credentials:
-      accessKey: AKIAQP4HH4EEEJAJZBFS # test-user-yongsoo IAM 사용자의 엑세스 키
-      secretKey: bzhtesa6GH+zBojTpK2WKzVCxcwZCiplha+FPVV8 # test-user-yongsoo IAM 사용자의 비밀 키
+      accessKey: ${ACCESS-KEY}
+      secretKey: ${SECRET-KEY}
     s3:
-      bucket: running-crew-s3
+      bucket: running-crew-test-s3
     region:
       static: ap-northeast-2
     stack:
       auto: false
-
 
 
 
@@ -36,13 +33,20 @@ logging.level:
   org.hibernate.type: trace
 
 
+s3:
+  host:
+    name: https://running-crew-test-s3.s3.ap-northeast-2.amazonaws.com/
 
 fcm:
   key:
     path: fcm/running-crew-project-firebase-adminsdk-ta9q7-fa58725efe.json
 
+area:
+  file:
+    path: area/seoul.csv
+
 jwt:
-  secret-key: 6B64DCA4E72F58EDIKU9AAB215FE7
+  secret-key: ${JWT-TOKEN}
 
 domain:
   name: http://localhost:8080

@@ -3,10 +3,14 @@ package com.project.runningcrew.member.controller;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
+import com.project.runningcrew.crewcondition.service.CrewConditionService;
 import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.badinput.CrewJoinApplyException;
 import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.dto.CreateMemberRequest;
+import com.project.runningcrew.member.dto.GetMemberResponse;
 import com.project.runningcrew.member.dto.MemberListResponse;
 import com.project.runningcrew.member.dto.SimpleMemberDto;
 import com.project.runningcrew.member.entity.Member;
@@ -43,6 +47,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final CrewService crewService;
+    private final CrewConditionService crewConditionService;
     private final UserService userService;
     private final RunningNoticeService runningNoticeService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
@@ -53,7 +58,7 @@ public class MemberController {
     @Operation(summary = "멤버 가져오기", description = "memberId 에 해당하는 멤버를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SimpleMemberDto.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetMemberResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
@@ -62,11 +67,11 @@ public class MemberController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/api/members/{memberId}")
-    public ResponseEntity<SimpleMemberDto> getMember(@PathVariable("memberId") Long memberId,
+    public ResponseEntity<GetMemberResponse> getMember(@PathVariable("memberId") Long memberId,
                                                      @Parameter(hidden = true) @CurrentUser User user) {
         Member member = memberService.findById(memberId);
         memberAuthorizationChecker.checkMember(user, member.getCrew());
-        return ResponseEntity.ok(new SimpleMemberDto(member));
+        return ResponseEntity.ok(new GetMemberResponse(member));
     }
 
 
@@ -85,7 +90,14 @@ public class MemberController {
                                              @RequestBody @Valid CreateMemberRequest createMemberRequest,
                                              @Parameter(hidden = true) @CurrentUser User user) {
         Crew crew = crewService.findById(crewId);
-        memberAuthorizationChecker.checkManager(user, crew);
+        CrewCondition crewCondition = crewConditionService.findByCrew(crew);
+        if (!crewCondition.isJoinApply()) {
+            throw new CrewJoinApplyException();
+        }
+
+        if (crewCondition.isJoinQuestion()) {
+            memberAuthorizationChecker.checkManager(user, crew);
+        }
 
         User joinUser = userService.findById(createMemberRequest.getUserId());
         Long memberId = memberService.acceptMember(new Member(joinUser, crew, MemberRole.ROLE_NORMAL));
@@ -272,6 +284,27 @@ public class MemberController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new MemberListResponse(runningMembers.size(), runningMembers));
+    }
+
+
+    @Operation(summary = "현재 로그인한 유저의 특정 크루 멤버 가져오기", description = "현재 로그인한 유저의 crewId 를 가진 크루에서의 멤버 정보를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SimpleMemberDto.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/crews/{crewId}/me")
+    public ResponseEntity<SimpleMemberDto> getCurrentMember(@PathVariable("crewId") Long crewId,
+                                                            @Parameter(hidden = true) @CurrentUser User user) {
+        Crew crew = crewService.findById(crewId);
+        Member currentMember = memberAuthorizationChecker.checkMember(user, crew);
+
+        return ResponseEntity.ok(new SimpleMemberDto(currentMember));
     }
 
 }
