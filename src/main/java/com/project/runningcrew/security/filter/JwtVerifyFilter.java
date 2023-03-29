@@ -1,6 +1,7 @@
 package com.project.runningcrew.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.runningcrew.exception.notFound.ResourceNotFoundException;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
@@ -13,7 +14,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -82,13 +82,27 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
         }
 
         if (email != null) {
-            User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-            UserRole userRole = userRoleRepository.findByUser(user).orElseThrow(UserRoleNotFoundException::new);
-            CustomUserDetail customUserDetail = new CustomUserDetail(user, userRole);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    customUserDetail, null, customUserDetail.getAuthorities());
+            try {
+                User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+                UserRole userRole = userRoleRepository.findByUser(user).orElseThrow(UserRoleNotFoundException::new);
+                CustomUserDetail customUserDetail = new CustomUserDetail(user, userRole);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        customUserDetail, null, customUserDetail.getAuthorities());
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (ResourceNotFoundException e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setCharacterEncoding("utf-8");
+
+                ErrorResponse errorResponse = ErrorResponse.builder()
+                        .status(HttpServletResponse.SC_BAD_REQUEST)
+                        .messages(e.getMessage())
+                        .errors(Map.of())
+                        .build();
+                objectMapper.writeValue(response.getOutputStream(), errorResponse);
+                return;
+            }
         }
         chain.doFilter(request, response);
     }
