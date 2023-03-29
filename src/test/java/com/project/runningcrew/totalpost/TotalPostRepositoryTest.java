@@ -114,7 +114,7 @@ class TotalPostRepositoryTest {
 
         ///when
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByMember(member.getId(), pageRequest);
+        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByMember(member, pageRequest);
 
         //then
         assertThat(totalPosts.getNumberOfElements()).isEqualTo(10);
@@ -144,7 +144,7 @@ class TotalPostRepositoryTest {
 
         ///when
         PageRequest pageRequest = PageRequest.of(1, 10);
-        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByMember(member.getId(), pageRequest);
+        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByMember(member, pageRequest);
 
         //then
         assertThat(totalPosts.getNumberOfElements()).isEqualTo(6);

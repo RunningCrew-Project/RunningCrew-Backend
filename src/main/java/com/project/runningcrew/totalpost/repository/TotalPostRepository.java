@@ -1,5 +1,6 @@
 package com.project.runningcrew.totalpost.repository;
 
+import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.totalpost.entity.PostType;
 import com.project.runningcrew.totalpost.entity.TotalPost;
 import lombok.RequiredArgsConstructor;
@@ -57,17 +58,17 @@ public class TotalPostRepository {
     }
 
     /**
-     * memberId 에 해당하는 member 가 작성한 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
+     * member 가 작성한 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
      *
-     * @param memberId Member 의 id
+     * @param member 글을 작성한 Member
      * @param pageable
      * @return memberId 에 해당하는 member 가 작성한 모든 게시글 또는 런닝공지
      */
-    public Slice<TotalPost> getTotalPostByMember(Long memberId, Pageable pageable) {
+    public Slice<TotalPost> getTotalPostByMember(Member member, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         Map<String, Object> params = Map.of(
-                "memberId", memberId,
+                "memberId", member.getId(),
                 "number", page * size,
                 "size", size + 1);
 
