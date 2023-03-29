@@ -1,8 +1,6 @@
 package com.project.runningcrew.user.service;
 
 
-import com.project.runningcrew.board.repository.BoardRepository;
-import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.exception.notFound.FcmTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.RefreshTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
@@ -19,11 +17,8 @@ import com.project.runningcrew.notification.repository.NotificationRepository;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.refreshtoken.entity.RefreshToken;
 import com.project.runningcrew.refreshtoken.repository.RefreshTokenRepository;
-import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
-import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
 import com.project.runningcrew.resourceimage.repository.RunningRecordImageRepository;
-import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
-import com.project.runningcrew.runningnotice.repository.RunningNoticeRepository;
+import com.project.runningcrew.runningrecord.repository.GpsRepository;
 import com.project.runningcrew.runningrecord.repository.RunningRecordRepository;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.repository.UserRepository;
@@ -53,6 +48,7 @@ public class UserService {
     private final UserRoleRepository userRoleRepository;
     private final NotificationRepository notificationRepository;
     private final RecruitAnswerRepository recruitAnswerRepository;
+    private final GpsRepository gpsRepository;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final String imageDirName = "user";
@@ -200,6 +196,7 @@ public class UserService {
     public void deleteUser(User user) {
         logOut(user);
         runningRecordImageRepository.deleteAllByUser(user);
+        gpsRepository.deleteAllByUser(user);
         runningRecordRepository.deleteAllByUser(user);
         notificationRepository.deleteAllByUser(user);
         recruitAnswerRepository.deleteAllByUser(user);
