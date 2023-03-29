@@ -175,7 +175,7 @@ public class RunningNoticeController {
                 .preRunningRecord(preRunningRecord)
                 .build();
 
-        Long runningNoticeId = runningNoticeService.saveRegularRunningNotice(
+        Long runningNoticeId = runningNoticeService.saveInstantRunningNotice(
                 runningNotice, createRunningNoticeRequest.getFiles());
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
