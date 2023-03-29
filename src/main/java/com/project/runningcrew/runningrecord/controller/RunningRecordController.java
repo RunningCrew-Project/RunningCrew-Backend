@@ -142,7 +142,7 @@ public class RunningRecordController {
         memberAuthorizationChecker.checkMember(user, crew);
 
         CrewRunningRecord crewRunningRecord = CrewRunningRecord.builder()
-                .title(crew.getName() + " " + runningNotice.getNoticeType())
+                .title(crew.getName() + " " + runningNotice.getNoticeType().getName())
                 .startDateTime(createCrewRunningRequest.getStartDateTime())
                 .location(createCrewRunningRequest.getLocation())
                 .runningDistance(createCrewRunningRequest.getRunningDistance())
@@ -179,10 +179,9 @@ public class RunningRecordController {
             @ApiResponse(responseCode = "404", description = "BAD REQUEST",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping(value = "/api/users/{userId}/running-notices")
-    public ResponseEntity<PagingResponse> getRunningRecordsByUser(@PathVariable("userId") Long userId,
-                                                                  @RequestParam("page") @PositiveOrZero int page) {
-        User user = userService.findById(userId);
+    @GetMapping(value = "/api/running-records")
+    public ResponseEntity<PagingResponse<SimpleRunningRecordDto>> getRunningRecordsByUser(@RequestParam("page") @PositiveOrZero int page,
+                                                                  @Parameter(hidden = true) @CurrentUser User user) {
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
         Slice<RunningRecord> runningRecordSlice = runningRecordService.findByUser(user, pageRequest);
 
@@ -190,7 +189,7 @@ public class RunningRecordController {
                 .map(SimpleRunningRecordDto::new)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new PagingResponse(
+        return ResponseEntity.ok(new PagingResponse<>(
                 new SliceImpl<>(simpleRunningRecordDtoList, runningRecordSlice.getPageable(), runningRecordSlice.hasNext())));
     }
 
