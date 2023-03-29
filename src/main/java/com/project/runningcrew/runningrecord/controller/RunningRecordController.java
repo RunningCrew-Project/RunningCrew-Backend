@@ -3,6 +3,7 @@ package com.project.runningcrew.runningrecord.controller;
 import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.PagingResponse;
 import com.project.runningcrew.common.dto.SimpleRunningRecordDto;
+import com.project.runningcrew.common.dto.YearMonthDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exception.badinput.RunningNoticeDoneException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
@@ -39,7 +40,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.net.URI;
 import java.time.LocalDate;
