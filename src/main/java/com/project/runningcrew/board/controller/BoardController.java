@@ -31,24 +31,21 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Tag(name = "board", description = "게시글에 관한 api")
+@Tag(name = "Board", description = "게시글에 관한 api")
 @RestController
 @RequiredArgsConstructor
 @Slf4j

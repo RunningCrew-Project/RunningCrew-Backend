@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "recruitAnswer", description = "가입 답변에 관한 api")
+@Tag(name = "RecruitAnswer", description = "가입 답변에 관한 api")
 @RestController
 @RequiredArgsConstructor
 public class RecruitAnswerController {

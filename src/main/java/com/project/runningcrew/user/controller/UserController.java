@@ -2,20 +2,17 @@ package com.project.runningcrew.user.controller;
 
 import com.project.runningcrew.area.service.DongAreaService;
 import com.project.runningcrew.common.annotation.CurrentUser;
-import com.project.runningcrew.common.dto.SimpleCommentDto;
 import com.project.runningcrew.common.dto.SimpleUserDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exception.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
-import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
 import com.project.runningcrew.user.dto.request.*;
 import com.project.runningcrew.user.dto.response.GetMyDataResponse;
 import com.project.runningcrew.user.dto.response.GetUserResponse;
 import com.project.runningcrew.user.dto.response.UserListResponse;
-import com.project.runningcrew.user.entity.Sex;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +26,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,10 +34,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Tag(description = "user 에 관한 api", name = "user")
+@Tag(name = "User", description = "user 에 관한 api")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -51,7 +46,6 @@ public class UserController {
     private final UserService userService;
     private final DongAreaService dongAreaService;
     private final CrewService crewService;
-    private final MemberService memberService;
     private final RecruitAnswerService recruitAnswerService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
 
@@ -59,7 +53,7 @@ public class UserController {
     private String host;
 
 
-    @Operation(summary = "특정 유저 정보 가져오기", description = "유저 아이디에 맞는 유저의 정보를 가져온다.")
+    @Operation(summary = "특정 유저 정보 가져오기", description = "유저 아이디에 맞는 유저의 정보를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetUserResponse.class))),
@@ -73,7 +67,6 @@ public class UserController {
     }
 
 
-
     @Operation(summary = "유저 생성하기", description = "유저 정보를 생성한 후 저장한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED", content = @Content()),
@@ -85,7 +78,7 @@ public class UserController {
     @PostMapping(value = "/api/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createUser(@ModelAttribute @Valid CreateUserRequest createUserRequest) {
 
-        if(!createUserRequest.getPassword().equals(createUserRequest.getPasswordCheck())) {
+        if (!createUserRequest.getPassword().equals(createUserRequest.getPasswordCheck())) {
             //note 비밀번호 & 비밀번호 재입력 Equal Check -> 일치하지 않으면 예외 발생
             throw new PasswordCheckFailException();
         }
@@ -104,19 +97,19 @@ public class UserController {
 
 
         //note 필수 아닌 값 Update
-        if(createUserRequest.getSex() != null) {
+        if (createUserRequest.getSex() != null) {
             user.updateSex(createUserRequest.getSex());
         }
 
-        if(createUserRequest.getBirthday() != null) {
+        if (createUserRequest.getBirthday() != null) {
             user.updateBirthday(createUserRequest.getBirthday());
         }
 
-        if(createUserRequest.getHeight() != null) {
+        if (createUserRequest.getHeight() != null) {
             user.updateHeight(createUserRequest.getHeight());
         }
 
-        if(createUserRequest.getWeight() != null) {
+        if (createUserRequest.getWeight() != null) {
             user.updateWeight(createUserRequest.getWeight());
         }
 
@@ -133,7 +126,6 @@ public class UserController {
         return ResponseEntity.created(uri).build();
 
     }
-
 
 
     @Operation(summary = "유저 수정하기", description = "유저 정보를 수정한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
@@ -178,19 +170,19 @@ public class UserController {
 
 
         //note 필수 아닌 값 Update
-        if(updateUserRequest.getSex() != null) {
+        if (updateUserRequest.getSex() != null) {
             updateUser.updateSex(updateUserRequest.getSex());
         }
 
-        if(updateUserRequest.getBirthday() != null) {
+        if (updateUserRequest.getBirthday() != null) {
             updateUser.updateBirthday(updateUserRequest.getBirthday());
         }
 
-        if(updateUserRequest.getHeight() != null) {
+        if (updateUserRequest.getHeight() != null) {
             updateUser.updateHeight(updateUserRequest.getHeight());
         }
 
-        if(updateUserRequest.getWeight() != null) {
+        if (updateUserRequest.getWeight() != null) {
             updateUser.updateWeight(updateUserRequest.getWeight());
         }
 
@@ -199,8 +191,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
 
     }
-
-
 
 
     @Operation(summary = "유저 삭제하기", description = "유저 정보를 삭제한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
@@ -217,13 +207,11 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(
             @PathVariable("userId") Long userId,
             @Parameter(hidden = true) @CurrentUser User user
-    )
-    {
+    ) {
         User findUser = userService.findById(userId);
         userService.deleteUser(findUser);
         return ResponseEntity.noContent().build();
     }
-
 
 
     @Operation(summary = "유저 로그아웃", description = "유저 상태를 로그아웃으로 변경.", security = {@SecurityRequirement(name = "Bearer-Key")})
@@ -291,7 +279,6 @@ public class UserController {
     }
 
 
-
     @Operation(summary = "유저 이메일 중복체크하기", description = "유저 이메일 중복체크한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
@@ -325,7 +312,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
         //note 중복 체크 통과 -> 204 No Content
     }
-
 
 
 }

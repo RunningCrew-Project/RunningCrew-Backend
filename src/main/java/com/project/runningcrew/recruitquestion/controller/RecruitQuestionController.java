@@ -35,7 +35,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "recruitQuestion", description = "가입 질문에 관한 api")
+@Tag(name = "RecruitQuestion", description = "가입 질문에 관한 api")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
