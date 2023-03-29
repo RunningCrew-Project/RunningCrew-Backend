@@ -203,7 +203,7 @@ public class RunningRecordController {
             @ApiResponse(responseCode = "404", description = "BAD REQUEST",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping(value = "/api/running-records")
+    @GetMapping(value = "/api/running-records/on-date")
     public ResponseEntity<RunningRecordListResponse> getRunningRecordByDate(
             @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
             @Parameter(hidden = true) @CurrentUser User user) {
