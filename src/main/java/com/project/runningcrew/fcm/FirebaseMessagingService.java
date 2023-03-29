@@ -5,6 +5,7 @@ import com.google.firebase.messaging.MulticastMessage;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.NoticeBoard;
 import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.notification.entity.NotificationType;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.user.entity.User;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -53,7 +55,9 @@ public class FirebaseMessagingService {
         List<String> tokens = fcmTokenList.stream().map(FcmToken::getFcmToken).collect(Collectors.toList());
         sendMessages(tokens, NotificationTitle.NEW_NOTICE_BOARD_TITLE,
                 noticeBoard.getTitle(),
-                crew.getCrewImgUrl());
+                crew.getCrewImgUrl(),
+                NotificationType.NOTICE_BOARD,
+                noticeBoard.getId());
 
     }
 
@@ -83,7 +87,9 @@ public class FirebaseMessagingService {
         List<String> tokens = fcmTokenList.stream().map(FcmToken::getFcmToken).collect(Collectors.toList());
         sendMessages(tokens, NotificationTitle.NEW_REGULAR_RUNNING_NOTICE_TITLE,
                 runningNotice.getTitle(),
-                crew.getCrewImgUrl());
+                crew.getCrewImgUrl(),
+                NotificationType.REGULAR_RUNNING_NOTICE,
+                runningNotice.getId());
     }
 
     /**
@@ -94,7 +100,8 @@ public class FirebaseMessagingService {
      * @param body   알림 내용
      * @param imgUrl 알림 이미지
      */
-    private void sendMessages(List<String> tokens, String title, String body, String imgUrl) {
+    private void sendMessages(List<String> tokens, String title, String body, String imgUrl,
+                              NotificationType notificationType, Long id) {
         MulticastMessage messages = MulticastMessage.builder()
                 .setNotification(
                         com.google.firebase.messaging.Notification.builder()
@@ -103,6 +110,10 @@ public class FirebaseMessagingService {
                                 .setImage(imgUrl)
                                 .build())
                 .addAllTokens(tokens)
+                .putAllData(Map.of(
+                        "type",notificationType.toString(),
+                        "id", id.toString()
+                ))
                 .build();
         FirebaseMessaging.getInstance().sendMulticastAsync(messages);
     }
