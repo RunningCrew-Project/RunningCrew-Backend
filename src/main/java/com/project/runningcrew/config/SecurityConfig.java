@@ -13,6 +13,7 @@ import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,6 +38,23 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
+    private final String[] SWAGGER_URL = {
+            "/swagger-*/**", "/v3/api-docs/**"
+    };
+    private final String[] GET_PERMIT_API_URL = {
+            "/api/sido-areas",
+            "/api/sido-areas/**",
+            "/api/gu-areas",
+            "/api/gu-areas/**",
+            "/api/crews",
+            "/api/crews/*",
+            "/api/crews/gu-areas/**"
+    };
+    private final String[] POST_PERMIT_API_URL = {
+            "/api/login",
+            "/api/users",
+            "/api/users/duplicate/**"
+    };
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -61,6 +79,10 @@ public class SecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler)
                 .and()
                 .authorizeRequests()
+                .antMatchers(SWAGGER_URL).permitAll()
+                .antMatchers(HttpMethod.GET, GET_PERMIT_API_URL).permitAll()
+                .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
+                .antMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .apply(new MyCustomDsl());

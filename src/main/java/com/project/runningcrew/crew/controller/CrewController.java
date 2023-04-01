@@ -160,7 +160,7 @@ public class CrewController {
     }
 
 
-    @Operation(summary = "크루 이름 중복 확인", description = "입력받은 이름을 가진 크루 확인한다.")
+    @Operation(summary = "크루 이름 중복 확인", description = "크루 이름의 중복을 확인한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",
@@ -168,7 +168,7 @@ public class CrewController {
             @ApiResponse(responseCode = "409", description = "CONFLICT",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/api/crews/name")
+    @PostMapping(value = "/api/crews/duplicate/name")
     public ResponseEntity<Void> checkCrewNameDuplicate(@RequestBody CrewNameRequest crewNameRequest) {
         String crewName = crewNameRequest.getName();
         if (crewService.existsByName(crewName)) {
@@ -224,7 +224,7 @@ public class CrewController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping(value = "/api/crews/gu-area/{guAreaId}")
+    @GetMapping(value = "/api/crews/gu-areas/{guAreaId}")
     public ResponseEntity<CrewListResponse<SimpleCrewDto>> findRandomCrewsByGuArea(@PathVariable("guAreaId") Long guAreaId) {
         GuArea guArea = guAreaService.findById(guAreaId);
         List<Crew> crews = crewService.findRandomByGuArea(guArea, 4);

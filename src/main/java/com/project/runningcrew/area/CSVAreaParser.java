@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +39,7 @@ public class CSVAreaParser {
 
         ClassPathResource resource = new ClassPathResource(path);
         String[] areaInfo;
-        try (CSVReader csvReader = new CSVReader(new FileReader(resource.getFile()))) {
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(resource.getInputStream()))) {
             while ((areaInfo = csvReader.readNext()) != null) {
                 String sidoName = areaInfo[0];
                 if (!sidoMap.containsKey(sidoName)) {

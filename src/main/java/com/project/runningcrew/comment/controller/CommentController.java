@@ -1,6 +1,5 @@
 package com.project.runningcrew.comment.controller;
 
-import com.amazonaws.services.cloudformation.model.Change;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.board.service.BoardService;
 import com.project.runningcrew.comment.dto.request.ChangeCommentRequest;
@@ -25,7 +24,6 @@ import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.service.RunningNoticeService;
 import com.project.runningcrew.user.entity.User;
-import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,25 +33,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "comment", description = "댓글에 관한 api")
+@Tag(name = "Comment", description = "댓글에 관한 api")
 @RestController
 @RequiredArgsConstructor
 public class CommentController {
@@ -288,7 +281,9 @@ public class CommentController {
     }
 
 
-    @Operation(summary = "특정 멤버가 작성한 모든 댓글 정보 가져오기", description = "특정 멤버가 작성한 모든 댓글 정보를 가져온다.")
+    @Operation(summary = "특정 멤버가 작성한 모든 댓글 정보 가져오기",
+            description = "특정 멤버가 작성한 모든 댓글 정보를 가져온다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
