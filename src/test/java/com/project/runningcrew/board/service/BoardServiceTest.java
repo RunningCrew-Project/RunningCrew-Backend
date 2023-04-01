@@ -178,69 +178,8 @@ public class BoardServiceTest {
         assertThat(findSlice.getNumber()).isEqualTo(0);
         assertThat(findSlice.hasNext()).isFalse();
     }
-//
-//    @DisplayName("특정 키워드를 제목 or 내용에 포함하는 게시글 가져오기 - 페이징 적용")
-//    @Test
-//    void findBoardByCrewAndKeyWordTest(@Mock Member member, @Mock Crew crew) throws Exception {
-//        //given
-//        String keyword = "key";
-//        List<Board> boardList = new ArrayList<>();
-//        for (int i = 0; i < 7; i++) {
-//            boardList.add(new FreeBoard(member, "title" + i, "content" + i));
-//        }
-//        for (int i = 0; i < 3; i++) {
-//            boardList.add(new FreeBoard(member, "ti_key_tle" + i, "content" + i));
-//        }
-//        for (int i = 0; i < 3; i++) {
-//            boardList.add(new FreeBoard(member, "title" + i, "cont_key_ent" + i));
-//        }
-//
-//        List<Board> realList = new ArrayList<>();
-//        for (Board board : boardList) {
-//            if(board.getDetail().contains(keyword) || board.getTitle().contains(keyword)) {
-//                realList.add(board);
-//            }
-//        }
-//
-//        PageRequest pageRequest = PageRequest.of(0, 10);
-//        SliceImpl<Board> boardSlice = new SliceImpl<>(realList, pageRequest, false);
-//        when(boardService.findBoardByCrewAndKeyWord(crew, keyword)).thenReturn(boardSlice);
-//
-//        //when
-//        Slice<Board> findSlice = boardService.findBoardByCrewAndKeyWord(crew, keyword);
-//        List<Board> findList = findSlice.getContent();
-//
-//        //then
-//        assertThat(findList.size()).isEqualTo(6);
-//        assertThat(findSlice.getNumberOfElements()).isEqualTo(6);
-//        assertThat(findSlice.getSize()).isEqualTo(10);
-//        assertThat(findSlice.hasNext()).isFalse();
-//        assertThat(findSlice.isFirst()).isTrue();
-//    }
-//
-//    @DisplayName("특정 크루의 자유게시판 목록 가져오기 - 페이징 적용")
-//    @Test
-//    void findFreeBoardByCrewTest(@Mock Member member, @Mock Crew crew) throws Exception {
-//        //given
-//        List<FreeBoard> boardList = new ArrayList<>();
-//        for (int i = 0; i < 9; i++) {
-//            boardList.add(new FreeBoard(member, "title" + i, "content" + i));
-//        }
-//        PageRequest pageRequest = PageRequest.of(0, 10);
-//        SliceImpl<FreeBoard> boardSlice = new SliceImpl<>(boardList, pageRequest, false);
-//        when(freeBoardRepository.findFreeBoardByCrew(crew, pageRequest)).thenReturn(boardSlice);
-//
-//        //when
-//        Slice<FreeBoard> findSlice = freeBoardService.findFreeBoardByCrew(crew, pageRequest);
-//        List<FreeBoard> findList = findSlice.getContent();
-//
-//        //then
-//        assertThat(findList.size()).isEqualTo(9);
-//        assertThat(findSlice.getNumberOfElements()).isEqualTo(9);
-//        assertThat(findSlice.getSize()).isEqualTo(10);
-//        assertThat(findSlice.isFirst()).isTrue();
-//        assertThat(findSlice.hasNext()).isFalse();
-//    }
+
+
 
     @DisplayName("특정 크루의 공지게시판 목록 가져오기 - 페이징 적용")
     @Test
