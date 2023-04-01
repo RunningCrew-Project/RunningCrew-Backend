@@ -35,7 +35,6 @@ public class KakaoUserParser {
         Map<String, Object> attributes = getKakaoAttributes(oauthDto);
         KakaoUserInfo kakaoUserInfo = new KakaoUserInfo(attributes);
 
-
         String email = kakaoUserInfo.getEmail();
         String password = new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
         String name = kakaoUserInfo.getName();
