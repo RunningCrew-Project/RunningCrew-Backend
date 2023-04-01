@@ -1,24 +1,12 @@
 spring:
-  datasource:
-    url: jdbc:h2:tcp://localhost/~/running-crew
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-    properties:
-      hibernate:
-        format_sql: true
-
+  profiles:
+    default: dev
 
 cloud:
   aws:
     credentials:
-      accessKey: ${ACCESS-KEY}
-      secretKey: ${SECRET-KEY}
+      accessKey: ${ACCESS_KEY}
+      secretKey: ${SECRET_KEY}
     s3:
       bucket: running-crew-test-s3
     region:
@@ -26,12 +14,9 @@ cloud:
     stack:
       auto: false
 
-
-
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
-
 
 s3:
   host:
@@ -39,14 +24,14 @@ s3:
 
 fcm:
   key:
-    path: fcm/running-crew-project-firebase-adminsdk-ta9q7-fa58725efe.json
+    path: fcm/running-crew-project-a1657-firebase-adminsdk-w9ud2-c06f1b3126.json
 
 area:
   file:
     path: area/seoul.csv
 
 jwt:
-  secret-key: ${JWT-TOKEN}
+  secret-key: ${JWT_TOKEN}
 
 domain:
   name: http://localhost:8080

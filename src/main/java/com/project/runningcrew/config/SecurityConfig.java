@@ -82,7 +82,8 @@ public class SecurityConfig {
                 .antMatchers(SWAGGER_URL).permitAll()
                 .antMatchers(HttpMethod.GET, GET_PERMIT_API_URL).permitAll()
                 .antMatchers(HttpMethod.POST, POST_PERMIT_API_URL).permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
                 .and()
                 .apply(new MyCustomDsl());
 
