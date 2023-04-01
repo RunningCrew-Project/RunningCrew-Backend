@@ -36,7 +36,8 @@ public class GoogleUserParser {
     @Transactional
     public User getGoogleUser(OauthDto oauthDto) {
 
-        GoogleUserInfo googleUserInfo = getGoogleAttributes(oauthDto);
+        Map<String, Object> attributes = getGoogleAttributes(oauthDto);
+        GoogleUserInfo googleUserInfo = new GoogleUserInfo(attributes);
 
         String email = googleUserInfo.getEmail();
         String password = new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
@@ -67,8 +68,8 @@ public class GoogleUserParser {
     }
 
 
-    public GoogleUserInfo getGoogleAttributes (OauthDto oauthDto) {
-        Map<String, Object> block = WebClient.create()
+    public Map<String, Object> getGoogleAttributes (OauthDto oauthDto) {
+        return WebClient.create()
                 .get()
                 .uri("https://oauth2.googleapis.com/tokeninfo?id_token=" + oauthDto.getIdToken())
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(oauthDto.getAccessToken()))
@@ -76,7 +77,6 @@ public class GoogleUserParser {
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                 })
                 .block();
-        return new GoogleUserInfo(block);
     }
 
 
