@@ -31,16 +31,16 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @NotBlank(message = "이름은 필수값입니다.")
-    @Column(nullable = false)
+    //@NotBlank(message = "이름은 필수값입니다.")
+    //@Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "닉네임은 필수값입니다.")
-    @Column(unique = true, nullable = false)
+    //@NotBlank(message = "닉네임은 필수값입니다.")
+    //@Column(unique = true, nullable = false)
     private String nickname;
 
-    @NotBlank(message = "이미지는 필수값입니다.")
-    @Column(nullable = false)
+    //@NotBlank(message = "이미지는 필수값입니다.")
+    //@Column(nullable = false)
     private String imgUrl;
 
     @NotNull
@@ -48,8 +48,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private LoginType login_type;
 
-    @NotBlank(message = "핸드폰 번호는 필수값입니다.")
-    @Column(nullable = false)
+    //@NotBlank(message = "핸드폰 번호는 필수값입니다.")
+    //@Column(nullable = false)
     private String phoneNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
