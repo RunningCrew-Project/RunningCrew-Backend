@@ -12,6 +12,7 @@ import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.userrole.entity.UserRole;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -55,7 +57,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("loginDTo mapping exception : {}", e);
         }
         return null;
     }

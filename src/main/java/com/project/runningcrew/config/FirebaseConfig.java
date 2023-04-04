@@ -3,13 +3,16 @@ package com.project.runningcrew.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.io.InputStream;
 
+@Slf4j
 @Component
 public class FirebaseConfig {
 
@@ -27,8 +30,8 @@ public class FirebaseConfig {
                     .build();
 
             FirebaseApp.initializeApp(options);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("firebase init exception : {}", e);
         }
     }
 
