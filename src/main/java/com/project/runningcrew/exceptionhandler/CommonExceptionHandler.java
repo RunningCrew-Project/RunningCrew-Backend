@@ -5,6 +5,7 @@ import com.project.runningcrew.exception.AuthorizationException;
 import com.project.runningcrew.exception.alreadyExist.AlreadyExistsException;
 import com.project.runningcrew.exception.badinput.BadInputException;
 import com.project.runningcrew.exception.duplicate.DuplicateException;
+import com.project.runningcrew.exception.image.ImageException;
 import com.project.runningcrew.exception.jwt.JwtExpiredException;
 import com.project.runningcrew.exception.jwt.JwtVerificationException;
 import com.project.runningcrew.exception.notFound.ResourceNotFoundException;
@@ -172,6 +173,22 @@ public class CommonExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .messages(e.getMessage())
                 .errors(e.getBadInputMaps())
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * ImageException 이 발생하면, ErrorResponse 와 HttpStatus.BAD_REQUEST 를 담은 ResponseEntity 를 반환
+     *
+     * @param e
+     * @return ErrorResponse 와 HttpStatus.BAD_REQUEST 를 담은 ResponseEntity
+     */
+    @ExceptionHandler(ImageException.class)
+    public ResponseEntity<ErrorResponse> ImageExceptionHandler(ImageException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .messages(e.getMessage())
+                .errors(e.getErrors())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

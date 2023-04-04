@@ -3,10 +3,9 @@ package com.project.runningcrew.image;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.project.runningcrew.exception.ImageFileCreationException;
-import com.project.runningcrew.exception.s3.S3DeleteException;
-import com.project.runningcrew.exception.s3.S3UploadException;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.project.runningcrew.exception.image.EmptyImageFileException;
+import com.project.runningcrew.exception.image.s3.S3DeleteException;
+import com.project.runningcrew.exception.image.s3.S3UploadException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +22,7 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class ImageS3ServiceImpl implements ImageService{
+public class ImageS3ServiceImpl implements ImageService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -37,14 +36,15 @@ public class ImageS3ServiceImpl implements ImageService{
 
     /**
      * MultipartFile 을 S3 스토리지에 업로드하고 url 을 반환한다.
+     *
      * @param multipartFile 저장할 MultipartFile
-     * @param dirName 이미지를 저장할 directory
+     * @param dirName       이미지를 저장할 directory
      * @return 저장된 s3 스토리지의 url
      */
     @Override
     public String uploadImage(MultipartFile multipartFile, String dirName) {
         if (multipartFile.isEmpty()) {
-            throw new ImageFileCreationException();
+            throw new EmptyImageFileException();
         }
 
         String s3FileName = dirName + "/" + UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
@@ -57,7 +57,8 @@ public class ImageS3ServiceImpl implements ImageService{
             amazonS3.putObject(bucketName, s3FileName, multipartFile.getInputStream(), obj);
         } catch (Exception e) {
             //note 이미지 업로드 에러 발생
-            throw new S3UploadException();
+            log.error("image S3 upload exception : {}", e);
+            throw new S3UploadException(bucketName);
         }
 
         return amazonS3.getUrl(bucketName, s3FileName).toString();
@@ -66,12 +67,15 @@ public class ImageS3ServiceImpl implements ImageService{
 
     /**
      * s3 스토리지에 저장된 이미지를 삭제한다.
+     *
      * @param fileUrl 삭제할 s3 스토리지의 이미지 url
      */
     @Override
     public void deleteImage(String fileUrl) {
 
-        if (!fileUrl.startsWith(hostName)) { throw new S3DeleteException(); }
+        if (!fileUrl.startsWith(hostName)) {
+            throw new S3DeleteException(bucketName, fileUrl);
+        }
 
         String decodeURL = URLDecoder.decode(
                 fileUrl.replace(hostName, "").replaceAll("\\p{Z}", ""),
@@ -80,10 +84,14 @@ public class ImageS3ServiceImpl implements ImageService{
         );
 
         boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, decodeURL);
-        log.info("fileUrl={}",decodeURL);
+        log.info("fileUrl={}", decodeURL);
 
-        if(isObjectExist) { amazonS3Client.deleteObject(bucketName, decodeURL); }
-        else { throw new S3DeleteException(); }
+        if (isObjectExist) {
+            amazonS3Client.deleteObject(bucketName, decodeURL);
+        } else {
+            log.error("it's an S3 image that doesn't exist in S3 bucket");
+            throw new S3DeleteException(bucketName, decodeURL);
+        }
 
     }
 }

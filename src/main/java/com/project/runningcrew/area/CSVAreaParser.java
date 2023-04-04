@@ -73,8 +73,7 @@ public class CSVAreaParser {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("csv read exception : {}", e);
         }
     }
 

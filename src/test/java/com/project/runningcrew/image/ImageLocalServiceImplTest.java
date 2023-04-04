@@ -1,7 +1,6 @@
 package com.project.runningcrew.image;
 
-import com.project.runningcrew.exception.ImageFileCreationException;
-import com.project.runningcrew.image.ImageService;
+import com.project.runningcrew.exception.image.local.LocalImageUploadException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +45,7 @@ class ImageLocalServiceImplTest {
         ///when
         //then
         assertThatThrownBy(() -> imageService.uploadImage(mockMultipartFile, "testtest"))
-                .isInstanceOf(ImageFileCreationException.class);
+                .isInstanceOf(LocalImageUploadException.class);
     }
 
     @DisplayName("Image 로컬에서 삭제 성공 테스트")
@@ -78,7 +77,7 @@ class ImageLocalServiceImplTest {
         ///when
         //then
         assertThatThrownBy(() -> imageService.deleteImage(fileUrl))
-                .isInstanceOf(ImageFileCreationException.class);
+                .isInstanceOf(LocalImageUploadException.class);
     }
 
 }
