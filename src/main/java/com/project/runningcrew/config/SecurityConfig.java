@@ -8,6 +8,7 @@ import com.project.runningcrew.security.exceptionhandler.CustomAuthenticationEnt
 import com.project.runningcrew.security.filter.JwtAuthenticationFilter;
 import com.project.runningcrew.security.JwtProvider;
 import com.project.runningcrew.security.filter.JwtVerifyFilter;
+import com.project.runningcrew.security.filter.LoggingFilter;
 import com.project.runningcrew.user.repository.UserRepository;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -85,7 +87,9 @@ public class SecurityConfig {
                 .antMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
-                .apply(new MyCustomDsl());
+                .apply(new MyCustomDsl())
+                .and()
+                .addFilterBefore(new LoggingFilter(), WebAsyncManagerIntegrationFilter.class);
 
         return http.build();
     }

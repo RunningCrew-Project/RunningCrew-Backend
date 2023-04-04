@@ -12,6 +12,7 @@ import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
+@Slf4j
 public class JwtVerifyFilter extends BasicAuthenticationFilter {
 
     private final UserRepository userRepository;
@@ -54,7 +56,7 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
         String jwtToken = jwtHeader.replace("Bearer ", "");
         String email = null;
         try {
-            email =  Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwtToken).getBody().getSubject();
+            email = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwtToken).getBody().getSubject();
         } catch (ExpiredJwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -90,6 +92,7 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
                         customUserDetail, null, customUserDetail.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                request.setAttribute("user", email);
             } catch (ResourceNotFoundException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
