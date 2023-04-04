@@ -1,8 +1,8 @@
 package com.project.runningcrew.image;
 
-import com.project.runningcrew.exception.ImageFileCreationException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.project.runningcrew.exception.image.EmptyImageFileException;
+import com.project.runningcrew.exception.image.local.LocalImageDeleteException;
+import com.project.runningcrew.exception.image.local.LocalImageUploadException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -20,12 +20,12 @@ public class ImageLocalServiceImpl implements ImageService {
      * @param multipartFile 저장할 MultipartFile
      * @param dirName 이미지를 저장할 directory
      * @return MultipartFile 이 저장된 경로
-     * @throws ImageFileCreationException MultipartFile 이 empty 이거나 MultipartFile 을 사용해 File 인스턴스 생성에 실패할 때
+     * @throws LocalImageUploadException MultipartFile 이 empty 이거나 MultipartFile 을 사용해 File 인스턴스 생성에 실패할 때
      */
     @Override
     public String uploadImage(MultipartFile multipartFile, String dirName) {
         if (multipartFile.isEmpty()) {
-            throw new ImageFileCreationException();
+            throw new EmptyImageFileException();
         }
         String fileName = UUID.randomUUID().toString();
         String extension = multipartFile.getOriginalFilename().split("\\.")[1];
@@ -34,7 +34,7 @@ public class ImageLocalServiceImpl implements ImageService {
         try {
             multipartFile.transferTo(uploadFile);
         } catch (Exception e) {
-            throw new ImageFileCreationException();
+            throw new LocalImageUploadException(uploadFile.getAbsolutePath());
         }
         return uploadFile.getAbsolutePath();
     }
@@ -42,14 +42,14 @@ public class ImageLocalServiceImpl implements ImageService {
     /**
      * 로컬에 저장된 경로가 fileUrl 인 Image 를 삭제한다.
      * @param fileUrl 삭제할 Image 의 경로
-     * @throws ImageFileCreationException fileUrl 로 File 인스턴스 생성에 실패할 때
+     * @throws LocalImageUploadException fileUrl 로 File 인스턴스 생성에 실패할 때
      */
 
     @Override
     public void deleteImage(String fileUrl) {
         File deleteFile = new File(fileUrl);
         if (!deleteFile.exists()) {
-            throw new ImageFileCreationException();
+            throw new LocalImageDeleteException(fileUrl);
         }
         deleteFile.delete();
     }
