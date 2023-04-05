@@ -22,7 +22,7 @@ public class User extends BaseEntity {
     //note 필수 값
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 

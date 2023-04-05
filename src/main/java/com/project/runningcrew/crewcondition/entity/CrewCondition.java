@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 public class CrewCondition {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "crew_condition_id")
     private Long id;
 

@@ -16,7 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -29,7 +33,6 @@ class NotificationRepositoryTest {
 
     @Autowired
     TestEntityFactory testEntityFactory;
-
 
     @DisplayName("공지글 Notification 저장 테스트")
     @Test
@@ -200,6 +203,60 @@ class NotificationRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 12);
         Slice<Notification> notifications = notificationRepository.findByUser(user, pageRequest);
         assertThat(notifications.isEmpty()).isTrue();
+    }
+
+    @DisplayName("Spring Data Jpa 의 saveAll 테스트")
+    @Test
+    public void saveAllTest1() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        List<Notification> notifications = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
+            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            notifications.add(notification);
+        }
+
+
+        ///when
+        long start = System.currentTimeMillis();
+        notificationRepository.saveAll(notifications);
+        long end = System.currentTimeMillis();
+
+        //then
+        System.out.println("수행시간: " + (end - start));
+    }
+
+    @DisplayName("NamedParameterJdbcTemplate 의 saveAll 테스트")
+    @Test
+    public void saveAllTest2() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        List<Notification> notifications = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
+            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            notifications.add(notification);
+        }
+
+
+        ///when
+        long start = System.currentTimeMillis();
+        notificationRepository.saveAllCustom(notifications);
+        long end = System.currentTimeMillis();
+
+        //then
+        System.out.println("수행시간: " + (end - start));
     }
 
 }

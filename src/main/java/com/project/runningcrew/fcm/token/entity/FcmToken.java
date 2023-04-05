@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 public class FcmToken extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "fcm_token_id")
     private Long id;
 

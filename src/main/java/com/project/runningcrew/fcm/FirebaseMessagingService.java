@@ -50,7 +50,7 @@ public class FirebaseMessagingService {
         List<Notification> notifications = fcmTokenList.stream()
                 .map(f -> Notification.createNoticeBoardNotification(f.getUser(), crew, noticeBoard))
                 .collect(Collectors.toList());
-        notificationRepository.saveAll(notifications);
+        notificationRepository.saveAllCustom(notifications);
 
         List<String> tokens = fcmTokenList.stream().map(FcmToken::getFcmToken).collect(Collectors.toList());
         sendMessages(tokens, NotificationTitle.NEW_NOTICE_BOARD_TITLE,
@@ -82,7 +82,7 @@ public class FirebaseMessagingService {
         List<Notification> notifications = fcmTokenList.stream()
                 .map(f -> Notification.createRegularRunningNotification(f.getUser(), crew, runningNotice))
                 .collect(Collectors.toList());
-        notificationRepository.saveAll(notifications);
+        notificationRepository.saveAllCustom(notifications);
 
         List<String> tokens = fcmTokenList.stream().map(FcmToken::getFcmToken).collect(Collectors.toList());
         sendMessages(tokens, NotificationTitle.NEW_REGULAR_RUNNING_NOTICE_TITLE,

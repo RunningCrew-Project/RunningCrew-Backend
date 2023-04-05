@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class GuArea {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gu_area_id")
     private Long id;
 

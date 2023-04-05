@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 public class RunningNotice extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "running_notice_id")
     private Long id;
 

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 public class RefreshToken extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "refresh_token_id")
     private Long id;
 
