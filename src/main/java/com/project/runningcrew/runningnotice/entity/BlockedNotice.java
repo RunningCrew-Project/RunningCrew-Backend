@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class BlockedNotice extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "blocked_notice_id")
     private Long id;
 

@@ -21,7 +21,7 @@ import java.util.List;
 public abstract class RunningRecord extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "running_record_id")
     private Long id;
 

@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 public class Crew extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "crew_id")
     private Long id;
 

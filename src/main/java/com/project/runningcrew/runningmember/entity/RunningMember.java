@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class RunningMember extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "running_member_id")
     private Long id;
 

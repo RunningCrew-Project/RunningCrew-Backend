@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class SidoArea {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sido_area_id")
     private Long id;
 

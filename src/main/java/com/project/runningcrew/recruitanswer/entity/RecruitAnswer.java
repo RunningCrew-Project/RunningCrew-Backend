@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 public class    RecruitAnswer extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recruit_answer_id")
     private Long id;
 

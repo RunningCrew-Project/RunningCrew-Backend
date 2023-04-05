@@ -16,7 +16,7 @@ import javax.validation.constraints.PositiveOrZero;
 public class Gps extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "gps_id")
     private Long id;
 

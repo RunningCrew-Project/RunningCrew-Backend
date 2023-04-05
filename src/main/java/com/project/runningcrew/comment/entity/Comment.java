@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 public abstract class Comment extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Long id;
 
