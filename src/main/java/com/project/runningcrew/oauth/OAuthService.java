@@ -2,40 +2,86 @@ package com.project.runningcrew.oauth;
 
 
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
+import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.oauth.dto.request.OauthDto;
+import com.project.runningcrew.oauth.dto.request.SignUpDto;
 import com.project.runningcrew.oauth.dto.response.LoginResponse;
 import com.project.runningcrew.oauth.oauth2user.Oauth2UserFactory;
 import com.project.runningcrew.security.JwtProvider;
 import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.user.repository.UserRepository;
+import com.project.runningcrew.user.service.UserService;
 import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class OAuthService {
 
-
     private final JwtProvider jwtProvider;
     private final Oauth2UserFactory oauth2UserFactory;
-    private final UserRoleRepository userRoleRepository;
 
+    private final UserService userService;
+    private final ImageService imageService;
+    private final String imageDirName = "user";
 
     //note SOCIAL LOGIN
     public LoginResponse socialLogin(OauthDto oauthDto) {
 
-        User user = oauth2UserFactory.getOauth2User(oauthDto);
-        UserRole userRole = userRoleRepository.findByUser(user).orElseThrow(UserRoleNotFoundException::new);
+        OAuth2User oAuth2User = oauth2UserFactory.getOauth2User(oauthDto);
 
-        String accessToken = jwtProvider.createAccessToken(user, userRole);
-        String refreshToken = jwtProvider.createRefreshToken(user);
+        String accessToken = jwtProvider.createAccessToken(oAuth2User.getUser(), oAuth2User.getUserRole());
+        String refreshToken = jwtProvider.createRefreshToken(oAuth2User.getUser());
+        boolean initData = initDataInput(oAuth2User.getUser());
+        //note : 소셜로그인 정보에 추가정보 기입 유무 포함.
 
-        return new LoginResponse(user, accessToken, refreshToken);
-
+        return new LoginResponse(oAuth2User.getUser(), accessToken, refreshToken, initData);
     }
 
+
+    /**
+     * 초기 데이터는 Email 뿐이다. 나머지 추가정보를 받아서 업데이트한다.
+     * @param user 추가정보를 입력할 user 정보.
+     * @param signUpDto 회원가입 필수 추가정보 :  [ 이름, 닉네임, 프로필 이미지 ] + @
+     */
+    public void signUpData(User user, SignUpDto signUpDto) {
+        //note 필수 추가 정보
+        userService.duplicateNickname(user.getNickname());
+        user.updateNickname(signUpDto.getNickname());
+
+        user.updateName(signUpDto.getName());
+
+        String imageUrl = imageService.uploadImage(signUpDto.getFile(), imageDirName);
+        user.updateImgUrl(imageUrl);
+
+        //note 필수 X
+        if (signUpDto.getSex() != null) {
+            user.updateSex(signUpDto.getSex());
+        }
+        if (signUpDto.getBirthday() != null) {
+            user.updateBirthday(signUpDto.getBirthday());
+        }
+        if (signUpDto.getHeight() != null) {
+            user.updateHeight(signUpDto.getHeight());
+        }
+        if (signUpDto.getWeight() != null) {
+            user.updateWeight(signUpDto.getWeight());
+        }
+    }
+
+
+    /**
+     * 회원가입 직후 필수 추가 정보를 입력하였는지 확인한다. 모두 입력하였다면 true 를 반환한다.
+     * @param user 추가정보를 입력할 user 정보.
+     * @return 필수 추가 정보 입력 유무 : [ 이름, 닉네임, 프로필 이미지 ]
+     */
+    public boolean initDataInput(User user) {
+        return (user.getName() != null && user.getNickname() != null && user.getImgUrl() != null);
+    }
 
 }

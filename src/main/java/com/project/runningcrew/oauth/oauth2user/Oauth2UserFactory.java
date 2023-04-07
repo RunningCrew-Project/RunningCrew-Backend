@@ -1,6 +1,7 @@
 package com.project.runningcrew.oauth.oauth2user;
 
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
+import com.project.runningcrew.oauth.OAuth2User;
 import com.project.runningcrew.oauth.dto.request.OauthDto;
 import com.project.runningcrew.oauth.oauth2user.parser.AppleUserParser;
 import com.project.runningcrew.oauth.oauth2user.parser.GoogleUserParser;
@@ -21,7 +22,7 @@ public class Oauth2UserFactory {
     private final GoogleUserParser googleUserParser;
     private final AppleUserParser appleUserParser;
 
-    public User getOauth2User(OauthDto oauthDto) {
+    public OAuth2User getOauth2User(OauthDto oauthDto) {
 
         switch (oauthDto.getOrigin()) {
             case "kakao":

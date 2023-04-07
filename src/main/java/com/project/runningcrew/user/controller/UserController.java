@@ -100,15 +100,12 @@ public class UserController {
         if (createUserRequest.getSex() != null) {
             user.updateSex(createUserRequest.getSex());
         }
-
         if (createUserRequest.getBirthday() != null) {
             user.updateBirthday(createUserRequest.getBirthday());
         }
-
         if (createUserRequest.getHeight() != null) {
             user.updateHeight(createUserRequest.getHeight());
         }
-
         if (createUserRequest.getWeight() != null) {
             user.updateWeight(createUserRequest.getWeight());
         }
