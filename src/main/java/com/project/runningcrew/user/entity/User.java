@@ -56,7 +56,7 @@ public class User extends BaseEntity {
     @JoinColumn(name = "dong_area_id")
     private DongArea dongArea;
 
-    @NotNull
+    //@NotNull
     private String password;
 
 

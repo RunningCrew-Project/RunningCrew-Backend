@@ -49,25 +49,20 @@ public class OAuthController {
                     "\n 네이버, 카카오는 AccessToken, origin 총 2개." +
                     "\n 애플은 idToken, origin 총 2개."
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(value = "/api/login/oauth")
     public ResponseEntity<LoginResponse> oauth2Login(@RequestBody OauthDto oauthDto) {
         LoginResponse loginResponse = oAuthService.socialLogin(oauthDto);
         return ResponseEntity.ok().body(loginResponse);
+        //note : LoginResponse 에 추가정보 기입 유무 정보 포함.
     }
 
-
-    /**
-     *
-     * 3가지 소셜로그인으로 가져올 수 있는 공통 정보는 이메일 밖에 없다.
-     * Apple 의 경우 실사용자 이름, 프로필 이미지가 API 정보에 포함되지 않음.
-     * 따라서 나머지 정보는 회원가입 직후 추가 정보입력을 받는 방안이 필요함.
-     *
-     * 그런데 기존에는 회원가입을 UserService 에서 userService.saveNormalUser(user, createUserRequest.getFile()); 를 사용했는데
-     * 소셜로그인의 경우 OAuth 단계에서 회원가입이 안되어있으면 바로 등록하고 User 를 반환해야함.
-     * userService.saveNormalUser(user, createUserRequest.getFile()) 처럼 프로필 이미지와 함께 유저를 저장할 수 없을듯
-     *
-     *
-     */
 
 
     @Operation(
@@ -76,8 +71,14 @@ public class OAuthController {
             security = {@SecurityRequirement(name = "Bearer-Key")}
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "CREATED", content = @Content()),
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "CONFLICT",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
@@ -87,51 +88,13 @@ public class OAuthController {
             @ModelAttribute @Valid SignUpDto signUpDto,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
-
-        //note 필수 추가정보
-        String name = signUpDto.getName();
-        user.updateName(name);
-
-        String nickname = signUpDto.getNickname();
-        user.updateNickname(nickname);
-
-        MultipartFile file = signUpDto.getFile();
-        user.updateImgUrl(String.valueOf(file));
-
-        DongArea dongArea = dongAreaService.findById(signUpDto.getDongId());
-        user.updateDongArea(dongArea);
-
-
-        //note 필수 추가정보 X
-        if (signUpDto.getSex() != null) {
-            user.updateSex(signUpDto.getSex());
-        }
-
-        if (signUpDto.getBirthday() != null) {
-            user.updateBirthday(signUpDto.getBirthday());
-        }
-
-        if (signUpDto.getHeight() != null) {
-            user.updateHeight(signUpDto.getHeight());
-        }
-
-        if (signUpDto.getWeight() != null) {
-            user.updateWeight(signUpDto.getWeight());
-        }
-
-        /**
-        Long userId = userService.saveNormalUser(user, createUserRequest.getFile());
-
-        URI uri = UriComponentsBuilder
-                .fromHttpUrl(host)
-                .path("/api/users/{id}")
-                .build(userId);
-
-        return ResponseEntity.created(uri).build();
-         */
-        return null;
-
+        oAuthService.signUpData(user, signUpDto);
+        return ResponseEntity.noContent().build();
     }
+
+
+
+
 
 
 

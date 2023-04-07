@@ -3,6 +3,8 @@ package com.project.runningcrew.oauth.oauth2user.parser;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
+import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
+import com.project.runningcrew.oauth.OAuth2User;
 import com.project.runningcrew.oauth.dto.request.OauthDto;
 import com.project.runningcrew.oauth.oauth2user.userinfo.AppleUserInfo;
 import com.project.runningcrew.oauth.oauth2user.userinfo.KakaoUserInfo;
@@ -34,32 +36,33 @@ public class AppleUserParser {
     private final UserRoleRepository userRoleRepository;
 
     @Transactional
-    public User getAppleUser(OauthDto oauthDto) {
+    public OAuth2User getAppleUser(OauthDto oauthDto) {
 
         Map<String, Object> attributes = getAppleAttributes(oauthDto);
         AppleUserInfo appleUserInfo = new AppleUserInfo(attributes);
-
         String email = appleUserInfo.getEmail();
-        String password = new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
 
         if (!userRepository.existsByEmail(email)) {
+            log.info("입력받은 Email 로 가입된 Apple 회원이 없습니다.");
 
             User user = User.builder()
                     .email(email)
-                    .password(password)
                     .login_type(LoginType.APPLE)
                     .build();
 
             User savedUser = userRepository.save(user);
+            log.info("Apple 회원등록, user={}", savedUser);
 
             UserRole userRole = new UserRole(user, Role.USER);
             userRoleRepository.save(userRole);
+            log.info("Apple 회원 역할등록, userRole={}", userRole);
 
-
-            return savedUser;
+            return new OAuth2User(savedUser, userRole);
         }
 
-        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        UserRole userRole = userRoleRepository.findByUser(user).orElseThrow(UserRoleNotFoundException::new);
+        return new OAuth2User(user, userRole);
     }
 
 

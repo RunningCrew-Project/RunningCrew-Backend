@@ -1,16 +1,20 @@
 package com.project.runningcrew.oauth.oauth2user.parser;
 
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
+import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
+import com.project.runningcrew.oauth.OAuth2User;
 import com.project.runningcrew.oauth.dto.request.OauthDto;
 import com.project.runningcrew.oauth.oauth2user.userinfo.GoogleUserInfo;
 import com.project.runningcrew.oauth.oauth2user.userinfo.KakaoUserInfo;
 import com.project.runningcrew.user.entity.LoginType;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.repository.UserRepository;
+import com.project.runningcrew.user.service.UserService;
 import com.project.runningcrew.userrole.entity.Role;
 import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GoogleUserParser {
@@ -34,37 +39,33 @@ public class GoogleUserParser {
 
 
     @Transactional
-    public User getGoogleUser(OauthDto oauthDto) {
+    public OAuth2User getGoogleUser(OauthDto oauthDto) {
 
         Map<String, Object> attributes = getGoogleAttributes(oauthDto);
         GoogleUserInfo googleUserInfo = new GoogleUserInfo(attributes);
-
         String email = googleUserInfo.getEmail();
-        String password = new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
-        String name = googleUserInfo.getName();
-        String profile_image = googleUserInfo.getImageUrl();
 
         if (!userRepository.existsByEmail(email)) {
+            log.info("입력받은 Email 로 가입된 Google 회원이 없습니다.");
 
             User user = User.builder()
                     .email(email)
-                    .password(password)
-                    .name(name)
-                    .imgUrl(profile_image)
                     .login_type(LoginType.KAKAO)
                     .build();
 
             User savedUser = userRepository.save(user);
-
+            log.info("Google 회원등록, user={}", savedUser);
 
             UserRole userRole = new UserRole(user, Role.USER);
             userRoleRepository.save(userRole);
+            log.info("Google 회원 역할등록, userRole={}", userRole);
 
-            return savedUser;
-
+            return new OAuth2User(savedUser, userRole);
         }
 
-        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        UserRole userRole = userRoleRepository.findByUser(user).orElseThrow(UserRoleNotFoundException::new);
+        return new OAuth2User(user, userRole);
     }
 
 
