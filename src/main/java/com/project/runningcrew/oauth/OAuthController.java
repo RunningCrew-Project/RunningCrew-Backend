@@ -38,9 +38,6 @@ import java.net.URI;
 public class OAuthController {
 
     private final OAuthService oAuthService;
-    private final UserService userService;
-    private final DongAreaService dongAreaService;
-
 
 
     @Operation(summary = "소셜 로그인",

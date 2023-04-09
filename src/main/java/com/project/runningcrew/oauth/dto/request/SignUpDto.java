@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class SignUpDto {
 
-    //note 필수 값
+    //note 필수 값  [ 초기 프로필 이미지는 받지 않는다 ]
 
     @Schema(description = "생성 유저 이름", example = "전용수")
     @NotBlank(message = "이름은 필수 값입니다.")
@@ -27,10 +27,6 @@ public class SignUpDto {
     @Schema(description = "생성 유저 닉네임", example = "nickname")
     @NotBlank(message = "닉네임은 필수 값입니다.")
     private String nickname;
-
-    @Schema(description = "생성 유저 프로필 이미지")
-    @NotNull(message = "프로필 이미지는 필수 값입니다.")
-    private MultipartFile file;
 
     @Schema(description = "생성 유저 동네 아이디", example = "1")
     @NotNull(message = "동네 아이디는 필수 값입니다.")

@@ -29,9 +29,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -92,20 +94,18 @@ public class UserService {
     }
 
     /**
-     * 입력받은 User 이미지와 User 로 일반 유저를 생성해 저장한 후, User 의 id 를 반환한다.
+     * 입력받은 User 로 일반 유저를 생성해 저장한 후, User 의 id 를 반환한다.
      *
-     * @param user          저장할 user
-     * @param multipartFile 저장할 user 의 이미지
+     * @param user 저장할 user
      * @return user id
      */
     @Transactional
-    public Long saveNormalUser(User user, MultipartFile multipartFile) {
+    public Long saveNormalUser(User user) {
+        //note 초기 유저 생성시 프로필 이미지를 받지 않는다.
 
         duplicateEmail(user.getEmail());
         duplicateNickname(user.getNickname());
 
-        String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-        user.updateImgUrl(imageUrl);
         user.updatePassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         userRoleRepository.save(new UserRole(user, Role.USER));
@@ -140,12 +140,13 @@ public class UserService {
      *
      * @param originUser    기존의 user
      * @param newUser       변경될 user
-     * @param multipartFile 변경될 user 의 이미지
+     * @param multipartFile 변경될 user 의 이미지 : (초기 유저는 이미지가 없다.)
      */
     @Transactional
-    public void updateUser(User originUser, User newUser, MultipartFile multipartFile) {
+    public void updateUser(User originUser, User newUser, Optional<MultipartFile> multipartFile) {
 
-        //note NotNull
+        //note NotNull [ 닉네임, 동, 비밀번호, 전화번호 ]
+
         if (!originUser.getNickname().equals(newUser.getNickname())) {
             if (userRepository.existsByNickname(newUser.getNickname())) {
                 throw new UserNickNameDuplicateException(newUser.getNickname());
@@ -153,38 +154,57 @@ public class UserService {
                 originUser.updateNickname(newUser.getNickname());
             }
         }
-
-        //note NotNull
         if (!originUser.getDongArea().equals(newUser.getDongArea())) {
             originUser.updateDongArea(newUser.getDongArea());
         }
+        if(!originUser.getPassword().equals(newUser.getPassword())) {
+            originUser.updatePassword(newUser.getPassword());
+        }
+        if(!originUser.getPhoneNumber().equals(newUser.getPhoneNumber())){
+            originUser.updatePhoneNumber(newUser.getPhoneNumber());
+        }
 
-        //note Nullable
+
+        //note Nullable [ 키, 체중, 생일, 성별 ]
+
         if(newUser.getHeight() != null) {
             originUser.updateHeight(newUser.getHeight());
         }
-
-        //note Nullable
         if (newUser.getWeight() != null) {
             originUser.updateWeight(newUser.getWeight());
         }
-
-        //note Nullable
         if (newUser.getBirthday() != null) {
             originUser.updateBirthday(newUser.getBirthday());
         }
-
-        //note Nullable
         if (newUser.getSex() != null) {
             originUser.updateSex(newUser.getSex());
         }
 
-        //note NotNull
-        if (!multipartFile.isEmpty()) {
-            imageService.deleteImage(originUser.getImgUrl());
-            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-            originUser.updateImgUrl(imageUrl);
+
+
+        //note 프로필 이미지
+
+
+        //note originUser 의 프로필 이미지가 존재하지 않는경우 [ 새로운 이미지를 등록한 경우 ]
+        if (ObjectUtils.isEmpty(originUser.getImgUrl())) {
+            if(multipartFile.isPresent()) {
+                MultipartFile file = multipartFile.get();
+                String imageUrl = imageService.uploadImage(file, imageDirName);
+                originUser.updateImgUrl(imageUrl);
+            }
+        } else {
+            //note originUser 프로필 이미지가 존재하는 경우 && [ 새로운 이미지를 등록한 경우, 기존 이미지를 삭제하고 기본 이미지를 적용한 경우 ]
+            if(multipartFile.isPresent()) {
+                imageService.deleteImage(originUser.getImgUrl());
+                MultipartFile file = multipartFile.get();
+                String imageUrl = imageService.uploadImage(file, imageDirName);
+                originUser.updateImgUrl(imageUrl);
+            } else {
+                imageService.deleteImage(originUser.getImgUrl());
+                originUser.updateImgUrl(null);
+            }
         }
+
     }
 
     /**

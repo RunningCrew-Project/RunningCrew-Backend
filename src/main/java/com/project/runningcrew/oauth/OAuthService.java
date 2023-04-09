@@ -25,12 +25,14 @@ public class OAuthService {
 
     private final JwtProvider jwtProvider;
     private final Oauth2UserFactory oauth2UserFactory;
-
     private final UserService userService;
-    private final ImageService imageService;
-    private final String imageDirName = "user";
 
-    //note SOCIAL LOGIN
+
+    /**
+     * 소셜 로그인. [ OAuth2User, accessToken, refreshToken, initData ] 정보가 포함된다.
+     * @param oauthDto 클라이언트가 제공한 로그인 정보.
+     * @return 위의 정보가 포함된 LoginResponse.
+     */
     public LoginResponse socialLogin(OauthDto oauthDto) {
 
         OAuth2User oAuth2User = oauth2UserFactory.getOauth2User(oauthDto);
@@ -47,17 +49,14 @@ public class OAuthService {
     /**
      * 초기 데이터는 Email 뿐이다. 나머지 추가정보를 받아서 업데이트한다.
      * @param user 추가정보를 입력할 user 정보.
-     * @param signUpDto 회원가입 필수 추가정보 :  [ 이름, 닉네임, 프로필 이미지 ] + @
+     * @param signUpDto 회원가입 필수 추가정보 :  [ 이름, 닉네임 ] + @ - 초기 프로필 이미지는 받지 않는다.
      */
     public void signUpData(User user, SignUpDto signUpDto) {
         //note 필수 추가 정보
         userService.duplicateNickname(user.getNickname());
         user.updateNickname(signUpDto.getNickname());
-
         user.updateName(signUpDto.getName());
 
-        String imageUrl = imageService.uploadImage(signUpDto.getFile(), imageDirName);
-        user.updateImgUrl(imageUrl);
 
         //note 필수 X
         if (signUpDto.getSex() != null) {
@@ -72,16 +71,17 @@ public class OAuthService {
         if (signUpDto.getWeight() != null) {
             user.updateWeight(signUpDto.getWeight());
         }
+
     }
 
 
     /**
      * 회원가입 직후 필수 추가 정보를 입력하였는지 확인한다. 모두 입력하였다면 true 를 반환한다.
      * @param user 추가정보를 입력할 user 정보.
-     * @return 필수 추가 정보 입력 유무 : [ 이름, 닉네임, 프로필 이미지 ]
+     * @return 필수 추가 정보 입력 유무 : [ 이름, 닉네임 ]
      */
     public boolean initDataInput(User user) {
-        return (user.getName() != null && user.getNickname() != null && user.getImgUrl() != null);
+        return (user.getName() != null && user.getNickname() != null);
     }
 
 }

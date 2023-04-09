@@ -23,10 +23,6 @@ public class UpdateUserRequest {
     @NotBlank(message = "수정할 닉네임을 입력해주세요.")
     private String nickname;
 
-    @Schema(description = "수정할 프로필 이미지", example = "imgUrl")
-    @NotNull(message = "프로필 이미지는 필수 값입니다.")
-    private MultipartFile file;
-
     @Schema(description = "수정할 전화번호", example = "010-1234-5678")
     @NotBlank(message = "전화번호 값은 필수입니다.")
     private String phoneNumber;
@@ -48,6 +44,9 @@ public class UpdateUserRequest {
 
 
     //note 필수 아닌 값
+
+    @Schema(description = "수정할 프로필 이미지", example = "imgUrl")
+    private MultipartFile file;
 
     @Schema(description = "수정 생년월일 정보", example = "2022-02-22")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

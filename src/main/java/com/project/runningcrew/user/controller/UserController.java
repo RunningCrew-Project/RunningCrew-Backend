@@ -13,6 +13,7 @@ import com.project.runningcrew.user.dto.request.*;
 import com.project.runningcrew.user.dto.response.GetMyDataResponse;
 import com.project.runningcrew.user.dto.response.GetUserResponse;
 import com.project.runningcrew.user.dto.response.UserListResponse;
+import com.project.runningcrew.user.entity.LoginType;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,12 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Tag(name = "User", description = "user 에 관한 api")
@@ -48,6 +52,8 @@ public class UserController {
     private final CrewService crewService;
     private final RecruitAnswerService recruitAnswerService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Value("${domain.name}")
     private String host;
@@ -84,7 +90,7 @@ public class UserController {
         }
 
 
-        //note 필수 값 Build
+        //note 필수 값 Build : [ 프로필 이미지 받지 않음 ]
         User user = User.builder()
                 .email(createUserRequest.getEmail())
                 .name(createUserRequest.getName())
@@ -92,7 +98,7 @@ public class UserController {
                 .nickname(createUserRequest.getNickname())
                 .phoneNumber(createUserRequest.getPhoneNumber())
                 .dongArea(dongAreaService.findById(createUserRequest.getDongId()))
-                .login_type(createUserRequest.getLoginType())
+                .login_type(LoginType.EMAIL)
                 .build();
 
 
@@ -112,7 +118,7 @@ public class UserController {
 
 
         //note Save
-        Long userId = userService.saveNormalUser(user, createUserRequest.getFile());
+        Long userId = userService.saveNormalUser(user);
 
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
@@ -158,33 +164,32 @@ public class UserController {
         User updateUser = User.builder()
                 .email(originUSer.getEmail()) // 변경 불가
                 .name(originUSer.getName()) // 변경 불가
-                .password(updateUserRequest.getPassword())
+                .password(passwordEncoder.encode(updateUserRequest.getPassword()))
                 .nickname(updateUserRequest.getNickname())
                 .phoneNumber(updateUserRequest.getPhoneNumber())
                 .dongArea(dongAreaService.findById(updateUserRequest.getDongId()))
                 .login_type(originUSer.getLogin_type()) // 변경 불가
                 .build();
 
+        Optional<MultipartFile> file = Optional.ofNullable(updateUserRequest.getFile());
+        userService.updateUser(originUSer, updateUser, file);
+
 
         //note 필수 아닌 값 Update
         if (updateUserRequest.getSex() != null) {
             updateUser.updateSex(updateUserRequest.getSex());
         }
-
         if (updateUserRequest.getBirthday() != null) {
             updateUser.updateBirthday(updateUserRequest.getBirthday());
         }
-
         if (updateUserRequest.getHeight() != null) {
             updateUser.updateHeight(updateUserRequest.getHeight());
         }
-
         if (updateUserRequest.getWeight() != null) {
             updateUser.updateWeight(updateUserRequest.getWeight());
         }
 
 
-        userService.updateUser(originUSer, updateUser, updateUserRequest.getFile());
         return ResponseEntity.noContent().build();
 
     }
