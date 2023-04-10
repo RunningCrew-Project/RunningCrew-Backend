@@ -86,9 +86,9 @@ public class CrewController {
             @ApiResponse(responseCode = "409", description = "CONFLICT",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/api/crews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/crews")
     public ResponseEntity<Void> createCrew(@Parameter(hidden = true) @CurrentUser User user,
-                                           @ModelAttribute @Valid CreateCrewRequest createCrewRequest) {
+                                           @RequestBody @Valid CreateCrewRequest createCrewRequest) {
         DongArea dongArea = dongAreaService.findById(createCrewRequest.getDongId());
         Crew crew = Crew.builder()
                 .name(createCrewRequest.getName())
