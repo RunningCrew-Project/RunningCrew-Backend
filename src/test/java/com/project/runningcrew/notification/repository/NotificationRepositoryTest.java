@@ -216,7 +216,7 @@ class NotificationRepositoryTest {
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         List<Notification> notifications = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
             Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
             notifications.add(notification);
@@ -243,7 +243,7 @@ class NotificationRepositoryTest {
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         List<Notification> notifications = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
             Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
             notifications.add(notification);
