@@ -4,6 +4,8 @@ import com.project.runningcrew.area.entity.SidoArea;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.crewcondition.entity.CrewCondition;
+import com.project.runningcrew.crewcondition.repository.CrewConditionRepository;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.user.entity.User;
@@ -42,6 +44,9 @@ class CrewServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private CrewConditionRepository crewConditionRepository;
+
     @InjectMocks
     private CrewService crewService;
 
@@ -78,37 +83,36 @@ class CrewServiceTest {
 
     @DisplayName("크루 저장 성공 테스트")
     @Test
-    public void saveTest1(@Mock DongArea dongArea, @Mock User user, @Mock MultipartFile multipartFile) {
+    public void saveTest1(@Mock DongArea dongArea, @Mock User user) {
         //given
         Long crewId = 1L;
         Long memberId = 2L;
-        String crewImgUrl = "crewImgUrl";
         Crew crew = Crew.builder().id(crewId)
                 .name("name")
                 .introduction("introduction")
                 .dongArea(dongArea)
                 .build();
         Member member = new Member(memberId, user, crew, MemberRole.ROLE_LEADER);
+        CrewCondition crewCondition = new CrewCondition(crew);
         when(crewRepository.existsByName(crew.getName())).thenReturn(false);
         when(crewRepository.save(crew)).thenReturn(crew);
-        when(imageService.uploadImage(multipartFile, "crew")).thenReturn(crewImgUrl);
+        when(crewConditionRepository.save(any())).thenReturn(crewCondition);
         when(memberRepository.save(any())).thenReturn(member);
 
         ///when
-        Long saveId = crewService.saveCrew(user, crew, multipartFile);
+        Long saveId = crewService.saveCrew(user, crew);
 
         //then
         assertThat(saveId).isSameAs(crewId);
-        assertThat(crew.getCrewImgUrl()).isEqualTo(crewImgUrl);
         verify(crewRepository, times(1)).existsByName(crew.getName());
         verify(crewRepository, times(1)).save(crew);
-        verify(imageService, times(1)).uploadImage(multipartFile, "crew");
+        verify(crewConditionRepository, times(1)).save(any());
         verify(memberRepository, times(1)).save(any());
     }
 
     @DisplayName("크루 저장 예외 테스트")
     @Test
-    public void saveTest2(@Mock DongArea dongArea, @Mock User user, @Mock MultipartFile multipartFile) {
+    public void saveTest2(@Mock DongArea dongArea, @Mock User user) {
         //given
         Crew crew = Crew.builder()
                 .name("name")
@@ -119,7 +123,7 @@ class CrewServiceTest {
 
         ///when
         //then
-        assertThatThrownBy(() -> crewService.saveCrew(user, crew, multipartFile))
+        assertThatThrownBy(() -> crewService.saveCrew(user, crew))
                 .isInstanceOf(CrewNameDuplicateException.class);
         verify(crewRepository, times(1)).existsByName(crew.getName());
     }
@@ -184,36 +188,6 @@ class CrewServiceTest {
         assertThatThrownBy(() -> crewService.updateCrew(originCrew, newCrew, multipartFile))
                 .isInstanceOf(CrewNameDuplicateException.class);
         verify(crewRepository, times(1)).existsByName(newCrew.getName());
-    }
-
-    @DisplayName("크루 삭제 테스트")
-    @Test
-    public void deleteTest(@Mock DongArea dongArea) {
-        //given
-        Long crewId = 1L;
-        Crew crew = Crew.builder().name("name")
-                .introduction("introduction")
-                .crewImgUrl("crewImgUrl")
-                .dongArea(dongArea)
-                .build();
-        List<Member> members = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            User user = User.builder().build();
-            members.add(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        }
-        doNothing().when(crewRepository).delete(crew);
-        doNothing().when(imageService).deleteImage(crew.getCrewImgUrl());
-        when(memberRepository.findAllByCrew(crew)).thenReturn(members);
-        doNothing().when(memberRepository).delete(any());
-
-        ///when
-        crewService.deleteCrew(crew);
-
-        //then
-        verify(crewRepository, times(1)).delete(crew);
-        verify(imageService, times(1)).deleteImage(crew.getCrewImgUrl());
-        verify(memberRepository, times(1)).findAllByCrew(crew);
-        verify(memberRepository, times(members.size())).delete(any());
     }
 
     @DisplayName("키워드로 크루 개수 반환 테스트")

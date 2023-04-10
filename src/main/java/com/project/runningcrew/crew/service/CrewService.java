@@ -23,6 +23,7 @@ import com.project.runningcrew.crew.repository.CrewRepository;
 import com.project.runningcrew.member.repository.MemberRepository;
 import com.project.runningcrew.image.ImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,8 @@ public class CrewService {
     private final CrewConditionRepository crewConditionRepository;
     private final ImageService imageService;
     private final String imageDirName = "crew";
+    @Value("${s3.defaultImg.crew}")
+    private String defaultCrewImgUrl;
 
     /**
      * 입력받은 crewId 를 가진 Crew 를 찾아 반환한다. 없다면 CrewNotFoundException 을 throw 한다.
@@ -65,18 +68,16 @@ public class CrewService {
     /**
      * 입력받은 Crew 이미지와 Crew 를 저장하고 Crew 의 리더를 생성한 후, Crew 에 부여된 id 를 반환한다.
      *
-     * @param crew          저장할 Crew
-     * @param multipartFile Crew 의 이미지
+     * @param crew 저장할 Crew
      * @return Crew 에 부여된 id
      * @throws CrewNameDuplicateException 입력받은 Crew 의 이름을 가진 크루가 이미 존재할 때
      */
     @Transactional
-    public Long saveCrew(User user, Crew crew, MultipartFile multipartFile) {
+    public Long saveCrew(User user, Crew crew) {
         if (crewRepository.existsByName(crew.getName())) {
             throw new CrewNameDuplicateException(crew.getName());
         }
-        String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-        crew.updateCrewImgUrl(imageUrl);
+        crew.updateCrewImgUrl(defaultCrewImgUrl);
         Crew savedCrew = crewRepository.save(crew);
         crewConditionRepository.save(new CrewCondition(savedCrew));
         memberRepository.save(new Member(user, crew, MemberRole.ROLE_LEADER));
@@ -105,8 +106,10 @@ public class CrewService {
         if (!originCrew.getDongArea().equals(newCrew.getDongArea())) {
             originCrew.updateDongArea(newCrew.getDongArea());
         }
-        if (multipartFile!= null && !multipartFile.isEmpty()) {
-            imageService.deleteImage(originCrew.getCrewImgUrl());
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            if (!originCrew.getCrewImgUrl().equals(defaultCrewImgUrl)) {
+                imageService.deleteImage(originCrew.getCrewImgUrl());
+            }
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
             originCrew.updateCrewImgUrl(imageUrl);
         }
@@ -131,7 +134,9 @@ public class CrewService {
         notificationRepository.deleteAllByCrew(crew);
         crewConditionRepository.deleteByCrew(crew);
         crewRepository.delete(crew);
-        imageService.deleteImage(crew.getCrewImgUrl());
+        if (!crew.getCrewImgUrl().equals(defaultCrewImgUrl)) {
+            imageService.deleteImage(crew.getCrewImgUrl());
+        }
     }
 
     /**
