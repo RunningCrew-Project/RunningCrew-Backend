@@ -95,7 +95,7 @@ public class CrewController {
                 .introduction(createCrewRequest.getIntroduction())
                 .dongArea(dongArea)
                 .build();
-        Long crewId = crewService.saveCrew(user, crew, createCrewRequest.getFile());
+        Long crewId = crewService.saveCrew(user, crew);
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
                 .path("/api/crews/{id}")
