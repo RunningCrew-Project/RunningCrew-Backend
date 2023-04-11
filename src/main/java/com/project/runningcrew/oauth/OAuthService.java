@@ -14,6 +14,7 @@ import com.project.runningcrew.user.service.UserService;
 import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,12 @@ public class OAuthService {
     private final JwtProvider jwtProvider;
     private final Oauth2UserFactory oauth2UserFactory;
     private final UserService userService;
+
+    private final ImageService imageService;
+    private final String DEFAULT_USER_IMG = "user/유저 기본 이미지.svg";
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
 
     /**
@@ -56,6 +63,11 @@ public class OAuthService {
         userService.duplicateNickname(user.getNickname());
         user.updateNickname(signUpDto.getNickname());
         user.updateName(signUpDto.getName());
+
+
+        //note 기본 이미지 적용
+        String imgUrl = imageService.getImage(bucketName, DEFAULT_USER_IMG);
+        user.updateImgUrl(imgUrl);
 
 
         //note 필수 X

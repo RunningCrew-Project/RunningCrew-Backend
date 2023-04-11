@@ -7,9 +7,14 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exception.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
+import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
 import com.project.runningcrew.user.dto.request.*;
+import com.project.runningcrew.user.dto.request.change.UpdateUserPasswordRequest;
+import com.project.runningcrew.user.dto.request.change.UpdateUserRequest;
+import com.project.runningcrew.user.dto.request.checkduplicate.CheckEmailRequest;
+import com.project.runningcrew.user.dto.request.checkduplicate.CheckNicknameRequest;
 import com.project.runningcrew.user.dto.response.GetMyDataResponse;
 import com.project.runningcrew.user.dto.response.GetUserResponse;
 import com.project.runningcrew.user.dto.response.UserListResponse;
@@ -52,8 +57,6 @@ public class UserController {
     private final CrewService crewService;
     private final RecruitAnswerService recruitAnswerService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
-    private final PasswordEncoder passwordEncoder;
-
 
     @Value("${domain.name}")
     private String host;
@@ -90,7 +93,7 @@ public class UserController {
         }
 
 
-        //note 필수 값 Build : [ 프로필 이미지 받지 않음 ]
+        //note 필수 값 Build : [ 프로필 이미지 : 기본 값 자동 설정됨 ]
         User user = User.builder()
                 .email(createUserRequest.getEmail())
                 .name(createUserRequest.getName())
@@ -100,6 +103,7 @@ public class UserController {
                 .dongArea(dongAreaService.findById(createUserRequest.getDongId()))
                 .login_type(LoginType.EMAIL)
                 .build();
+
 
 
         //note 필수 아닌 값 Update
@@ -116,7 +120,6 @@ public class UserController {
             user.updateWeight(createUserRequest.getWeight());
         }
 
-
         //note Save
         Long userId = userService.saveNormalUser(user);
 
@@ -131,7 +134,11 @@ public class UserController {
     }
 
 
-    @Operation(summary = "유저 수정하기", description = "유저 정보를 수정한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @Operation(
+            summary = "유저 정보 수정하기(비밀번호 제외)",
+            description = "유저 정보를 수정한다(비밀번호 제외).",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",
@@ -152,26 +159,19 @@ public class UserController {
             @Parameter(hidden = true) @CurrentUser User user
     ) {
 
-        if (!updateUserRequest.getPassword().equals(updateUserRequest.getPasswordCheck())) {
-            //note 비밀번호 & 비밀번호 재입력 Equal Check -> 일치하지 않으면 예외 발생
-            throw new PasswordCheckFailException();
-        }
-
-        User originUSer = userService.findById(userId);
-
-
         //note 필수 값 Build
+        User originUSer = userService.findById(userId);
         User updateUser = User.builder()
                 .email(originUSer.getEmail()) // 변경 불가
-                .name(originUSer.getName()) // 변경 불가
-                .password(passwordEncoder.encode(updateUserRequest.getPassword()))
+                .name(updateUserRequest.getName())
                 .nickname(updateUserRequest.getNickname())
                 .phoneNumber(updateUserRequest.getPhoneNumber())
                 .dongArea(dongAreaService.findById(updateUserRequest.getDongId()))
                 .login_type(originUSer.getLogin_type()) // 변경 불가
                 .build();
 
-        Optional<MultipartFile> file = Optional.ofNullable(updateUserRequest.getFile());
+
+        MultipartFile file = updateUserRequest.getFile();
         userService.updateUser(originUSer, updateUser, file);
 
 
@@ -193,6 +193,48 @@ public class UserController {
         return ResponseEntity.noContent().build();
 
     }
+
+
+
+
+
+
+    @Operation(
+            summary = "유저 비밀번호 수정하기",
+            description = "유저 비밀번호를 수정한다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping(value = "/api/users/{userId}/password")
+    public ResponseEntity<Void> updateUserPassword(
+            @PathVariable("userId") Long userId,
+            @ModelAttribute @Valid UpdateUserPasswordRequest updateUserPasswordRequest,
+            @Parameter(hidden = true) @CurrentUser User user
+    ) {
+
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+
+
+
+
+
+
+
 
 
     @Operation(summary = "유저 삭제하기", description = "유저 정보를 삭제한다.", security = {@SecurityRequirement(name = "Bearer-Key")})

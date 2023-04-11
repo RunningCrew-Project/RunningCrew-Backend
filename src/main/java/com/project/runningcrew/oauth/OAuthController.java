@@ -1,18 +1,12 @@
 package com.project.runningcrew.oauth;
 
 
-import com.project.runningcrew.area.entity.DongArea;
-import com.project.runningcrew.area.service.DongAreaService;
 import com.project.runningcrew.common.annotation.CurrentUser;
-import com.project.runningcrew.exception.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.oauth.dto.request.SignUpDto;
 import com.project.runningcrew.oauth.dto.response.LoginResponse;
 import com.project.runningcrew.oauth.dto.request.OauthDto;
-import com.project.runningcrew.user.dto.request.CheckNicknameRequest;
-import com.project.runningcrew.user.dto.request.CreateUserRequest;
 import com.project.runningcrew.user.entity.User;
-import com.project.runningcrew.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,11 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
 
 
 @Slf4j

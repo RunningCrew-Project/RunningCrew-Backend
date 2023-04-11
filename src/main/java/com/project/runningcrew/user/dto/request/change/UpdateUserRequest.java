@@ -1,4 +1,4 @@
-package com.project.runningcrew.user.dto.request;
+package com.project.runningcrew.user.dto.request.change;
 
 import com.project.runningcrew.user.entity.Sex;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +19,10 @@ public class UpdateUserRequest {
 
     //note 필수 값
 
+    @Schema(description = "수정 이름 입력", example = "change_name")
+    @NotBlank(message = "수정할 이름을 입력해주세요.")
+    private String name;
+
     @Schema(description = "수정 닉네임 입력", example = "change_nickname")
     @NotBlank(message = "수정할 닉네임을 입력해주세요.")
     private String nickname;
@@ -27,26 +31,17 @@ public class UpdateUserRequest {
     @NotBlank(message = "전화번호 값은 필수입니다.")
     private String phoneNumber;
 
-    @Schema(description = "수정 비밀번호 입력", example = "same_password")
-    @NotBlank(message = "수정할 비밀번호 값을 입력해주세요.")
-    private String password;
-
-    @Schema(description = "수정 비밀번호 재입력", example = "same_password")
-    @NotBlank(message = "수정할 비밀번호 값을 재입력해주세요.")
-    private String passwordCheck;
-
     @Schema(description = "수정 동네 아이디", example = "1")
     @NotNull(message = "동네 아이디는 필수 값입니다.")
     @Positive(message = "동네 아이디는 1 이상의 수입니다.")
     private Long dongId;
 
-
+    @Schema(description = "수정할 프로필 이미지", example = "imgUrl")
+    @NotNull(message = "프로필 이미지는 필수 값입니다.")
+    private MultipartFile file;
 
 
     //note 필수 아닌 값
-
-    @Schema(description = "수정할 프로필 이미지", example = "imgUrl")
-    private MultipartFile file;
 
     @Schema(description = "수정 생년월일 정보", example = "2022-02-22")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
