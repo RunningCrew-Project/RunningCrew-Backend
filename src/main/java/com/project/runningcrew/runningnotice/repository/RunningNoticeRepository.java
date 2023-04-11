@@ -2,6 +2,7 @@ package com.project.runningcrew.runningnotice.repository;
 
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.runningnotice.dto.NoticeWithUserDto;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
@@ -103,6 +104,14 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
     @Query("select rn from RunningNotice rn where rn.noticeType = :noticeType and rn.member.crew = :crew")
     Slice<RunningNotice> findAllByCrewAndNoticeType(@Param("noticeType") NoticeType noticeType, @Param("crew") Crew crew, Pageable pageable);
 
+
+
+    @Query("select new com.project.runningcrew.runningnotice.dto.NoticeWithUserDto(rn.id, rn.createdDate, rn.title, u.nickname) " +
+            "from RunningNotice rn " +
+            "inner join Member m on rn.member = m " +
+            "inner join User u on m.user = u " +
+            "where rn.noticeType = :noticeType and m.crew = :crew")
+    Slice<NoticeWithUserDto> findAllDtoByCrewAndNoticeType(@Param("noticeType") NoticeType noticeType, @Param("crew") Crew crew, Pageable pageable);
 
     /**
      * 특정 유저가 신청한 특정 상태의 런닝 공지를 모두 반환한다.
