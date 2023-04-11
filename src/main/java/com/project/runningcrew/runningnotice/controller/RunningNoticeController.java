@@ -272,8 +272,8 @@ public class RunningNoticeController {
         memberAuthorizationChecker.checkMember(user, crew);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Slice<RunningNotice> regulars = runningNoticeService.findRegularsByCrew(crew, pageRequest);
-        List<Long> runningNoticeIds = regulars.stream().map(RunningNotice::getId).collect(Collectors.toList());
+        Slice<NoticeWithUserDto> regulars = runningNoticeService.findRegularsByCrew(crew, pageRequest);
+        List<Long> runningNoticeIds = regulars.stream().map(NoticeWithUserDto::getId).collect(Collectors.toList());
         Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
@@ -305,8 +305,8 @@ public class RunningNoticeController {
         memberAuthorizationChecker.checkMember(user, crew);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Slice<RunningNotice> instants = runningNoticeService.findInstantsByCrew(crew, pageRequest);
-        List<Long> runningNoticeIds = instants.stream().map(RunningNotice::getId).collect(Collectors.toList());
+        Slice<NoticeWithUserDto> instants = runningNoticeService.findInstantsByCrew(crew, pageRequest);
+        List<Long> runningNoticeIds = instants.stream().map(NoticeWithUserDto::getId).collect(Collectors.toList());
         Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
 
@@ -319,38 +319,38 @@ public class RunningNoticeController {
     }
 
 
-    @Operation(summary = "검색어로 런닝공지 가져오기", description = "검색어에 해당하는 런닝공지를 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
-            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @GetMapping(value = "/api/crews/{crewId}/running-notices")
-    public ResponseEntity<PagingResponse<PagingRunningNoticeDto>> findRunningNoticesByKeyword(@PathVariable("crewId") Long crewId,
-                                                                                              @RequestParam("keyword") @NotBlank String keyword,
-                                                                                              @RequestParam("page") @PositiveOrZero int page,
-                                                                                              @Parameter(hidden = true) @CurrentUser User user) {
-        Crew crew = crewService.findById(crewId);
-        memberAuthorizationChecker.checkMember(user, crew);
-
-        PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Slice<RunningNotice> runningNotices = runningNoticeService.findByCrewAndKeyword(crew, keyword, pageRequest);
-        List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
-        Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
-        Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
-
-        List<PagingRunningNoticeDto> contents = runningNotices.stream()
-                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()), commentCountMap.get(r.getId())))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new PagingResponse<>(
-                new SliceImpl<>(contents, runningNotices.getPageable(), runningNotices.hasNext())));
-    }
+//    @Operation(summary = "검색어로 런닝공지 가져오기", description = "검색어에 해당하는 런닝공지를 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "OK",
+//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
+//            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+//            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+//            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+//    })
+//    @GetMapping(value = "/api/crews/{crewId}/running-notices")
+//    public ResponseEntity<PagingResponse<PagingRunningNoticeDto>> findRunningNoticesByKeyword(@PathVariable("crewId") Long crewId,
+//                                                                                              @RequestParam("keyword") @NotBlank String keyword,
+//                                                                                              @RequestParam("page") @PositiveOrZero int page,
+//                                                                                              @Parameter(hidden = true) @CurrentUser User user) {
+//        Crew crew = crewService.findById(crewId);
+//        memberAuthorizationChecker.checkMember(user, crew);
+//
+//        PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
+//        Slice<RunningNotice> runningNotices = runningNoticeService.findByCrewAndKeyword(crew, keyword, pageRequest);
+//        List<Long> runningNoticeIds = runningNotices.stream().map(RunningNotice::getId).collect(Collectors.toList());
+//        Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
+//        Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
+//
+//        List<PagingRunningNoticeDto> contents = runningNotices.stream()
+//                .map(r -> new PagingRunningNoticeDto(r, firstImages.get(r.getId()), commentCountMap.get(r.getId())))
+//                .collect(Collectors.toList());
+//
+//        return ResponseEntity.ok(new PagingResponse<>(
+//                new SliceImpl<>(contents, runningNotices.getPageable(), runningNotices.hasNext())));
+//    }
 
 
     @Operation(summary = "특정 날에 시작하는 크루 정기런닝 공지 가져오기", description = "crewId 에 속하는 크루에서 특정 날에 시작하는 정기런닝 공지를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})

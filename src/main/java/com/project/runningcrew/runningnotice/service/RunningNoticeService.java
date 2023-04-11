@@ -7,6 +7,7 @@ import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.runningnotice.dto.NoticeWithUserDto;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
@@ -183,8 +184,8 @@ public class RunningNoticeService {
      * @param pageable
      * @return 페이징 조건에 맞고, NoticeType 이 REGULAR 인 특정 크루의 모든 RunningNotice
      */
-    public Slice<RunningNotice> findRegularsByCrew(Crew crew, Pageable pageable) {
-        return runningNoticeRepository.findAllByCrewAndNoticeType(NoticeType.REGULAR, crew, pageable);
+    public Slice<NoticeWithUserDto> findRegularsByCrew(Crew crew, Pageable pageable) {
+        return runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.REGULAR, crew, pageable);
     }
 
     /**
@@ -194,8 +195,8 @@ public class RunningNoticeService {
      * @param pageable
      * @return 페이징 조건에 맞고, NoticeType 이 INSTANT 인 특정 크루의 모든 RunningNotice
      */
-    public Slice<RunningNotice> findInstantsByCrew(Crew crew, Pageable pageable) {
-        return runningNoticeRepository.findAllByCrewAndNoticeType(NoticeType.INSTANT, crew, pageable);
+    public Slice<NoticeWithUserDto> findInstantsByCrew(Crew crew, Pageable pageable) {
+        return runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, pageable);
     }
 
     /**
