@@ -6,6 +6,7 @@ import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.runningnotice.dto.NoticeWithUserDto;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
@@ -331,12 +332,9 @@ class RunningNoticeServiceTest {
                 .thenReturn(runningNoticeSlice);
 
         ///when
-        Slice<RunningNotice> result = runningNoticeService.findRegularsByCrew(crew, pageRequest);
+        Slice<NoticeWithUserDto> result = runningNoticeService.findRegularsByCrew(crew, pageRequest);
 
         //then
-        for (RunningNotice runningNotice : result) {
-            assertThat(runningNotice.getNoticeType()).isSameAs(NoticeType.REGULAR);
-        }
         assertThat(result.getNumber()).isSameAs(0);
         assertThat(result.getSize()).isSameAs(10);
         assertThat(result.getNumberOfElements()).isSameAs(10);
@@ -371,12 +369,9 @@ class RunningNoticeServiceTest {
                 .thenReturn(runningNoticeSlice);
 
         ///when
-        Slice<RunningNotice> result = runningNoticeService.findInstantsByCrew(crew, pageRequest);
+        Slice<NoticeWithUserDto> result = runningNoticeService.findInstantsByCrew(crew, pageRequest);
 
         //then
-        for (RunningNotice runningNotice : result) {
-            assertThat(runningNotice.getNoticeType()).isSameAs(NoticeType.INSTANT);
-        }
         assertThat(result.getNumber()).isSameAs(0);
         assertThat(result.getSize()).isSameAs(10);
         assertThat(result.getNumberOfElements()).isSameAs(10);
