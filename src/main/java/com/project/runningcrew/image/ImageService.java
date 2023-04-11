@@ -22,5 +22,7 @@ public interface ImageService {
     public void deleteImage(String fileUrl);
 
 
+    public String getImage(String bucketName, String fileName);
+
 
 }

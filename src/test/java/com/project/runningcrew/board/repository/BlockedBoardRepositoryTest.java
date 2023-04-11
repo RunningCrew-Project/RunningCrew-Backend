@@ -4,7 +4,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
-import com.project.runningcrew.board.entity.BlockedBoard;
+import com.project.runningcrew.blocked.BlockedBoard;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.board.entity.FreeBoard;
 import com.project.runningcrew.member.entity.Member;

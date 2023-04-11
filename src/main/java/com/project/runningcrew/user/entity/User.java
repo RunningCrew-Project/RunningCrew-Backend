@@ -19,7 +19,7 @@ import java.util.List;
 public class User extends BaseEntity {
 
 
-    //note 필수 값
+    //note 필수
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,38 +31,34 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
-    //@NotBlank(message = "이름은 필수값입니다.")
-    //@Column(nullable = false)
-    private String name;
-
-    //@NotBlank(message = "닉네임은 필수값입니다.")
-    //@Column(unique = true, nullable = false)
-    private String nickname;
-
-    //@NotBlank(message = "이미지는 필수값입니다.")
-    //@Column(nullable = false)
-    private String imgUrl;
-
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoginType login_type;
 
-    //@NotBlank(message = "핸드폰 번호는 필수값입니다.")
-    //@Column(nullable = false)
-    private String phoneNumber;
+
+
+    //note 필수 X
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dong_area_id")
     private DongArea dongArea;
 
-    //@NotNull
+
+    @Column()
+    private String name;
+
+    @Column(unique = true)
+    private String nickname;
+
+    @Column()
+    private String imgUrl;
+
+    @Column()
     private String password;
 
-
-
-
-    //note 필수 아닌 값
+    @Column()
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column()
@@ -143,6 +139,8 @@ public class User extends BaseEntity {
     public void updateBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
+
+    public void updatePhoneNumber(String phoneNumber) {this.phoneNumber = phoneNumber;}
 
     public void updateHeight(int height) {
         this.height = height;

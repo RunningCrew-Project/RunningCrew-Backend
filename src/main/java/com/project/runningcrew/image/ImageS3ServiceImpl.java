@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.project.runningcrew.exception.image.EmptyImageFileException;
 import com.project.runningcrew.exception.image.s3.S3DeleteException;
 import com.project.runningcrew.exception.image.s3.S3UploadException;
+import com.project.runningcrew.exception.notFound.ImageNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,7 +85,7 @@ public class ImageS3ServiceImpl implements ImageService {
         );
 
         boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, decodeURL);
-        log.info("fileUrl={}", decodeURL);
+        log.info("Delete fileUrl={}", decodeURL);
 
         if (isObjectExist) {
             amazonS3Client.deleteObject(bucketName, decodeURL);
@@ -94,4 +95,30 @@ public class ImageS3ServiceImpl implements ImageService {
         }
 
     }
+
+
+    /**
+     * 이미지 조회하기.
+     * @param bucketName 조회할 버킷의 이름
+     * @param fileName 파일 경로 + 파일 이름
+     * @return S3 버킷의 조회 이미지
+     */
+    @Override
+    public String getImage(String bucketName, String fileName) {
+
+
+        boolean isObjectExist = amazonS3.doesObjectExist(bucketName, fileName);
+
+        if(isObjectExist) {
+            log.info("Get fileUrl={}", fileName);
+            return amazonS3.getUrl(bucketName, fileName).toString();
+        } else {
+            throw new ImageNotFoundException();
+        }
+
+    }
+
+
+
+
 }

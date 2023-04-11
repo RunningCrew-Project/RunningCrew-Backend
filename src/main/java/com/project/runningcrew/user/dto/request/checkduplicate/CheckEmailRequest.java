@@ -1,4 +1,4 @@
-package com.project.runningcrew.user.dto.request;
+package com.project.runningcrew.user.dto.request.checkduplicate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

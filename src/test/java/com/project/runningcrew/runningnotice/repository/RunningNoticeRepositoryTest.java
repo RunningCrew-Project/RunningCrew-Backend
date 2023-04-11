@@ -9,6 +9,7 @@ import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.runningnotice.dto.NoticeWithUserDto;
 import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
@@ -773,6 +774,33 @@ class RunningNoticeRepositoryTest {
         Assertions.assertThat(slice1.getNumberOfElements()).isEqualTo(3);
         Assertions.assertThat(slice1.isLast()).isTrue();
         Assertions.assertThat(slice1.hasNext()).isFalse();
+    }
+
+    @DisplayName("NoticeWithUserDto 가져오기 테스트")
+    @Test
+    public void findAllDtoByCrewAndNoticeTypeTest() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        User user = testEntityFactory.getUser(dongArea, 0);
+        Crew crew = testEntityFactory.getCrew(dongArea, 0);
+        Member member = testEntityFactory.getMember(user, crew);
+        for (int i = 1; i < 11; i++) {
+            testEntityFactory.getInstantRunningNotice(member, i);
+        }
+
+        ///when
+        PageRequest pageRequest = PageRequest.of(1, 7);
+        Slice<NoticeWithUserDto> slice = runningNoticeRepository
+                .findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, pageRequest);
+
+        //then
+        Assertions.assertThat(slice.getSize()).isEqualTo(7);
+        Assertions.assertThat(slice.getNumber()).isEqualTo(1);
+        Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(3);
+        Assertions.assertThat(slice.isLast()).isTrue();
+        Assertions.assertThat(slice.hasNext()).isFalse();
     }
 
 }
