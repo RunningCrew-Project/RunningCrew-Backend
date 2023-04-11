@@ -55,7 +55,7 @@ public class TotalPostController {
     private int pagingSize = 15;
 
 
-    @Operation(summary = "검색어로 전체 글 가져오기", description = "검색어에 해당하는 전체 글을 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @Operation(summary = "전체 글 가져오기", description = "전체 글을 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
@@ -67,6 +67,32 @@ public class TotalPostController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/api/crews/{crewId}/total-posts")
+    public ResponseEntity<PagingResponse<PagingTotalPostDto>> getTotalPost(
+            @PathVariable("crewId") Long crewId,
+            @RequestParam("page") @PositiveOrZero int page,
+            @Parameter(hidden = true) @CurrentUser User user) {
+
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkMember(user, crew);
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize);
+        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPost(crew, pageRequest);
+
+        return ResponseEntity.ok(new PagingResponse<>(getPagingTotalPostDtoSlice(totalPosts)));
+    }
+
+    @Operation(summary = "검색어로 전체 글 가져오기", description = "검색어에 해당하는 전체 글을 페이징하여 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/api/crews/{crewId}/total-posts/search")
     public ResponseEntity<PagingResponse<PagingTotalPostDto>> getTotalPostByKeyword(
             @PathVariable("crewId") Long crewId,
             @RequestParam("keyword") @NotBlank String keyword,
@@ -77,7 +103,7 @@ public class TotalPostController {
         memberAuthorizationChecker.checkMember(user, crew);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByKeyword(keyword, pageRequest);
+        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByKeyword(crew, keyword, pageRequest);
 
         return ResponseEntity.ok(new PagingResponse<>(getPagingTotalPostDtoSlice(totalPosts)));
     }
