@@ -59,16 +59,8 @@ public class UserService {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
 
-
     private final String imageDirName = "user";
-    private final String DEFAULT_USER_IMG = "user/유저 기본 이미지.svg";
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
-    @Value("${s3.host.name}")
-    private String hostName;
-
+    private final String DEFAULT_USER_IMG = "유저 기본 이미지.svg";
 
 
     /**
@@ -122,7 +114,7 @@ public class UserService {
         duplicateNickname(user.getNickname());
 
         //note 기본 이미지 적용
-        String imgUrl = imageService.getImage(bucketName, DEFAULT_USER_IMG);
+        String imgUrl = imageService.getImage(imageDirName, DEFAULT_USER_IMG);
         user.updateImgUrl(imgUrl);
 
         user.updatePassword(passwordEncoder.encode(user.getPassword()));
@@ -199,14 +191,11 @@ public class UserService {
 
         //note [ 프로필 이미지 ]
 
-        String decodeURL = URLDecoder.decode(
-                originUser.getImgUrl().replace(hostName, "").replaceAll("\\p{Z}", ""),
-                StandardCharsets.UTF_8
-                //note 한글 파일 Decoding & 공백 제거
-        );
+        String S3URL = imageDirName + '/' + DEFAULT_USER_IMG; // user/기본이미지.svg
+        String decodeURL = imageService.decodeURL(originUser.getImgUrl());
         log.info("decodeURL={}", decodeURL);
 
-        if(decodeURL.equals(DEFAULT_USER_IMG)) {
+        if(decodeURL.equals(S3URL)) {
             log.info("DEFAULT 유저 이미지는 버킷 내부에서 삭제되지 않습니다.");
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
             originUser.updateImgUrl(imageUrl);
@@ -221,13 +210,15 @@ public class UserService {
     }
 
 
-
-
+    /**
+     * user 비밀번호를 수정한다.
+     * @param user 비밀번호를 수정할 user
+     * @param newPassword 새로운 비밀번호 정보
+     */
     @Transactional
     public void updateUserPassword(User user, String newPassword) {
-
-
-
+        String encode = passwordEncoder.encode(newPassword);
+        user.updatePassword(encode);
     }
 
 
