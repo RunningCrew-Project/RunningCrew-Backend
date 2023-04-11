@@ -26,14 +26,21 @@ import com.project.runningcrew.userrole.entity.Role;
 import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
@@ -51,7 +58,18 @@ public class UserService {
     private final GpsRepository gpsRepository;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+
+
     private final String imageDirName = "user";
+    private final String DEFAULT_USER_IMG = "user/유저 기본 이미지.svg";
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+
+    @Value("${s3.host.name}")
+    private String hostName;
+
+
 
     /**
      * 입력받은 user 를 로그아웃한다. user 의 fcmToken 과 refreshToken 을 삭제한다.
@@ -92,20 +110,21 @@ public class UserService {
     }
 
     /**
-     * 입력받은 User 이미지와 User 로 일반 유저를 생성해 저장한 후, User 의 id 를 반환한다.
+     * 입력받은 User 로 일반 유저를 생성해 저장한 후, User 의 id 를 반환한다.
      *
-     * @param user          저장할 user
-     * @param multipartFile 저장할 user 의 이미지
+     * @param user 저장할 user
      * @return user id
      */
     @Transactional
-    public Long saveNormalUser(User user, MultipartFile multipartFile) {
+    public Long saveNormalUser(User user) {
 
         duplicateEmail(user.getEmail());
         duplicateNickname(user.getNickname());
 
-        String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-        user.updateImgUrl(imageUrl);
+        //note 기본 이미지 적용
+        String imgUrl = imageService.getImage(bucketName, DEFAULT_USER_IMG);
+        user.updateImgUrl(imgUrl);
+
         user.updatePassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         userRoleRepository.save(new UserRole(user, Role.USER));
@@ -145,7 +164,8 @@ public class UserService {
     @Transactional
     public void updateUser(User originUser, User newUser, MultipartFile multipartFile) {
 
-        //note NotNull
+        //note NotNull [ 닉네임, 동, 전화번호 ]
+
         if (!originUser.getNickname().equals(newUser.getNickname())) {
             if (userRepository.existsByNickname(newUser.getNickname())) {
                 throw new UserNickNameDuplicateException(newUser.getNickname());
@@ -153,39 +173,75 @@ public class UserService {
                 originUser.updateNickname(newUser.getNickname());
             }
         }
-
-        //note NotNull
         if (!originUser.getDongArea().equals(newUser.getDongArea())) {
             originUser.updateDongArea(newUser.getDongArea());
         }
+        if(!originUser.getPhoneNumber().equals(newUser.getPhoneNumber())){
+            originUser.updatePhoneNumber(newUser.getPhoneNumber());
+        }
 
-        //note Nullable
+
+        //note Nullable [ 키, 체중, 생일, 성별 ]
+
         if(newUser.getHeight() != null) {
             originUser.updateHeight(newUser.getHeight());
         }
-
-        //note Nullable
         if (newUser.getWeight() != null) {
             originUser.updateWeight(newUser.getWeight());
         }
-
-        //note Nullable
         if (newUser.getBirthday() != null) {
             originUser.updateBirthday(newUser.getBirthday());
         }
-
-        //note Nullable
         if (newUser.getSex() != null) {
             originUser.updateSex(newUser.getSex());
         }
 
-        //note NotNull
-        if (!multipartFile.isEmpty()) {
+
+        //note [ 프로필 이미지 ]
+
+        String decodeURL = URLDecoder.decode(
+                originUser.getImgUrl().replace(hostName, "").replaceAll("\\p{Z}", ""),
+                StandardCharsets.UTF_8
+                //note 한글 파일 Decoding & 공백 제거
+        );
+        log.info("decodeURL={}", decodeURL);
+
+        if(decodeURL.equals(DEFAULT_USER_IMG)) {
+            log.info("DEFAULT 유저 이미지는 버킷 내부에서 삭제되지 않습니다.");
+            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
+            originUser.updateImgUrl(imageUrl);
+        } else {
+            log.info("기존 유저 이미지는 버킷 내부에서 삭제됩니다.");
             imageService.deleteImage(originUser.getImgUrl());
             String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
             originUser.updateImgUrl(imageUrl);
         }
+
+
     }
+
+
+
+
+    @Transactional
+    public void updateUserPassword(User user, String newPassword) {
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 입력된 User 와 그에 매핑된 userImg, RunningRecord 를 삭제한다.

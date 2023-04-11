@@ -35,10 +35,6 @@ public class CreateUserRequest {
     @NotBlank(message = "닉네임은 필수 값입니다.")
     private String nickname;
 
-    @Schema(description = "생성 유저 프로필 이미지")
-    @NotNull(message = "프로필 이미지는 필수 값입니다.")
-    private MultipartFile file;
-
     @Schema(description = "생성 유저 휴대폰 번호", example = "01012345678")
     @NotBlank(message = "휴대폰 번호는 필수 값입니다.")
     private String phoneNumber;
@@ -55,10 +51,6 @@ public class CreateUserRequest {
     @NotNull(message = "동네 아이디는 필수 값입니다.")
     @Positive(message = "동네 아이디는 1 이상의 수입니다.")
     private Long dongId;
-
-    @Schema(description = "생성 유저 로그인 타입", example = "EMAIL")
-    private LoginType loginType;
-
 
 
     //note 필수 아닌 값

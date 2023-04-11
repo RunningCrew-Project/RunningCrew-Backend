@@ -1,5 +1,6 @@
-package com.project.runningcrew.board.entity;
+package com.project.runningcrew.blocked;
 
+import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.common.BaseEntity;
 import com.project.runningcrew.member.entity.Member;
 import lombok.AccessLevel;
