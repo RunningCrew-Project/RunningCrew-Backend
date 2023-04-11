@@ -1,5 +1,6 @@
 package com.project.runningcrew.totalpost.repository;
 
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.totalpost.entity.PostType;
 import com.project.runningcrew.totalpost.entity.TotalPost;
@@ -32,24 +33,51 @@ public class TotalPostRepository {
                 PostType.getPostType(rs.getString("post_type")));
     }
 
+
+    /**
+     * 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
+     *
+     * @param crew     크루
+     * @param pageable
+     * @return 모든 게시글 또는 런닝공지
+     */
+    public Slice<TotalPost> getTotalPost(Crew crew, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        Map<String, Object> params = Map.of(
+                "crewId", crew.getId(),
+                "number", page * size,
+                "size", size + 1);
+
+        List<TotalPost> content = namedParameterJdbcTemplate
+                .query(PostTypeSqlQuery.FIND_ALL, params, this::mapRow);
+        boolean hasNext = content.size() == size + 1;
+        if (hasNext) {
+            content = content.subList(0, size);
+        }
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
     /**
      * keyword 가 title 이나 detail 에 포함된 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
      *
+     * @param crew     크루
      * @param keyword  검색어
      * @param pageable
      * @return keyword 가 title 이나 detail 에 포함된 모든 게시글 또는 런닝공지
      */
-    public Slice<TotalPost> getTotalPostByKeyword(String keyword, Pageable pageable) {
+    public Slice<TotalPost> getTotalPostByKeyword(Crew crew, String keyword, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         String wrappedKeyword = "%" + keyword + "%";
         Map<String, Object> params = Map.of(
+                "crewId", crew.getId(),
                 "keyword", wrappedKeyword,
                 "number", page * size,
                 "size", size + 1);
 
         List<TotalPost> content = namedParameterJdbcTemplate
-                .query(PostTypeSqlQuery.GET_KEYWORD, params, this::mapRow);
+                .query(PostTypeSqlQuery.FIND_ALL_BY_KEYWORD, params, this::mapRow);
         boolean hasNext = content.size() == size + 1;
         if (hasNext) {
             content = content.subList(0, size);
@@ -60,7 +88,7 @@ public class TotalPostRepository {
     /**
      * member 가 작성한 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
      *
-     * @param member 글을 작성한 Member
+     * @param member   글을 작성한 Member
      * @param pageable
      * @return memberId 에 해당하는 member 가 작성한 모든 게시글 또는 런닝공지
      */
@@ -73,7 +101,7 @@ public class TotalPostRepository {
                 "size", size + 1);
 
         List<TotalPost> content = namedParameterJdbcTemplate
-                .query(PostTypeSqlQuery.GET_MEMBER, params, this::mapRow);
+                .query(PostTypeSqlQuery.FIND_ALL_BY_MEMBER, params, this::mapRow);
         boolean hasNext = content.size() == size + 1;
         if (hasNext) {
             content = content.subList(0, size);
