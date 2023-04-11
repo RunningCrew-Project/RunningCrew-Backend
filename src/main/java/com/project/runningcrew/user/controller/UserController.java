@@ -5,6 +5,7 @@ import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.SimpleUserDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.exception.AuthorizationException;
 import com.project.runningcrew.exception.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.image.ImageService;
@@ -34,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -42,7 +42,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Tag(name = "User", description = "user 에 관한 api")
@@ -189,12 +188,9 @@ public class UserController {
             updateUser.updateWeight(updateUserRequest.getWeight());
         }
 
-
         return ResponseEntity.noContent().build();
 
     }
-
-
 
 
 
@@ -218,22 +214,18 @@ public class UserController {
     @PutMapping(value = "/api/users/{userId}/password")
     public ResponseEntity<Void> updateUserPassword(
             @PathVariable("userId") Long userId,
-            @ModelAttribute @Valid UpdateUserPasswordRequest updateUserPasswordRequest,
+            @RequestBody @Valid UpdateUserPasswordRequest updateUserPasswordRequest,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
 
+        if (!updateUserPasswordRequest.getPassword().equals(updateUserPasswordRequest.getPasswordCheck())) {
+            throw new PasswordCheckFailException();
+        }
 
+        userService.updateUserPassword(user, updateUserPasswordRequest.getPassword());
         return ResponseEntity.noContent().build();
+
     }
-
-
-
-
-
-
-
-
-
 
 
 

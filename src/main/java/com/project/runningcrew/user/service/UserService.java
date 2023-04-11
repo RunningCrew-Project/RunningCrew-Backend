@@ -221,13 +221,15 @@ public class UserService {
     }
 
 
-
-
+    /**
+     * user 비밀번호를 수정한다.
+     * @param user 비밀번호를 수정할 user
+     * @param newPassword 새로운 비밀번호 정보
+     */
     @Transactional
     public void updateUserPassword(User user, String newPassword) {
-
-
-
+        String encode = passwordEncoder.encode(newPassword);
+        user.updatePassword(encode);
     }
 
 
