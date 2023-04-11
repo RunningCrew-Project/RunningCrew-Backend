@@ -54,8 +54,16 @@ public class ImageLocalServiceImpl implements ImageService {
         deleteFile.delete();
     }
 
+
+
+
     @Override
     public String getImage(String bucketName, String fileName) {
+        return null;
+    }
+
+    @Override
+    public String decodeURL(String fileUrl) {
         return null;
     }
 

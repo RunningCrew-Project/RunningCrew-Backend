@@ -37,7 +37,6 @@ public class ImageS3ServiceImpl implements ImageService {
 
     /**
      * MultipartFile 을 S3 스토리지에 업로드하고 url 을 반환한다.
-     *
      * @param multipartFile 저장할 MultipartFile
      * @param dirName       이미지를 저장할 directory
      * @return 저장된 s3 스토리지의 url
@@ -68,7 +67,6 @@ public class ImageS3ServiceImpl implements ImageService {
 
     /**
      * s3 스토리지에 저장된 이미지를 삭제한다.
-     *
      * @param fileUrl 삭제할 s3 스토리지의 이미지 url
      */
     @Override
@@ -78,12 +76,7 @@ public class ImageS3ServiceImpl implements ImageService {
             throw new S3DeleteException(bucketName, fileUrl);
         }
 
-        String decodeURL = URLDecoder.decode(
-                fileUrl.replace(hostName, "").replaceAll("\\p{Z}", ""),
-                StandardCharsets.UTF_8
-                //note 한글 파일 Decoding & 공백 제거
-        );
-
+        String decodeURL = decodeURL(fileUrl);
         boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, decodeURL);
         log.info("Delete fileUrl={}", decodeURL);
 
@@ -99,23 +92,37 @@ public class ImageS3ServiceImpl implements ImageService {
 
     /**
      * 이미지 조회하기.
-     * @param bucketName 조회할 버킷의 이름
-     * @param fileName 파일 경로 + 파일 이름
+     * @param dirName 조회할 버킷의 디렉토리 이름
+     * @param imgName 이미지 이름
      * @return S3 버킷의 조회 이미지
      */
     @Override
-    public String getImage(String bucketName, String fileName) {
+    public String getImage(String dirName, String imgName) {
 
-
-        boolean isObjectExist = amazonS3.doesObjectExist(bucketName, fileName);
+        String filePath = dirName + '/' + imgName;
+        boolean isObjectExist = amazonS3.doesObjectExist(bucketName, filePath);
 
         if(isObjectExist) {
-            log.info("Get fileUrl={}", fileName);
-            return amazonS3.getUrl(bucketName, fileName).toString();
+            log.info("Get fileUrl={}", filePath);
+            return amazonS3.getUrl(bucketName, filePath).toString();
         } else {
             throw new ImageNotFoundException();
         }
 
+    }
+
+
+    /**
+     * 파일 경로 URL 을 utf-8 디코딩하여 반환한다.
+     * @param fileUrl 파일 경로
+     * @return 디코딩 URL
+     */
+    @Override
+    public String decodeURL(String fileUrl) {
+        return URLDecoder.decode(
+                fileUrl.replace(hostName, "").replaceAll("\\p{Z}", ""),
+                StandardCharsets.UTF_8
+        );
     }
 
 

@@ -29,11 +29,8 @@ public class OAuthService {
     private final UserService userService;
 
     private final ImageService imageService;
-    private final String DEFAULT_USER_IMG = "user/유저 기본 이미지.svg";
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
+    private final String imageDirName = "user";
+    private final String DEFAULT_USER_IMG = "유저 기본 이미지.svg";
 
     /**
      * 소셜 로그인. [ OAuth2User, accessToken, refreshToken, initData ] 정보가 포함된다.
@@ -64,9 +61,8 @@ public class OAuthService {
         user.updateNickname(signUpDto.getNickname());
         user.updateName(signUpDto.getName());
 
-
         //note 기본 이미지 적용
-        String imgUrl = imageService.getImage(bucketName, DEFAULT_USER_IMG);
+        String imgUrl = imageService.getImage(imageDirName, DEFAULT_USER_IMG);
         user.updateImgUrl(imgUrl);
 
 

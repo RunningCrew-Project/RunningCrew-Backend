@@ -23,6 +23,7 @@ public interface ImageService {
 
 
     public String getImage(String bucketName, String fileName);
+    public String decodeURL(String fileUrl);
 
 
 }
