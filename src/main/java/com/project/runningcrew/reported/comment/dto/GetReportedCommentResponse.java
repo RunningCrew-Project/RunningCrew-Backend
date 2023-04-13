@@ -1,4 +1,4 @@
-package com.project.runningcrew.blocked.reported.comment.dto;
+package com.project.runningcrew.reported.comment.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

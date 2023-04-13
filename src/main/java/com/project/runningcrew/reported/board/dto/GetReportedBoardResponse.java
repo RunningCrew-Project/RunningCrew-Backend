@@ -1,4 +1,4 @@
-package com.project.runningcrew.blocked.reported.board.dto;
+package com.project.runningcrew.reported.board.dto;
 
 
 import lombok.Getter;

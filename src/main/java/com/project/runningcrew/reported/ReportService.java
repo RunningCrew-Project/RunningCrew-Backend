@@ -1,11 +1,9 @@
-package com.project.runningcrew.blocked.reported;
+package com.project.runningcrew.reported;
 
-import com.project.runningcrew.blocked.reported.board.ReportedBoard;
-import com.project.runningcrew.blocked.reported.board.ReportedBoardRepository;
-import com.project.runningcrew.blocked.reported.comment.ReportedComment;
-import com.project.runningcrew.blocked.reported.comment.ReportedCommentRepository;
-import com.project.runningcrew.board.entity.Board;
-import com.project.runningcrew.comment.entity.Comment;
+import com.project.runningcrew.reported.board.ReportedBoard;
+import com.project.runningcrew.reported.board.ReportedBoardRepository;
+import com.project.runningcrew.reported.comment.ReportedComment;
+import com.project.runningcrew.reported.comment.ReportedCommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;

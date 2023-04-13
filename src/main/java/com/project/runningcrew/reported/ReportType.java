@@ -1,4 +1,4 @@
-package com.project.runningcrew.blocked.reported;
+package com.project.runningcrew.reported;
 
 public enum ReportType {
     PRIVACY,                    // 개인정보 침해

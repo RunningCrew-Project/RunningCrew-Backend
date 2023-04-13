@@ -1,6 +1,6 @@
-package com.project.runningcrew.blocked.reported.runningnotice;
+package com.project.runningcrew.reported.runningnotice;
 
-import com.project.runningcrew.blocked.reported.ReportType;
+import com.project.runningcrew.reported.ReportType;
 import com.project.runningcrew.common.BaseEntity;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
