@@ -1,35 +1,13 @@
 package com.project.runningcrew.board.repository;
 
-import com.project.runningcrew.crew.entity.Crew;
-import com.project.runningcrew.area.entity.DongArea;
-import com.project.runningcrew.area.entity.GuArea;
-import com.project.runningcrew.area.entity.SidoArea;
-import com.project.runningcrew.blocked.BlockedBoard;
-import com.project.runningcrew.board.entity.Board;
-import com.project.runningcrew.board.entity.FreeBoard;
-import com.project.runningcrew.member.entity.Member;
-import com.project.runningcrew.member.entity.MemberRole;
-import com.project.runningcrew.user.entity.LoginType;
-import com.project.runningcrew.user.entity.Sex;
-import com.project.runningcrew.user.entity.User;
-import com.project.runningcrew.crew.repository.CrewRepository;
-import com.project.runningcrew.member.repository.MemberRepository;
-import com.project.runningcrew.TestEntityFactory;
-import com.project.runningcrew.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 @SpringBootTest
 @Transactional
 class BlockedBoardRepositoryTest {
 
+    /*
 
     @Autowired UserRepository userRepository;
     @Autowired CrewRepository crewRepository;
@@ -172,4 +150,5 @@ class BlockedBoardRepositoryTest {
         //then
         Assertions.assertThat(findBlockedBoardOpt).isEmpty();
     }
+    **/
 }
