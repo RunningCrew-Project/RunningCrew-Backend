@@ -1,7 +1,7 @@
-package com.project.runningcrew.blocked.reported;
+package com.project.runningcrew.reported;
 
-import com.project.runningcrew.blocked.reported.board.dto.GetReportedBoardResponse;
-import com.project.runningcrew.blocked.reported.comment.dto.GetReportedCommentResponse;
+import com.project.runningcrew.reported.board.dto.GetReportedBoardResponse;
+import com.project.runningcrew.reported.comment.dto.GetReportedCommentResponse;
 import com.project.runningcrew.common.dto.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

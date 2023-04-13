@@ -1,7 +1,7 @@
-package com.project.runningcrew.blocked.reported.board;
+package com.project.runningcrew.reported.comment;
 
-import com.project.runningcrew.blocked.reported.ReportType;
-import com.project.runningcrew.board.entity.Board;
+import com.project.runningcrew.reported.ReportType;
+import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.common.BaseEntity;
 import com.project.runningcrew.member.entity.Member;
 import lombok.AccessLevel;
@@ -12,18 +12,18 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name = "reported_boards")
+@Table(name = "reported_comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReportedBoard extends BaseEntity {
+public class ReportedComment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reported_board_id")
+    @Column(name = "reported_comment_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
-    private Board board;
+    @JoinColumn(name = "comment_id", nullable = false)
+    private Comment comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -32,18 +32,11 @@ public class ReportedBoard extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
-    public ReportedBoard(Board board, Member member, ReportType reportType) {
-        this.board = board;
+    public ReportedComment(Comment comment, Member member, ReportType reportType) {
+        this.comment = comment;
         this.member = member;
         this.reportType = reportType;
     }
 
-    public ReportedBoard(Long id, Board board, Member member) {
-        this.id = id;
-        this.board = board;
-        this.member = member;
-    }
 
 }
-
-
