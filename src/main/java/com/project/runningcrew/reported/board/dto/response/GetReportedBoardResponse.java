@@ -1,6 +1,7 @@
-package com.project.runningcrew.reported.board.dto;
+package com.project.runningcrew.reported.board.dto.response;
 
 
+import com.project.runningcrew.reported.ReportType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,5 +14,7 @@ public class GetReportedBoardResponse {
     private Long boardId;
 
     private Long reporterMemberId;
+
+    private ReportType reportType;
 
 }
