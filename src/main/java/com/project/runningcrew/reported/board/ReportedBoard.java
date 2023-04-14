@@ -38,10 +38,11 @@ public class ReportedBoard extends BaseEntity {
         this.reportType = reportType;
     }
 
-    public ReportedBoard(Long id, Board board, Member member) {
+    public ReportedBoard(Long id, Board board, Member member, ReportType reportType) {
         this.id = id;
         this.board = board;
         this.member = member;
+        this.reportType = reportType;
     }
 
 }

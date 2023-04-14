@@ -1,5 +1,6 @@
 package com.project.runningcrew.reported;
 
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.reported.board.ReportedBoard;
 import com.project.runningcrew.reported.board.ReportedBoardRepository;
 import com.project.runningcrew.reported.comment.ReportedComment;
@@ -49,21 +50,23 @@ public class ReportService {
     /**
      * 신고 사유에 따른 게시글 신고 정보 목록을 반환한다. - 페이징 적용
      * @param reportType 신고 사유
+     * @param crew 크루
      * @param pageable 페이징 정보
      * @return 게시글 신고 정보 목록
      */
-    public Slice<ReportedBoard> findReportedBoardsByReportType(ReportType reportType, Pageable pageable) {
-        return reportedBoardRepository.findByReportType(reportType, pageable);
+    public Slice<ReportedBoard> findReportedBoardsByReportType(ReportType reportType, Crew crew, Pageable pageable) {
+        return reportedBoardRepository.findByCrewAndReportType(reportType, crew, pageable);
     }
 
     /**
      * 신고 사유에 따른 댓글 신고 정보 목록을 반환한다. - 페이징 적용
      * @param reportType 신고 사유
+     * @param crew 크루
      * @param pageable 페이징 정보
      * @return 댓글 신고 정보 목록
      */
-    public Slice<ReportedComment> findReportedCommentsByReportType(ReportType reportType, Pageable pageable) {
-        return reportedCommentRepository.findByReportType(reportType, pageable);
+    public Slice<ReportedComment> findReportedCommentsByReportType(ReportType reportType, Crew crew, Pageable pageable) {
+        return reportedCommentRepository.findByCrewAndReportType(reportType, crew, pageable);
     }
 
 
