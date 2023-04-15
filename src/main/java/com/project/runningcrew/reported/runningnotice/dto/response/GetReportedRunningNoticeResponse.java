@@ -1,4 +1,4 @@
-package com.project.runningcrew.reported.comment.dto.response;
+package com.project.runningcrew.reported.runningnotice.dto.response;
 
 import com.project.runningcrew.reported.ReportType;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class GetReportedCommentResponse {
+public class GetReportedRunningNoticeResponse {
 
     private Long reportId;
 
-    private Long commentId;
+    private Long runningNoticeId;
 
     private Long reporterMemberId;
 
