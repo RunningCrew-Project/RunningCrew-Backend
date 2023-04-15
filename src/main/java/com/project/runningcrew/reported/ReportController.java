@@ -29,12 +29,17 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -48,9 +53,12 @@ public class ReportController {
     private final MemberAuthorizationChecker memberAuthorizationChecker;
 
     private final ReportService reportService;
+    private int pagingSize = 15;
 
     @Value("${domain.name}")
     private String host;
+
+
 
     @Operation(
             summary = "게시글 신고하기",
@@ -141,9 +149,26 @@ public class ReportController {
     @GetMapping(value = "/api/crews/{crewId}/boards/report")
     public ResponseEntity<PagingResponse<GetReportedBoardResponse>> getReportedBoards(
             @Parameter(hidden = true) @CurrentUser User user,
-            @PathVariable("crewId") Long crewId
+            @PathVariable("crewId") Long crewId,
+            @RequestParam("page") int page
     ) {
-        return null;
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkLeader(user, crew);
+        //note Leader 체크
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize);
+        Slice<ReportedBoard> findSlice = reportService.findReportedBoardsByCrew(crew, pageRequest);
+
+        List<GetReportedBoardResponse> dtoList = findSlice.stream()
+                .map(element -> new GetReportedBoardResponse(
+                        element.getId(),
+                        element.getBoard().getId(),
+                        element.getMember().getId(),
+                        element.getReportType()
+                )).collect(Collectors.toList());
+
+        Slice<GetReportedBoardResponse> dtoSlice = new SliceImpl<>(dtoList, findSlice.getPageable(), findSlice.hasNext());
+        return ResponseEntity.ok(new PagingResponse<>(dtoSlice));
     }
 
 
@@ -168,9 +193,25 @@ public class ReportController {
     @GetMapping(value = "/crews/{crewId}/comments/report")
     public ResponseEntity<PagingResponse<GetReportedCommentResponse>> getReportedComments(
             @Parameter(hidden = true) @CurrentUser User user,
-            @PathVariable("crewId") Long crewId
+            @PathVariable("crewId") Long crewId,
+            @RequestParam("page") int page
     ) {
-        return null;
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkLeader(user, crew);
+        //note Leader 체크
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize);
+        Slice<ReportedComment> findSlice = reportService.findReportedCommentsByCrew(crew, pageRequest);
+
+        List<GetReportedCommentResponse> dtoList = findSlice.stream().map(element -> new GetReportedCommentResponse(
+                element.getId(),
+                element.getComment().getId(),
+                element.getMember().getId(),
+                element.getReportType()
+        )).collect(Collectors.toList());
+
+        Slice<GetReportedCommentResponse> dtoSlice = new SliceImpl<>(dtoList, findSlice.getPageable(), findSlice.hasNext());
+        return ResponseEntity.ok(new PagingResponse<>(dtoSlice));
     }
 
 

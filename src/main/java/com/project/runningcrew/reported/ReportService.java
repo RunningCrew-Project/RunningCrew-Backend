@@ -48,25 +48,23 @@ public class ReportService {
     }
 
     /**
-     * 신고 사유에 따른 게시글 신고 정보 목록을 반환한다. - 페이징 적용
-     * @param reportType 신고 사유
+     * 입력받은 크루의 게시글 신고 정보 전체 목록을 반환한다. - 페이징 적용
      * @param crew 크루
      * @param pageable 페이징 정보
      * @return 게시글 신고 정보 목록
      */
-    public Slice<ReportedBoard> findReportedBoardsByReportType(ReportType reportType, Crew crew, Pageable pageable) {
-        return reportedBoardRepository.findByCrewAndReportType(reportType, crew, pageable);
+    public Slice<ReportedBoard> findReportedBoardsByCrew(Crew crew, Pageable pageable) {
+        return reportedBoardRepository.findByCrew(crew, pageable);
     }
 
     /**
-     * 신고 사유에 따른 댓글 신고 정보 목록을 반환한다. - 페이징 적용
-     * @param reportType 신고 사유
+     * 입력받은 크루의 댓글 신고 정보 전체 목록을 반환한다. - 페이징 적용
      * @param crew 크루
      * @param pageable 페이징 정보
      * @return 댓글 신고 정보 목록
      */
-    public Slice<ReportedComment> findReportedCommentsByReportType(ReportType reportType, Crew crew, Pageable pageable) {
-        return reportedCommentRepository.findByCrewAndReportType(reportType, crew, pageable);
+    public Slice<ReportedComment> findReportedCommentsByCrew(Crew crew, Pageable pageable) {
+        return reportedCommentRepository.findByCrew(crew, pageable);
     }
 
 
