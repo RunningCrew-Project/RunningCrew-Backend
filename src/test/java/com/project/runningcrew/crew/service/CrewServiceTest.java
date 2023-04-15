@@ -50,6 +50,10 @@ class CrewServiceTest {
     @InjectMocks
     private CrewService crewService;
 
+    private final String CREW_IMAGE_DIR_NAME = "crew";
+    private final String DEFAULT_CREW_IMG = "크루 기본 이미지.svg";
+    private final String DEFAULT_CREW_IMG_PATH = CREW_IMAGE_DIR_NAME + "/" + DEFAULT_CREW_IMG;
+
     @DisplayName("id 로 크루 하나 가져오기 성공 테스트")
     @Test
     public void findByIdTest1() {
@@ -95,6 +99,7 @@ class CrewServiceTest {
         Member member = new Member(memberId, user, crew, MemberRole.ROLE_LEADER);
         CrewCondition crewCondition = new CrewCondition(crew);
         when(crewRepository.existsByName(crew.getName())).thenReturn(false);
+        when(imageService.getImage(CREW_IMAGE_DIR_NAME, DEFAULT_CREW_IMG)).thenReturn("img");
         when(crewRepository.save(crew)).thenReturn(crew);
         when(crewConditionRepository.save(any())).thenReturn(crewCondition);
         when(memberRepository.save(any())).thenReturn(member);
@@ -105,6 +110,7 @@ class CrewServiceTest {
         //then
         assertThat(saveId).isSameAs(crewId);
         verify(crewRepository, times(1)).existsByName(crew.getName());
+        verify(imageService, times(1)).getImage(CREW_IMAGE_DIR_NAME, DEFAULT_CREW_IMG);
         verify(crewRepository, times(1)).save(crew);
         verify(crewConditionRepository, times(1)).save(any());
         verify(memberRepository, times(1)).save(any());
@@ -128,17 +134,17 @@ class CrewServiceTest {
         verify(crewRepository, times(1)).existsByName(crew.getName());
     }
 
-    @DisplayName("크루 수정 성공 테스트")
+    @DisplayName("기본 이미지 크루 수정 성공 테스트")
     @Test
     public void updateCrewTest1(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
                                 @Mock MultipartFile multipartFile) {
         //given
         Long crewId = 1L;
-        String newCrewImgUrl = "crewImgUrl2";
+        String newCrewImgUrl = "newCrewImgUrl";
         Crew originCrew = Crew.builder().id(crewId)
                 .name("name1")
                 .introduction("introduction1")
-                .crewImgUrl("crewImgUrl1")
+                .crewImgUrl("defaultUrl")
                 .dongArea(dongArea1)
                 .build();
         Crew newCrew = Crew.builder()
@@ -147,6 +153,41 @@ class CrewServiceTest {
                 .dongArea(dongArea2)
                 .build();
         when(crewRepository.existsByName(newCrew.getName())).thenReturn(false);
+        when(imageService.decodeURL("defaultUrl")).thenReturn(DEFAULT_CREW_IMG_PATH);
+        when(imageService.uploadImage(multipartFile, "crew")).thenReturn(newCrewImgUrl);
+
+        ///when
+        crewService.updateCrew(originCrew, newCrew, multipartFile);
+
+        //then
+        assertThat(originCrew.getName()).isEqualTo(newCrew.getName());
+        assertThat(originCrew.getIntroduction()).isEqualTo(newCrew.getIntroduction());
+        assertThat(originCrew.getCrewImgUrl()).isEqualTo(newCrewImgUrl);
+        assertThat(originCrew.getDongArea()).isEqualTo(newCrew.getDongArea());
+        verify(crewRepository, times(1)).existsByName(newCrew.getName());
+        verify(imageService, times(1)).uploadImage(multipartFile, "crew");
+    }
+
+    @DisplayName("기본 이미지 아닌 크루 수정 성공 테스트")
+    @Test
+    public void updateCrewTest2(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
+                                @Mock MultipartFile multipartFile) {
+        //given
+        Long crewId = 1L;
+        String newCrewImgUrl = "crewImgUrl2";
+        Crew originCrew = Crew.builder().id(crewId)
+                .name("name1")
+                .introduction("introduction1")
+                .crewImgUrl("crewImgUrl")
+                .dongArea(dongArea1)
+                .build();
+        Crew newCrew = Crew.builder()
+                .name("name2")
+                .introduction("introduction2")
+                .dongArea(dongArea2)
+                .build();
+        when(crewRepository.existsByName(newCrew.getName())).thenReturn(false);
+        when(imageService.decodeURL("crewImgUrl")).thenReturn("crewImgUrl");
         doNothing().when(imageService).deleteImage(originCrew.getCrewImgUrl());
         when(imageService.uploadImage(multipartFile, "crew")).thenReturn(newCrewImgUrl);
 
@@ -165,7 +206,7 @@ class CrewServiceTest {
 
     @DisplayName("크루 수정 예외 테스트")
     @Test
-    public void updateCrewTest2(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
+    public void updateCrewTest3(@Mock DongArea dongArea1, @Mock DongArea dongArea2,
                                 @Mock MultipartFile multipartFile) {
         //given
         Long crewId = 1L;
