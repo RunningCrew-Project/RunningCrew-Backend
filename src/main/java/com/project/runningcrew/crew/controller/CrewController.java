@@ -86,16 +86,16 @@ public class CrewController {
             @ApiResponse(responseCode = "409", description = "CONFLICT",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/api/crews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/api/crews")
     public ResponseEntity<Void> createCrew(@Parameter(hidden = true) @CurrentUser User user,
-                                           @ModelAttribute @Valid CreateCrewRequest createCrewRequest) {
+                                           @RequestBody @Valid CreateCrewRequest createCrewRequest) {
         DongArea dongArea = dongAreaService.findById(createCrewRequest.getDongId());
         Crew crew = Crew.builder()
                 .name(createCrewRequest.getName())
                 .introduction(createCrewRequest.getIntroduction())
                 .dongArea(dongArea)
                 .build();
-        Long crewId = crewService.saveCrew(user, crew, createCrewRequest.getFile());
+        Long crewId = crewService.saveCrew(user, crew);
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
                 .path("/api/crews/{id}")

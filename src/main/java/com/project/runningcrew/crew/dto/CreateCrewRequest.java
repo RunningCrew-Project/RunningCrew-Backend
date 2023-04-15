@@ -29,8 +29,4 @@ public class CreateCrewRequest {
     @Positive(message = "동 id 는 1 이상의 수입니다.")
     private Long dongId;
 
-    @Schema(description = "저장할 크루 이미지")
-    @NotNull(message = "이미지는 필수값입니다.")
-    private MultipartFile file;
-
 }
