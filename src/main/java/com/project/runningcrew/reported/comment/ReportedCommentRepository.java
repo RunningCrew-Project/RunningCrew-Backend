@@ -1,7 +1,6 @@
 package com.project.runningcrew.reported.comment;
 
 import com.project.runningcrew.crew.entity.Crew;
-import com.project.runningcrew.reported.ReportType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;

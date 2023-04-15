@@ -38,10 +38,11 @@ public class ReportedRunningNotice extends BaseEntity {
         this.reportType = reportType;
     }
 
-    public ReportedRunningNotice(Long id, RunningNotice runningNotice, Member member) {
+    public ReportedRunningNotice(Long id, RunningNotice runningNotice, Member member, ReportType reportType) {
         this.id = id;
         this.runningNotice = runningNotice;
         this.member = member;
+        this.reportType = reportType;
     }
 
 }

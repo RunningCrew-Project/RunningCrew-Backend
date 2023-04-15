@@ -18,6 +18,9 @@ import com.project.runningcrew.reported.comment.ReportedComment;
 import com.project.runningcrew.reported.comment.dto.request.CreateReportedCommentRequest;
 import com.project.runningcrew.reported.comment.dto.response.GetReportedCommentResponse;
 import com.project.runningcrew.common.dto.PagingResponse;
+import com.project.runningcrew.reported.runningnotice.ReportedRunningNotice;
+import com.project.runningcrew.reported.runningnotice.dto.request.CreateReportedRunningNoticeRequest;
+import com.project.runningcrew.reported.runningnotice.dto.response.GetReportedRunningNoticeResponse;
 import com.project.runningcrew.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,10 +37,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,6 +92,9 @@ public class ReportController {
         reportService.saveReportedBoard(new ReportedBoard(board, reporter, createReportedBoardRequest.getReportType()));
 
         return ResponseEntity.created(null).build();
+        /**
+         * 단건 신고 정보 조회 기능이 없다고 생각되어 일단 URI 를 따로 만들지는 않았습니다.
+         */
     }
 
 
@@ -130,6 +135,39 @@ public class ReportController {
 
 
     @Operation(
+            summary = "런닝 공지 신고하기",
+            description = "런닝 공지를 신고하여 신고정보를 생성한다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "CREATED", content = @Content()),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping(value = "/api/crews/{crewId}/running-notices/report")
+    public ResponseEntity<Void> reportRunningNotice(
+            @Parameter(hidden = true) @CurrentUser User user,
+            @PathVariable("crewId") Long crewId,
+            @RequestBody @Valid CreateReportedRunningNoticeRequest createReportedRunningNoticeRequest
+    ) {
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkMember(user, crew);
+
+        Member reporter = memberService.findById(createReportedRunningNoticeRequest.getReporterMemberId());
+        Comment comment = commentService.findById(createReportedRunningNoticeRequest.getRunningNoticeId());
+        reportService.saveReportedComment(new ReportedComment(comment, reporter, createReportedRunningNoticeRequest.getReportType()));
+
+        return ResponseEntity.created(null).build();
+    }
+
+
+    @Operation(
             summary = "게시글 신고정보 목록 조회",
             description = "게시글 신고정보 목록을 조회한다.",
             security = {@SecurityRequirement(name = "Bearer-Key")}
@@ -150,7 +188,7 @@ public class ReportController {
     public ResponseEntity<PagingResponse<GetReportedBoardResponse>> getReportedBoards(
             @Parameter(hidden = true) @CurrentUser User user,
             @PathVariable("crewId") Long crewId,
-            @RequestParam("page") int page
+            @RequestParam("page") @PositiveOrZero int page
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkLeader(user, crew);
@@ -194,7 +232,7 @@ public class ReportController {
     public ResponseEntity<PagingResponse<GetReportedCommentResponse>> getReportedComments(
             @Parameter(hidden = true) @CurrentUser User user,
             @PathVariable("crewId") Long crewId,
-            @RequestParam("page") int page
+            @RequestParam("page") @PositiveOrZero int page
     ) {
         Crew crew = crewService.findById(crewId);
         memberAuthorizationChecker.checkLeader(user, crew);
@@ -211,6 +249,49 @@ public class ReportController {
         )).collect(Collectors.toList());
 
         Slice<GetReportedCommentResponse> dtoSlice = new SliceImpl<>(dtoList, findSlice.getPageable(), findSlice.hasNext());
+        return ResponseEntity.ok(new PagingResponse<>(dtoSlice));
+    }
+
+
+
+    @Operation(
+            summary = "런닝 공지 신고정보 목록 조회",
+            description = "런닝 공지 신고정보 목록을 조회한다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
+            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/crews/{crewId}/running-notices/report")
+    public ResponseEntity<PagingResponse<GetReportedRunningNoticeResponse>> getReportedRunningNotices(
+            @Parameter(hidden = true) @CurrentUser User user,
+            @PathVariable("crewId") Long crewId,
+            @RequestParam("page") @PositiveOrZero int page
+    ) {
+        Crew crew = crewService.findById(crewId);
+        memberAuthorizationChecker.checkLeader(user, crew);
+        //note Leader 체크
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize);
+        Slice<ReportedRunningNotice> findSlice = reportService.findReportedRunningNoticesByCrew(crew, pageRequest);
+
+        List<GetReportedRunningNoticeResponse> dtoList = findSlice.stream().map(element -> new GetReportedRunningNoticeResponse(
+                element.getId(),
+                element.getRunningNotice().getId(),
+                element.getMember().getId(),
+                element.getReportType()
+        )).collect(Collectors.toList());
+
+        Slice<GetReportedRunningNoticeResponse> dtoSlice = new SliceImpl<>(dtoList, findSlice.getPageable(), findSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(dtoSlice));
     }
 
