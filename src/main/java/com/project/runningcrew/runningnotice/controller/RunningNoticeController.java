@@ -496,9 +496,9 @@ public class RunningNoticeController {
             @PathVariable("runningNoticeId") Long runningNoticeId,
             @Parameter(hidden = true) @CurrentUser User user) {
         RunningNotice runningNotice = runningNoticeService.findById(runningNoticeId);
-        boolean result = runningNoticeService.checkRunningNotice(user, runningNotice);
+        int runningCheckCode = runningNoticeService.checkRunningNotice(user, runningNotice);
 
-        return ResponseEntity.ok(new ReadyResponse(String.valueOf(result)));
+        return ResponseEntity.ok(new ReadyResponse(runningCheckCode));
     }
 
 

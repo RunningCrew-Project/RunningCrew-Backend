@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReadyResponse {
 
-    private String isValid;
+    private int runningCheckCode;
 
 }
