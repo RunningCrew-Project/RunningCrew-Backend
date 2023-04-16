@@ -3,6 +3,7 @@ package com.project.runningcrew.runningnotice.service;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.exception.badinput.RunningDateTimeBeforeException;
 import com.project.runningcrew.exception.badinput.YearMonthFormatException;
+import com.project.runningcrew.exception.notFound.RunningMemberNotFoundException;
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.resourceimage.entity.RunningNoticeImage;
 import com.project.runningcrew.member.entity.Member;
@@ -260,28 +261,30 @@ public class RunningNoticeService {
     }
 
     /**
-     * 특정 user 가 특정 RunningNotice 에 대해 크루런닝을 시작할 수 있는지 확인하여, 가능하면 true, 불가능하면 false 를
-     * 반환한다.
+     * 특정 user 가 특정 RunningNotice 에 대해 크루런닝을 시작할 수 있는지 확인하여 정수값을 반환한다.
+     * 런닝 시작 가능시간이 지났으면 0, 런닝 시작시간 이전이면 1, 런닝 시작이 가능하면 2 이다.
      *
      * @param user
      * @param runningNotice 확인할 RunningNotice
-     * @return 크루런닝을 시작할 수 있으면 true, 시작할 수 없으면 false
+     * @return 런닝 시작 가능시간이 지났으면 0, 런닝 시작시간 이전이면 1, 런닝 시작이 가능하면 2
+     * @throws MemberNotFoundException 존재하지 않는 멤버일 때
+     * @throws RunningMemberNotFoundException 런닝에 참여하지 않았을 때
      */
-    public boolean checkRunningNotice(User user, RunningNotice runningNotice) {
+    public int checkRunningNotice(User user, RunningNotice runningNotice) {
         Member member = memberRepository.findByUserAndCrew(user, runningNotice.getMember().getCrew())
                 .orElseThrow(MemberNotFoundException::new);
-        if (!runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice)) {
-            return false;
-        }
+        runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice)
+                .orElseThrow(RunningMemberNotFoundException::new);
+
         if (runningNotice.getStatus() != RunningStatus.READY) {
-            return false;
+            return 0;
         }
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(runningNotice.getRunningDateTime().minusMinutes(15))) {
-            return false;
+            return 1;
         }
 
-        return true;
+        return 2;
     }
 
     /**
