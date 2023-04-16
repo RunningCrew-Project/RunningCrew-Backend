@@ -179,11 +179,15 @@ public class RunningRecordController {
             @ApiResponse(responseCode = "404", description = "BAD REQUEST",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping(value = "/api/running-records")
-    public ResponseEntity<PagingResponse<SimpleRunningRecordDto>> getRunningRecordsByUser(@RequestParam("page") @PositiveOrZero int page,
-                                                                  @Parameter(hidden = true) @CurrentUser User user) {
+    @GetMapping(value = "/api/users/{userId}/running-records")
+    public ResponseEntity<PagingResponse<SimpleRunningRecordDto>> getRunningRecordsByUser(
+            @PathVariable("userId") Long userId,
+            @RequestParam("page") @PositiveOrZero int page,
+            @Parameter(hidden = true) @CurrentUser User user) {
+
+        User findUser = userService.findById(userId);
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Slice<RunningRecord> runningRecordSlice = runningRecordService.findByUser(user, pageRequest);
+        Slice<RunningRecord> runningRecordSlice = runningRecordService.findByUser(findUser, pageRequest);
 
         List<SimpleRunningRecordDto> simpleRunningRecordDtoList = runningRecordSlice.stream()
                 .map(SimpleRunningRecordDto::new)
