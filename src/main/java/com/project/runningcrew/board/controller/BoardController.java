@@ -4,6 +4,7 @@ import com.project.runningcrew.board.dto.request.CreateNotReviewBoardRequest;
 import com.project.runningcrew.board.dto.request.CreateReviewBoardRequest;
 import com.project.runningcrew.board.dto.request.UpdateBoardRequest;
 import com.project.runningcrew.board.dto.response.GetBoardResponse;
+import com.project.runningcrew.board.dto.response.PagingBoardDto;
 import com.project.runningcrew.board.entity.*;
 import com.project.runningcrew.board.service.*;
 import com.project.runningcrew.comment.service.CommentService;
@@ -37,6 +38,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -360,7 +362,7 @@ public class BoardController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/members/{memberId}/boards")
-    public ResponseEntity<PagingResponse<SimpleBoardDto>> getBoardsOfMember(
+    public ResponseEntity<PagingResponse<PagingBoardDto>> getBoardsOfMember(
             @RequestParam("page") int page,
             @PathVariable("memberId") Long memberId,
             @Parameter(hidden = true) @CurrentUser User user
@@ -368,77 +370,18 @@ public class BoardController {
         Member member = memberService.findById(memberId);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<Board> boardSlice = boardService.findBoardByMember(member, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = boardService.findSimpleBoardDtoByMember(member, pageRequest);
 
-
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
         Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
-
-        List<SimpleBoardDto> dtoList = new ArrayList<>();
-
-        for (Long boardId : boardIds) {
-            Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId);
-            Long commentCount = countMaps.get(boardId);
-            dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-        }
+        List<PagingBoardDto> dtoList = simpleBoardSlice.stream()
+                .map(element -> new PagingBoardDto(element, imageMaps.get(element.getId()), countMaps.get(element.getId())))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(new PagingResponse<>(
-                new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext())));
-
-    }
-
-
-
-    @Operation(summary = "특정 키워드를 포함한 모든 게시글 정보 가져오기"
-            , description = "특정 키워드를 포함한 모든 게시글을 가져온다."
-            , security = {@SecurityRequirement(name = "Bearer-Key")}
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
-            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @GetMapping("/api/crews/{crewId}/boards")
-    public ResponseEntity<PagingResponse<SimpleBoardDto>> getBoardsOfKeyword(
-            @RequestParam("page") int page,
-            @RequestParam("keyword") String keyword,
-            @PathVariable("crewId") Long crewId,
-            @Parameter(hidden = true) @CurrentUser User user
-    ) {
-
-        Crew crew = crewService.findById(crewId);
-        memberAuthorizationChecker.checkMember(user, crew);
-        //note 요청 user 의 크루 회원 여부 검증
-
-
-        PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<Board> boardSlice = boardService.findBoardByCrewAndKeyWord(crew, keyword, pageRequest);
-
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
-        Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
-        Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
-
-
-        List<SimpleBoardDto> dtoList = new ArrayList<>();
-
-        for (Long boardId : boardIds) {
-            Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId);
-            Long commentCount = countMaps.get(boardId);
-            dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-        }
-
-        //note dtoList -> Slice
-        Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext());
-        return ResponseEntity.ok(new PagingResponse<>(responseSlice));
+                new SliceImpl<>(dtoList, simpleBoardSlice.getPageable(), simpleBoardSlice.hasNext())));
 
     }
 
@@ -458,7 +401,7 @@ public class BoardController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/crews/{crewId}/boards/free")
-    public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfFreeBoards(
+    public ResponseEntity<PagingResponse<PagingBoardDto>> getSliceOfFreeBoards(
         @PathVariable("crewId") Long crewId,
         @RequestParam("page") int page,
         @Parameter(hidden = true) @CurrentUser User user
@@ -468,24 +411,20 @@ public class BoardController {
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<FreeBoard> boardSlice = freeBoardService.findFreeBoardByCrew(crew, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = freeBoardService.findFreeBoardDtoByCrew(crew, pageRequest);
 
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
         Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
 
-        List<SimpleBoardDto> dtoList = new ArrayList<>();
+        List<PagingBoardDto> dtoList = simpleBoardSlice.stream()
+                .map(element -> new PagingBoardDto(element, imageMaps.get(element.getId()), countMaps.get(element.getId())))
+                .collect(Collectors.toList());
 
-        for (Long boardId : boardIds) {
-            Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId);
-            Long commentCount = countMaps.get(boardId);
-            dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-        }
 
         //note dtoList -> Slice
-        Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext());
+        Slice<PagingBoardDto> responseSlice = new SliceImpl<>(dtoList, simpleBoardSlice.getPageable(), simpleBoardSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(responseSlice));
 
     }
@@ -507,7 +446,7 @@ public class BoardController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/crews/{crewId}/boards/notice")
-    public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfNoticeBoards(
+    public ResponseEntity<PagingResponse<PagingBoardDto>> getSliceOfNoticeBoards(
             @PathVariable("crewId") Long crewId,
             @RequestParam("page") int page,
             @Parameter(hidden = true) @CurrentUser User user
@@ -517,24 +456,18 @@ public class BoardController {
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<NoticeBoard> boardSlice = noticeBoardService.findNoticeBoardByCrew(crew, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = noticeBoardService.findNoticeBoardDtoByCrew(crew, pageRequest);
 
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
         Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
-
-        List<SimpleBoardDto> dtoList = new ArrayList<>();
-
-        for (Long boardId : boardIds) {
-            Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId);
-            Long commentCount = countMaps.get(boardId);
-            dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-        }
+        List<PagingBoardDto> dtoList = simpleBoardSlice.stream()
+                .map(element -> new PagingBoardDto(element, imageMaps.get(element.getId()), countMaps.get(element.getId())))
+                .collect(Collectors.toList());
 
         //note dtoList -> Slice
-        Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext());
+        Slice<PagingBoardDto> responseSlice = new SliceImpl<>(dtoList, simpleBoardSlice.getPageable(), simpleBoardSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(responseSlice));
 
     }
@@ -555,7 +488,7 @@ public class BoardController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/crews/{crewId}/boards/review")
-    public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfReviewBoards(
+    public ResponseEntity<PagingResponse<PagingBoardDto>> getSliceOfReviewBoards(
             @PathVariable("crewId") Long crewId,
             @RequestParam("page") int page,
             @Parameter(hidden = true) @CurrentUser User user
@@ -565,24 +498,18 @@ public class BoardController {
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<ReviewBoard> boardSlice = reviewBoardService.findReviewBoardByCrew(crew, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = reviewBoardService.findReviewBoardDtoByCrew(crew, pageRequest);
 
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
         Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
-
-        List<SimpleBoardDto> dtoList = new ArrayList<>();
-
-        for (Long boardId : boardIds) {
-            Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId);
-            Long commentCount = countMaps.get(boardId);
-            dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-        }
+        List<PagingBoardDto> dtoList = simpleBoardSlice.stream()
+                .map(element -> new PagingBoardDto(element, imageMaps.get(element.getId()), countMaps.get(element.getId())))
+                .collect(Collectors.toList());
 
         //note dtoList -> Slice
-        Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext());
+        Slice<PagingBoardDto> responseSlice = new SliceImpl<>(dtoList, simpleBoardSlice.getPageable(), simpleBoardSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(responseSlice));
 
     }
@@ -604,7 +531,7 @@ public class BoardController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/api/crews/{crewId}/boards/info")
-    public ResponseEntity<PagingResponse<SimpleBoardDto>> getSliceOfInfoBoards(
+    public ResponseEntity<PagingResponse<PagingBoardDto>> getSliceOfInfoBoards(
             @PathVariable("crewId") Long crewId,
             @RequestParam("page") int page,
             @Parameter(hidden = true) @CurrentUser User user
@@ -614,24 +541,18 @@ public class BoardController {
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<InfoBoard> boardSlice = infoBoardService.findInfoBoardByCrew(crew, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = infoBoardService.findInfoBoardDtoByCrew(crew, pageRequest);
 
-        List<Long> boardIds = boardSlice.stream().map(Board::getId).collect(Collectors.toList());
+        List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
         Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
-
-        List<SimpleBoardDto> dtoList = new ArrayList<>();
-
-        for (Long boardId : boardIds) {
-            Board board = boardService.findById(boardId);
-            String fileName = imageMaps.get(boardId);
-            Long commentCount = countMaps.get(boardId);
-            dtoList.add(new SimpleBoardDto(board, fileName, commentCount));
-        }
+        List<PagingBoardDto> dtoList = simpleBoardSlice.stream()
+                .map(element -> new PagingBoardDto(element, imageMaps.get(element.getId()), countMaps.get(element.getId())))
+                .collect(Collectors.toList());
 
         //note dtoList -> Slice
-        Slice<SimpleBoardDto> responseSlice = new SliceImpl<>(dtoList, boardSlice.getPageable(), boardSlice.hasNext());
+        Slice<PagingBoardDto> responseSlice = new SliceImpl<>(dtoList, simpleBoardSlice.getPageable(), simpleBoardSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(responseSlice));
 
     }

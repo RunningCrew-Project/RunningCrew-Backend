@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CreateCrewRequest {
 
     @Schema(description = "크루 이름", example = "crew")

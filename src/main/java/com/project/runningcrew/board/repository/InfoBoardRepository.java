@@ -1,6 +1,7 @@
 package com.project.runningcrew.board.repository;
 
 import com.project.runningcrew.board.entity.InfoBoard;
+import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -19,5 +20,9 @@ public interface InfoBoardRepository extends JpaRepository<InfoBoard, Long> {
     @Query("select ib from InfoBoard ib where ib.member.crew = :crew")
     Slice<InfoBoard> findInfoBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
 
-
+    @Query("select new com.project.runningcrew.common.dto.SimpleBoardDto(ib.id, ib.createdDate, ib.title, u.nickname) " +
+            "from InfoBoard ib " +
+            "inner join Member m on m.crew = :crew " +
+            "inner join User u on m.user = u")
+    Slice<SimpleBoardDto> findInfoBoardDtoByCrew(@Param("crew") Crew crew, Pageable pageable);
 }
