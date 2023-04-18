@@ -59,9 +59,9 @@ public class UserService {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
 
-    private final String imageDirName = "user";
+    private final String USER_IMG_DIR_NAME = "user";
     private final String DEFAULT_USER_IMG = "유저 기본 이미지.svg";
-
+    private final String DEFAULT_USER_IMG_PATH = USER_IMG_DIR_NAME + '/' + DEFAULT_USER_IMG;
 
     /**
      * 입력받은 user 를 로그아웃한다. user 의 fcmToken 과 refreshToken 을 삭제한다.
@@ -114,7 +114,7 @@ public class UserService {
         duplicateNickname(user.getNickname());
 
         //note 기본 이미지 적용
-        String imgUrl = imageService.getImage(imageDirName, DEFAULT_USER_IMG);
+        String imgUrl = imageService.getImage(USER_IMG_DIR_NAME, DEFAULT_USER_IMG);
         user.updateImgUrl(imgUrl);
 
         user.updatePassword(passwordEncoder.encode(user.getPassword()));
@@ -137,7 +137,7 @@ public class UserService {
         duplicateEmail(user.getEmail());
         duplicateNickname(user.getNickname());
 
-        String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
+        String imageUrl = imageService.uploadImage(multipartFile, USER_IMG_DIR_NAME);
         user.updateImgUrl(imageUrl);
         user.updatePassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
@@ -191,21 +191,18 @@ public class UserService {
 
         //note [ 프로필 이미지 ]
 
-        String S3URL = imageDirName + '/' + DEFAULT_USER_IMG; // user/기본이미지.svg
         String decodeURL = imageService.decodeURL(originUser.getImgUrl());
         log.info("decodeURL={}", decodeURL);
 
-        if(decodeURL.equals(S3URL)) {
-            log.info("DEFAULT 유저 이미지는 버킷 내부에서 삭제되지 않습니다.");
-            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-            originUser.updateImgUrl(imageUrl);
-        } else {
-            log.info("기존 유저 이미지는 버킷 내부에서 삭제됩니다.");
-            imageService.deleteImage(originUser.getImgUrl());
-            String imageUrl = imageService.uploadImage(multipartFile, imageDirName);
-            originUser.updateImgUrl(imageUrl);
+        if(!ObjectUtils.isEmpty(multipartFile)) {
+            String imageUrl = imageService.uploadImage(multipartFile, USER_IMG_DIR_NAME);
+            if (decodeURL.equals(DEFAULT_USER_IMG_PATH)) {
+                originUser.updateImgUrl(imageUrl);
+            } else {
+                imageService.deleteImage(originUser.getImgUrl());
+                originUser.updateImgUrl(imageUrl);
+            }
         }
-
 
     }
 
@@ -254,8 +251,16 @@ public class UserService {
         }
 
         userRoleRepository.deleteByUser(user);
-        
-        imageService.deleteImage(user.getImgUrl());
+        String decodeURL = imageService.decodeURL(user.getImgUrl());
+        log.info("decodeURL={}", decodeURL);
+
+        if(decodeURL.equals(DEFAULT_USER_IMG_PATH)) {
+            log.info("DEFAULT 유저 이미지는 버킷 내부에서 삭제되지 않습니다.");
+        } else {
+            log.info("기존 유저 이미지는 버킷 내부에서 삭제됩니다.");
+            imageService.deleteImage(user.getImgUrl());
+        }
+
         userRepository.delete(user);
     }
 
