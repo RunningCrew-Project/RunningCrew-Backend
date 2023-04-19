@@ -14,8 +14,6 @@ public class GetReportedCommentResponse {
 
     private Long commentId;
 
-    private Long reporterMemberId;
-
     private ReportType reportType;
 
 }

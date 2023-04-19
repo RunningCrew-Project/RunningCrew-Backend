@@ -1,4 +1,4 @@
-package com.project.runningcrew.reported.board.dto.request;
+package com.project.runningcrew.reported.totalpost.board.dto.request;
 
 import com.project.runningcrew.reported.ReportType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,8 +20,8 @@ public class CreateReportedBoardRequest {
     @NotNull(message = "게시글 아이디 값은 필수입니다.")
     private Long boardId;
 
-    @Schema(description = "게시글의 신고 사유", example = "ABUSE")
+    @Schema(description = "게시글의 신고 사유", example = "abuse(전부 소문자)")
     @NotBlank(message = "게시글 신고 사유 값은 필수입니다.")
-    private ReportType reportType;
+    private String reportType;
 
 }

@@ -1,8 +1,8 @@
-package com.project.runningcrew.reported.runningnotice;
+package com.project.runningcrew.reported.totalpost.runningnotice;
 
 import com.project.runningcrew.reported.ReportType;
-import com.project.runningcrew.common.BaseEntity;
 import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.reported.totalpost.ReportedTotalPost;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,37 +12,22 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Table(name = "reported_running_notices")
+@DiscriminatorValue("running_notice")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReportedRunningNotice extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reported_running_notice_id")
-    private Long id;
+public class ReportedRunningNotice extends ReportedTotalPost {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "running_notice_id", nullable = false)
+    @JoinColumn(name = "running_notice_id")
     private RunningNotice runningNotice;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
-    @Enumerated(EnumType.STRING)
-    private ReportType reportType;
-
     public ReportedRunningNotice(RunningNotice runningNotice, Member member, ReportType reportType) {
+        super(member, reportType);
         this.runningNotice = runningNotice;
-        this.member = member;
-        this.reportType = reportType;
     }
 
     public ReportedRunningNotice(Long id, RunningNotice runningNotice, Member member, ReportType reportType) {
-        this.id = id;
+        super(id, member, reportType);
         this.runningNotice = runningNotice;
-        this.member = member;
-        this.reportType = reportType;
     }
 
 }
