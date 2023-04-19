@@ -1,4 +1,4 @@
-package com.project.runningcrew.reported.totalpost.board.dto.request;
+package com.project.runningcrew.reported.totalpost.board.dto;
 
 import com.project.runningcrew.reported.ReportType;
 import io.swagger.v3.oas.annotations.media.Schema;
