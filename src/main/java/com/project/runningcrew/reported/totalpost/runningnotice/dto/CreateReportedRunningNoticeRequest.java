@@ -1,4 +1,4 @@
-package com.project.runningcrew.reported.runningnotice.dto.request;
+package com.project.runningcrew.reported.totalpost.runningnotice.dto;
 
 import com.project.runningcrew.reported.ReportType;
 import io.swagger.v3.oas.annotations.media.Schema;

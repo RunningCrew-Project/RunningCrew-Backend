@@ -3,6 +3,7 @@ package com.project.runningcrew.board.service;
 import com.project.runningcrew.board.entity.InfoBoard;
 import com.project.runningcrew.board.entity.ReviewBoard;
 import com.project.runningcrew.comment.service.CommentService;
+import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.resourceimage.entity.BoardImage;
@@ -134,6 +135,7 @@ public class BoardService {
 
     }
 
+
     /**
      * 입력받은 Member 가 작성한 모든 Board 를 반환한다.
      * @param member 작성자 member
@@ -144,15 +146,14 @@ public class BoardService {
     }
 
     /**
-     * 특정 Crew 의 Board 중 keyword 를 제목 or 내용에 포함하는 Board 를 반환한다.
-     * @param crew 입력받은 crew 데이터
-     * @param keyword 검색단어 keyword
-     * @return 특정 Crew 의 Board 중 keyword 를 제목 or 내용에 포함하는 Board List
+     * @param member 작성자 member
+     * @param pageable 페이징 정보
+     * @return SimpleBoardDto 의 Slice
      */
-    public Slice<Board> findBoardByCrewAndKeyWord(Crew crew, String keyword, Pageable pageable) {
-        return boardRepository.findSliceAllByCrewAndKeyWord(keyword, crew, pageable);
-    }
 
+    public Slice<SimpleBoardDto> findSimpleBoardDtoByMember(Member member, Pageable pageable) {
+        return boardRepository.findSimpleBoardDtoByMember(member, pageable);
+    }
 
 
 }

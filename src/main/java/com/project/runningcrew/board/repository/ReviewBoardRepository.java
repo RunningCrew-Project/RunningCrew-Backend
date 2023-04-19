@@ -1,5 +1,6 @@
 package com.project.runningcrew.board.repository;
 
+import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.ReviewBoard;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +19,9 @@ public interface ReviewBoardRepository extends JpaRepository<ReviewBoard, Long> 
     @Query("select rb from ReviewBoard rb where rb.member.crew = :crew")
     Slice<ReviewBoard> findReviewBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
 
+    @Query("select new com.project.runningcrew.common.dto.SimpleBoardDto(rb.id, rb.createdDate, rb.title, u.nickname) " +
+            "from ReviewBoard rb " +
+            "inner join Member m on m.crew = :crew " +
+            "inner join User u on m.user = u")
+    Slice<SimpleBoardDto> findReviewBoardDtoByCrew(@Param("crew") Crew crew, Pageable pageable);
 }

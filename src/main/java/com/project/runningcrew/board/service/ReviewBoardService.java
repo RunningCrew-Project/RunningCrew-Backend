@@ -1,9 +1,11 @@
 package com.project.runningcrew.board.service;
 
+import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.ReviewBoard;
 import com.project.runningcrew.board.repository.ReviewBoardRepository;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,10 @@ public class ReviewBoardService {
      */
     public Slice<ReviewBoard> findReviewBoardByCrew(Crew crew, Pageable pageable) {
         return reviewBoardRepository.findReviewBoardByCrew(crew, pageable);
+    }
+
+    public Slice<SimpleBoardDto> findReviewBoardDtoByCrew(Crew crew, Pageable pageable) {
+        return reviewBoardRepository.findReviewBoardDtoByCrew(crew, pageable);
     }
 
 }

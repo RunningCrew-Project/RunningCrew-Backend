@@ -20,8 +20,8 @@ public class CreateReportedCommentRequest {
     @NotNull(message = "댓글 아이디 값은 필수입니다.")
     private Long commentId;
 
-    @Schema(description = "댓글 신고 사유", example = "ABUSE")
+    @Schema(description = "댓글 신고 사유", example = "abuse(전부 소문자)")
     @NotBlank(message = "댓글 신고 사유 값은 필수입니다.")
-    private ReportType reportType;
+    private String reportType;
 
 }

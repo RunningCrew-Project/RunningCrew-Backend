@@ -1,5 +1,6 @@
 package com.project.runningcrew.board.service;
 
+import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.board.entity.NoticeBoard;
@@ -62,6 +63,10 @@ public class NoticeBoardService {
      */
     public Slice<NoticeBoard> findNoticeBoardByCrew(Crew crew, Pageable pageable) {
         return noticeBoardRepository.findNoticeBoardByCrew(crew, pageable);
+    }
+
+    public Slice<SimpleBoardDto> findNoticeBoardDtoByCrew(Crew crew, Pageable pageable) {
+        return noticeBoardRepository.findNoticeBoardDtoByCrew(crew, pageable);
     }
 
 

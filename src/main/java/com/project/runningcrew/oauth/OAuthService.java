@@ -1,6 +1,8 @@
 package com.project.runningcrew.oauth;
 
 
+import com.project.runningcrew.area.entity.DongArea;
+import com.project.runningcrew.area.service.DongAreaService;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
 import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.oauth.dto.request.OauthDto;
@@ -27,10 +29,12 @@ public class OAuthService {
     private final JwtProvider jwtProvider;
     private final Oauth2UserFactory oauth2UserFactory;
     private final UserService userService;
-
+    private final DongAreaService dongAreaService;
     private final ImageService imageService;
-    private final String imageDirName = "user";
+
+    private final String USER_IMG_DIR_NAME = "user";
     private final String DEFAULT_USER_IMG = "유저 기본 이미지.svg";
+    private final String DEFAULT_USER_IMG_PATH = USER_IMG_DIR_NAME + '/' + DEFAULT_USER_IMG;
 
     /**
      * 소셜 로그인. [ OAuth2User, accessToken, refreshToken, initData ] 정보가 포함된다.
@@ -53,16 +57,18 @@ public class OAuthService {
     /**
      * 초기 데이터는 Email 뿐이다. 나머지 추가정보를 받아서 업데이트한다.
      * @param user 추가정보를 입력할 user 정보.
-     * @param signUpDto 회원가입 필수 추가정보 :  [ 이름, 닉네임 ] + @ - 초기 프로필 이미지는 받지 않는다.
+     * @param signUpDto 회원가입 필수 추가정보 :  [ 이름, 닉네임, 동 ] + @ - 초기 프로필 이미지는 받지 않는다.
      */
     public void signUpData(User user, SignUpDto signUpDto) {
-        //note 필수 추가 정보
+        //note 필수 추가 정보 [ 이름, 닉네임, 동 ]
         userService.duplicateNickname(user.getNickname());
         user.updateNickname(signUpDto.getNickname());
         user.updateName(signUpDto.getName());
+        DongArea dongArea = dongAreaService.findById(signUpDto.getDongId());
+        user.updateDongArea(dongArea);
 
         //note 기본 이미지 적용
-        String imgUrl = imageService.getImage(imageDirName, DEFAULT_USER_IMG);
+        String imgUrl = imageService.getImage(USER_IMG_DIR_NAME, DEFAULT_USER_IMG);
         user.updateImgUrl(imgUrl);
 
 
@@ -86,10 +92,10 @@ public class OAuthService {
     /**
      * 회원가입 직후 필수 추가 정보를 입력하였는지 확인한다. 모두 입력하였다면 true 를 반환한다.
      * @param user 추가정보를 입력할 user 정보.
-     * @return 필수 추가 정보 입력 유무 : [ 이름, 닉네임 ]
+     * @return 필수 추가 정보 입력 유무 : [ 이름, 닉네임, 동 ]
      */
     public boolean initDataInput(User user) {
-        return (user.getName() != null && user.getNickname() != null);
+        return (user.getName() != null && user.getNickname() != null && user.getDongArea() != null);
     }
 
 }

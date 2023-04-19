@@ -1,5 +1,6 @@
 package com.project.runningcrew.board.repository;
 
+import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.NoticeBoard;
 import org.springframework.data.domain.Pageable;
@@ -18,4 +19,9 @@ public interface NoticeBoardRepository extends JpaRepository<NoticeBoard, Long> 
     @Query("select nb from NoticeBoard nb where nb.member.crew = :crew")
     Slice<NoticeBoard> findNoticeBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
 
+    @Query("select new com.project.runningcrew.common.dto.SimpleBoardDto(nb.id, nb.createdDate, nb.title, u.nickname) " +
+            "from NoticeBoard nb " +
+            "inner join Member m on m.crew = :crew " +
+            "inner join User u on m.user = u")
+    Slice<SimpleBoardDto> findNoticeBoardDtoByCrew(@Param("crew") Crew crew, Pageable pageable);
 }

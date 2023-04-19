@@ -2,6 +2,7 @@ package com.project.runningcrew.board.service;
 
 import com.project.runningcrew.board.entity.InfoBoard;
 import com.project.runningcrew.board.repository.InfoBoardRepository;
+import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,10 @@ public class InfoBoardService {
      */
     public Slice<InfoBoard> findInfoBoardByCrew(Crew crew, Pageable pageable) {
         return infoBoardRepository.findInfoBoardByCrew(crew, pageable);
+    }
+
+    public Slice<SimpleBoardDto> findInfoBoardDtoByCrew(Crew crew, Pageable pageable) {
+        return infoBoardRepository.findInfoBoardDtoByCrew(crew, pageable);
     }
 
 }

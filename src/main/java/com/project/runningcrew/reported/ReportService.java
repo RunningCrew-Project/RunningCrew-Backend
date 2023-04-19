@@ -1,12 +1,14 @@
 package com.project.runningcrew.reported;
 
 import com.project.runningcrew.crew.entity.Crew;
-import com.project.runningcrew.reported.board.ReportedBoard;
-import com.project.runningcrew.reported.board.ReportedBoardRepository;
+import com.project.runningcrew.reported.totalpost.board.ReportedBoard;
+import com.project.runningcrew.reported.totalpost.board.ReportedBoardRepository;
 import com.project.runningcrew.reported.comment.ReportedComment;
 import com.project.runningcrew.reported.comment.ReportedCommentRepository;
-import com.project.runningcrew.reported.runningnotice.ReportedRunningNotice;
-import com.project.runningcrew.reported.runningnotice.ReportedRunningNoticeRepository;
+import com.project.runningcrew.reported.totalpost.runningnotice.ReportedRunningNotice;
+import com.project.runningcrew.reported.totalpost.runningnotice.ReportedRunningNoticeRepository;
+import com.project.runningcrew.reported.totalpost.ReportedTotalPost;
+import com.project.runningcrew.reported.totalpost.ReportedTotalPostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -21,14 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
 
-    /**
-     * 한 번 신고당한 게시글 or 댓글은 다시 신고당하지 않는다 : 신고자가 많을 수 있기 때문에 아닌거같음, 디자인 상 신고자를 표기하지 않음(익명성). 근데 id 값 넣긴 함.
-     */
-
     private final ReportedBoardRepository reportedBoardRepository;
-    private final ReportedCommentRepository reportedCommentRepository;
     private final ReportedRunningNoticeRepository reportedRunningNoticeRepository;
+    private final ReportedCommentRepository reportedCommentRepository;
 
+    private final ReportedTotalPostRepository reportedTotalPostRepository;
 
 
     /**
@@ -63,16 +62,16 @@ public class ReportService {
 
 
 
-
     /**
-     * 입력받은 크루의 게시글 신고 정보 전체 목록을 반환한다. - 페이징 적용
+     * 입력받은 크루의 신고글 정보 전체 목록을 반환한다. - 페이징 적용
      * @param crew 크루
      * @param pageable 페이징 정보
-     * @return 게시글 신고 정보 목록
+     * @return 신고글 정보 목록
      */
-    public Slice<ReportedBoard> findReportedBoardsByCrew(Crew crew, Pageable pageable) {
-        return reportedBoardRepository.findByCrew(crew, pageable);
+    public Slice<ReportedTotalPost> findReportedTotalPostsByCrew(Crew crew, Pageable pageable) {
+        return reportedTotalPostRepository.findByCrew(crew, pageable);
     }
+
 
     /**
      * 입력받은 크루의 댓글 신고 정보 전체 목록을 반환한다. - 페이징 적용
@@ -82,16 +81,6 @@ public class ReportService {
      */
     public Slice<ReportedComment> findReportedCommentsByCrew(Crew crew, Pageable pageable) {
         return reportedCommentRepository.findByCrew(crew, pageable);
-    }
-
-    /**
-     * 입력받은 크루의 런닝 공지 신고 정보 전체 목록을 반환한다. - 페이징 적용
-     * @param crew 크루
-     * @param pageable 페이징 정보
-     * @return 런닝 공지 신고 정보 목록
-     */
-    public Slice<ReportedRunningNotice> findReportedRunningNoticesByCrew(Crew crew, Pageable pageable) {
-        return reportedRunningNoticeRepository.findByCrew(crew, pageable);
     }
 
 
