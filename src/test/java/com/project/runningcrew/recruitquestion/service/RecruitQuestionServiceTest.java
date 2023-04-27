@@ -73,5 +73,24 @@ class RecruitQuestionServiceTest {
         verify(recruitQuestionRepository, times(1)).findAllByCrew(crew);
     }
 
+    @DisplayName("가입 질문 리스트 설정 테스트")
+    @Test
+    public void setRecruitQuestionTest(@Mock Crew crew) {
+        //given
+        List<RecruitQuestion> recruitQuestions = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            recruitQuestions.add(new RecruitQuestion((long) i, crew, "question" + i, i));
+        }
+        doNothing().when(recruitQuestionRepository).deleteAllByCrew(crew);
+        when(recruitQuestionRepository.saveAll(recruitQuestions)).thenReturn(recruitQuestions);
+
+        ///when
+        recruitQuestionService.setRecruitQuestions(crew, recruitQuestions);
+
+        //then
+        verify(recruitQuestionRepository, times(1)).deleteAllByCrew(crew);
+        verify(recruitQuestionRepository, times(1)).saveAll(recruitQuestions);
+    }
+
 
 }
