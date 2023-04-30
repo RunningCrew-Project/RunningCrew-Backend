@@ -2,6 +2,7 @@ package com.project.runningcrew.comment.repository;
 
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.comment.entity.BoardComment;
+import com.project.runningcrew.common.dto.SimpleCommentDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,18 @@ import java.util.stream.Collectors;
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
 
 
-    List<BoardComment> findAllByBoard(Board board);
+    /**
+     * 입력받은 Board 에 작성된 댓글 리스트를 반환한다.
+     * @param board 입력받은 board
+     * @return 입력받은 Board 의 Comment -> SimpleCommentDto 리스트
+     */
+    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(bc.id, bc.createdDate, bc.detail, u.nickname, u.imgUrl) " +
+            "from BoardComment bc " +
+            "inner join Board b on b = bc.board " +
+            "inner join Member m on m = bc.member " +
+            "inner join User u on m.user = u " +
+            "where bc.board = :board")
+    List<SimpleCommentDto> findAllByBoard(@Param("board") Board board);
 
 
     /**
@@ -33,6 +45,12 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
      */
     @Query("select bc.board.id, count(bc) from BoardComment bc where bc.board.id in (:boardIds) group by bc.board.id")
     List<Object[]> countAllByBoardIds(@Param("boardIds") List<Long> boardIds);
+
+
+
+
+
+
 
 
 

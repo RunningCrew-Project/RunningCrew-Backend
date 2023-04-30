@@ -35,18 +35,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Tag(name = "Comment", description = "댓글에 관한 api")
@@ -59,10 +54,6 @@ public class CommentController {
     private final BoardService boardService;
     private final RunningNoticeService runningNoticeService;
     private final MemberService memberService;
-    private final CrewService crewService;
-    private final BoardImageService boardImageService;
-    private final RunningNoticeImageService runningNoticeImageService;
-
     private final MemberAuthorizationChecker memberAuthorizationChecker;
 
     @Value("${domain.name}")
@@ -71,8 +62,11 @@ public class CommentController {
 
 
 
-
-    @Operation(summary = "댓글 가져오기", description = "commentId 에 해당하는 댓글을 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
+    @Operation(
+            summary = "댓글 상세조회",
+            description = "commentId 에 해당하는 댓글의 상세정보를 가져온다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")}
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetCommentResponse.class))),
@@ -247,10 +241,8 @@ public class CommentController {
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        List<BoardComment> commentList = commentService.findAllByBoard(board);
-        int commentCount = commentList.size();
-
-        List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
+        List<SimpleCommentDto> dtoList = commentService.findAllByBoard(board);
+        int commentCount = dtoList.size();
         return ResponseEntity.ok(new CommentListResponse(commentCount, dtoList));
     }
 
@@ -278,10 +270,8 @@ public class CommentController {
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
-        List<RunningNoticeComment> commentList = commentService.findAllByRunningNotice(runningNotice);
-        int commentCount = commentList.size();
-
-        List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
+        List<SimpleCommentDto> dtoList = commentService.findAllByRunningNotice(runningNotice);
+        int commentCount = dtoList.size();
         return ResponseEntity.ok(new CommentListResponse(commentCount, dtoList));
     }
 
