@@ -4,6 +4,7 @@ import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.comment.entity.RunningNoticeComment;
+import com.project.runningcrew.common.dto.SimpleCommentDto;
 import com.project.runningcrew.exception.notFound.CommentNotFoundException;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
@@ -101,16 +102,6 @@ public class CommentService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
     /**
      * 입력된 Member 가 작성한 Comment Slice 를 반환한다.
      * @param member
@@ -122,20 +113,20 @@ public class CommentService {
     }
 
     /**
-     * 입력된 Board 에 작성된 BoardComment List 를 반환한다.
+     * 입력된 Board 에 작성된 BoardComment List 를 SimpleCommentDto 형태로 매핑하여 반환한다.
      * @param board
-     * @return 입력받은 Board 에 작성된 BoardComment list
+     * @return 입력받은 Board 에 작성된 BoardComment 의 SimpleCommentDto 리스트
      */
-    public List<BoardComment> findAllByBoard(Board board) {
+    public List<SimpleCommentDto> findAllByBoard(Board board) {
         return boardCommentRepository.findAllByBoard(board);
     }
 
     /**
-     * 입력된 RunningNotice 에 작성된 RunningNoticeComment List 를 반환한다.
+     * 입력된 RunningNotice 에 작성된 RunningNoticeComment List 를 SimpleCommentDto 형태로 매핑하여 반환한다.
      * @param runningNotice
-     * @return 입력받은 RunningNotice 에 작성된 RunningNoticeComment list
+     * @return 입력받은 RunningNotice 에 작성된 RunningNoticeComment 의 SimpleCommentDto 리스트
      */
-    public List<RunningNoticeComment> findAllByRunningNotice(RunningNotice runningNotice) {
+    public List<SimpleCommentDto> findAllByRunningNotice(RunningNotice runningNotice) {
         return runningNoticeCommentRepository.findAllByRunningNotice(runningNotice);
     }
 

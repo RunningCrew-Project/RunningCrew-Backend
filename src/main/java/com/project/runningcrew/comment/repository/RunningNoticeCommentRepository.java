@@ -1,6 +1,7 @@
 package com.project.runningcrew.comment.repository;
 
 import com.project.runningcrew.comment.entity.RunningNoticeComment;
+import com.project.runningcrew.common.dto.SimpleCommentDto;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,7 +18,13 @@ public interface RunningNoticeCommentRepository extends JpaRepository<RunningNot
      * @param runningNotice 입력받은 RunningNotice
      * @return 입력받은 RunningNotice 의 댓글 리스트
      */
-    List<RunningNoticeComment> findAllByRunningNotice(RunningNotice runningNotice);
+    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(rc.id, rc.createdDate, rc.detail, u.nickname, u.imgUrl) " +
+            "from RunningNoticeComment rc " +
+            "inner join RunningNotice r on r = rc.runningNotice " +
+            "inner join Member m on m = rc.member " +
+            "inner join User u on m.user = u " +
+            "where rc.runningNotice = :runningNotice")
+    List<SimpleCommentDto> findAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
 
     /**
