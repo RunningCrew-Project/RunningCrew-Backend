@@ -6,7 +6,6 @@ import com.project.runningcrew.comment.dto.request.ChangeCommentRequest;
 import com.project.runningcrew.comment.dto.request.CreateBoardCommentRequest;
 import com.project.runningcrew.comment.dto.request.CreateRunningNoticeCommentRequest;
 import com.project.runningcrew.comment.dto.response.CommentListResponse;
-import com.project.runningcrew.comment.dto.response.GetCommentOfMemberResponse;
 import com.project.runningcrew.comment.dto.response.GetCommentResponse;
 import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.comment.entity.Comment;
@@ -21,6 +20,8 @@ import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.member.service.MemberService;
+import com.project.runningcrew.resourceimage.service.BoardImageService;
+import com.project.runningcrew.resourceimage.service.RunningNoticeImageService;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.service.RunningNoticeService;
 import com.project.runningcrew.user.entity.User;
@@ -43,7 +44,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Tag(name = "Comment", description = "댓글에 관한 api")
@@ -57,6 +60,8 @@ public class CommentController {
     private final RunningNoticeService runningNoticeService;
     private final MemberService memberService;
     private final CrewService crewService;
+    private final BoardImageService boardImageService;
+    private final RunningNoticeImageService runningNoticeImageService;
 
     private final MemberAuthorizationChecker memberAuthorizationChecker;
 
@@ -279,38 +284,6 @@ public class CommentController {
         List<SimpleCommentDto> dtoList = commentList.stream().map(SimpleCommentDto::new).collect(Collectors.toList());
         return ResponseEntity.ok(new CommentListResponse(commentCount, dtoList));
     }
-
-
-    @Operation(summary = "특정 멤버가 작성한 모든 댓글 정보 가져오기",
-            description = "특정 멤버가 작성한 모든 댓글 정보를 가져온다.",
-            security = {@SecurityRequirement(name = "Bearer-Key")})
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
-            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @GetMapping("/api/members/{memberId}/comments")
-    public ResponseEntity<PagingResponse<GetCommentOfMemberResponse>> getCommentPageOfMember(
-            @RequestParam("page") int page,
-            @PathVariable("memberId") Long memberId,
-            @Parameter(hidden = true) @CurrentUser User user
-    ) {
-        Member member = memberService.findById(memberId);
-
-        PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<Comment> commentSlice = commentService.findAllByMember(member, pageRequest);
-
-        List<GetCommentOfMemberResponse> dtoList = commentSlice.stream().map(GetCommentOfMemberResponse::new).collect(Collectors.toList());
-        Slice<GetCommentOfMemberResponse> responseSlice = new SliceImpl<>(dtoList, commentSlice.getPageable(), commentSlice.hasNext());
-        return ResponseEntity.ok(new PagingResponse<>(responseSlice));
-    }
-
-
 
 
 }

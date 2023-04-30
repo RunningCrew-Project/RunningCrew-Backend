@@ -135,6 +135,37 @@ public class TotalPostController {
     }
 
 
+    @Operation(summary = "멤버가 댓글 단 전체 글 정보 가져오기",
+            description = "멤버가 댓글 단 전체 글 정보를 페이징하여 가져온다.",
+            security = {@SecurityRequirement(name = "Bearer-Key")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class))),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/api/members/{memberId}/comments/total-posts")
+    public ResponseEntity<PagingResponse<PagingTotalPostDto>> getCommentPageOfMember(
+            @RequestParam("page") int page,
+            @PathVariable("memberId") Long memberId,
+            @Parameter(hidden = true) @CurrentUser User user
+    ) {
+        Member member = memberService.findById(memberId);
+        memberAuthorizationChecker.checkMember(user, member.getCrew());
+
+        PageRequest pageRequest = PageRequest.of(page, pagingSize);
+        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByCommentOfMember(member, pageRequest);
+
+        return ResponseEntity.ok(new PagingResponse<>(getPagingTotalPostDtoSlice(totalPosts)));
+    }
+
+
+
+
     private Slice<PagingTotalPostDto> getPagingTotalPostDtoSlice(Slice<TotalPost> totalPosts) {
         List<Long> boardIds = totalPosts.stream()
                 .filter(p -> p.getPostType().equals(PostType.BOARD))

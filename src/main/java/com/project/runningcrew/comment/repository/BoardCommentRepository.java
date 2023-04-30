@@ -36,13 +36,6 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
 
 
 
-
-
-
-
-
-
-
     /**
      * 미사용 예정, Test 코드 컴파일 오류때문에 남겨둠.
      * 미사용 예정, Test 코드 컴파일 오류때문에 남겨둠.
@@ -50,9 +43,6 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
      */
     @Query("select count(bc) from BoardComment bc where bc.board.id in (:boardId) group by bc.board.id")
     List<Integer> countByBoardId(@Param("boardId") List<Long> boardId);
-
-
-
 
 
 
