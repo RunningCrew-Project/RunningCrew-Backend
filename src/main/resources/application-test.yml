@@ -17,3 +17,5 @@ spring:
       hibernate:
         format_sql: true
 
+domain:
+  name: https://runningcrew-test.ddns.net

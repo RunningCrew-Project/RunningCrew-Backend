@@ -17,3 +17,5 @@ spring:
       hibernate:
         format_sql: true
 
+domain:
+  name: http://localhost:8080

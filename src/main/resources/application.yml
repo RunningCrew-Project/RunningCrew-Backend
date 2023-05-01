@@ -32,6 +32,3 @@ area:
 
 jwt:
   secret-key: ${JWT_TOKEN}
-
-domain:
-  name: http://localhost:8080
