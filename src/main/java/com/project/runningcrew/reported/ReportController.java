@@ -166,7 +166,8 @@ public class ReportController {
 
         Member reporter = memberService.findById(createReportedRunningNoticeRequest.getReporterMemberId());
         RunningNotice runningNotice = runningNoticeService.findById(createReportedRunningNoticeRequest.getRunningNoticeId());
-        reportService.saveReportedRunningNotice(new ReportedRunningNotice(runningNotice, reporter, createReportedRunningNoticeRequest.getReportType()));
+        ReportType reportType = ReportType.getReportType(createReportedRunningNoticeRequest.getReportType());
+        reportService.saveReportedRunningNotice(new ReportedRunningNotice(runningNotice, reporter, reportType));
 
         return ResponseEntity.created(null).build();
     }
