@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SimpleCommentDto {
 
-    private final Long id;
+    private final Long commentId;
+
+    private final Long memberId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private final LocalDateTime createdDate;

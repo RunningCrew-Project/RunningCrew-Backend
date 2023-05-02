@@ -20,7 +20,7 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
      * @param board 입력받은 board
      * @return 입력받은 Board 의 Comment -> SimpleCommentDto 리스트
      */
-    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(bc.id, bc.createdDate, bc.detail, u.nickname, u.imgUrl) " +
+    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(bc.id, m.id, bc.createdDate, bc.detail, u.nickname, u.imgUrl) " +
             "from BoardComment bc " +
             "inner join Board b on b = bc.board " +
             "inner join Member m on m = bc.member " +
