@@ -18,7 +18,7 @@ public interface RunningNoticeCommentRepository extends JpaRepository<RunningNot
      * @param runningNotice 입력받은 RunningNotice
      * @return 입력받은 RunningNotice 의 댓글 리스트
      */
-    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(rc.id, rc.createdDate, rc.detail, u.nickname, u.imgUrl) " +
+    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(rc.id, m.id, rc.createdDate, rc.detail, u.nickname, u.imgUrl) " +
             "from RunningNoticeComment rc " +
             "inner join RunningNotice r on r = rc.runningNotice " +
             "inner join Member m on m = rc.member " +

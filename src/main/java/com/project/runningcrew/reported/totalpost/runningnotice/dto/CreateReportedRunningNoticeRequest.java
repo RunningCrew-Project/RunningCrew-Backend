@@ -20,8 +20,8 @@ public class CreateReportedRunningNoticeRequest {
     @NotNull(message = "런닝 공지 아이디 값은 필수입니다.")
     private Long runningNoticeId;
 
-    @Schema(description = "런닝 공지 신고 사유", example = "ABUSE")
+    @Schema(description = "런닝 공지 신고 사유", example = "privacy(전부 소문자)")
     @NotBlank(message = "런닝 공지 신고 사유 값은 필수입니다.")
-    private ReportType reportType;
+    private String reportType;
 
 }

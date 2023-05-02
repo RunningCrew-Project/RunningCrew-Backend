@@ -166,7 +166,8 @@ public class ReportController {
 
         Member reporter = memberService.findById(createReportedRunningNoticeRequest.getReporterMemberId());
         RunningNotice runningNotice = runningNoticeService.findById(createReportedRunningNoticeRequest.getRunningNoticeId());
-        reportService.saveReportedRunningNotice(new ReportedRunningNotice(runningNotice, reporter, createReportedRunningNoticeRequest.getReportType()));
+        ReportType reportType = ReportType.getReportType(createReportedRunningNoticeRequest.getReportType());
+        reportService.saveReportedRunningNotice(new ReportedRunningNotice(runningNotice, reporter, reportType));
 
         return ResponseEntity.created(null).build();
     }
@@ -189,7 +190,7 @@ public class ReportController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping(value = "/api/crews/{crewId}/boards/report")
+    @GetMapping(value = "/api/crews/{crewId}/total-posts/report")
     public ResponseEntity<PagingResponse<GetReportedTotalPostResponse>> getReportedBoards(
             @Parameter(hidden = true) @CurrentUser User user,
             @PathVariable("crewId") Long crewId,
