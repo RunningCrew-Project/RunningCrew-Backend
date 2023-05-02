@@ -190,7 +190,7 @@ public class ReportController {
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping(value = "/api/crews/{crewId}/boards/report")
+    @GetMapping(value = "/api/crews/{crewId}/total-posts/report")
     public ResponseEntity<PagingResponse<GetReportedTotalPostResponse>> getReportedBoards(
             @Parameter(hidden = true) @CurrentUser User user,
             @PathVariable("crewId") Long crewId,
