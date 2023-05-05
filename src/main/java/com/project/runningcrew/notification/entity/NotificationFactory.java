@@ -37,4 +37,14 @@ public class NotificationFactory {
                 NotificationType.REGULAR_RUNNING_NOTICE, runningNotice.getId());
     }
 
+    public static Notification createCrewJoinNotification(User user, Crew crew) {
+        return new Notification(user, crew, crew.getName() + "크루 가입을 환영합니다.",
+                NotificationType.CREW, crew.getId());
+    }
+
+    public static Notification createCrewJoinNotification(Long id, User user, Crew crew) {
+        return new Notification(id, user, crew, crew.getName() + "크루 가입을 환영합니다.",
+                NotificationType.CREW, crew.getId());
+    }
+
 }
