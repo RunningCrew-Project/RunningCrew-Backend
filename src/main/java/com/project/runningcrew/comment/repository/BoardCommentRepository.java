@@ -3,6 +3,7 @@ package com.project.runningcrew.comment.repository;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.comment.entity.BoardComment;
 import com.project.runningcrew.common.dto.SimpleCommentDto;
+import com.project.runningcrew.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,6 +28,23 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
             "inner join User u on m.user = u " +
             "where bc.board = :board")
     List<SimpleCommentDto> findAllByBoard(@Param("board") Board board);
+
+
+    /**
+     * 입력받은 Board 에 작성된 댓글 리스트를 반환한다.(차단 멤버가 작성한 댓글 제외)
+     * @param board 입력받은 Board
+     * @param member 댓글 리스트를 조회할 Member
+     * @return 입력받은 Board 의 Comment -> SimpleCommentDto 리스트(차단 멤버가 작성한 댓글 제외)
+     */
+    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(bc.id, m.id, bc.createdDate, bc.detail, u.nickname, u.imgUrl) " +
+            "from BoardComment bc " +
+            "inner join Board b on b = bc.board " +
+            "inner join Member m on m = bc.member " +
+            "inner join User u on m.user = u " +
+            "where bc.board = :board and bc.id not in " +
+            "(select bc.id from BoardComment bc inner join BlockedInfo bi on bi.blockedMemberId = bc.member.id where bi.blockerMember = :member)")
+    List<SimpleCommentDto> findAllByBoard2(@Param("board") Board board, @Param("member") Member member);
+
 
 
     /**
