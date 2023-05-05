@@ -45,8 +45,8 @@ public class Notification extends BaseEntity {
     @Column
     private Long referenceId;
 
-    private Notification(User user, Crew crew, String content, NotificationType type,
-                        Long referenceId) {
+    public Notification(User user, Crew crew, String content, NotificationType type,
+                         Long referenceId) {
         this.user = user;
         this.crew = crew;
         this.content = content;
@@ -54,42 +54,14 @@ public class Notification extends BaseEntity {
         this.referenceId = referenceId;
     }
 
-    private Notification(Long id, User user, Crew crew, String content,
-                        NotificationType type, Long referenceId) {
+    public Notification(Long id, User user, Crew crew, String content,
+                         NotificationType type, Long referenceId) {
         this.id = id;
         this.user = user;
         this.crew = crew;
         this.content = content;
         this.type = type;
         this.referenceId = referenceId;
-    }
-
-    public static Notification createNoticeBoardNotification(User user, Crew crew, NoticeBoard board) {
-        return new Notification(user, crew, board.getTitle(),
-                NotificationType.NOTICE_BOARD, board.getId());
-    }
-
-    public static Notification createNoticeBoardNotification(Long id, User user, Crew crew,
-                                                             NoticeBoard board) {
-        return new Notification(id, user, crew, board.getTitle(),
-                NotificationType.NOTICE_BOARD, board.getId());
-    }
-
-    public static Notification createRegularRunningNotification(User user, Crew crew, RunningNotice runningNotice) {
-        if (runningNotice.getNoticeType() != NoticeType.REGULAR) {
-            return null;
-        }
-        return new Notification(user, crew, runningNotice.getTitle(),
-                NotificationType.REGULAR_RUNNING_NOTICE, runningNotice.getId());
-    }
-
-    public static Notification createRegularRunningNotification(Long id, User user, Crew crew,
-                                                                RunningNotice runningNotice) {
-        if (runningNotice.getNoticeType() != NoticeType.REGULAR) {
-            return null;
-        }
-        return new Notification(id, user, crew, runningNotice.getTitle(),
-                NotificationType.REGULAR_RUNNING_NOTICE, runningNotice.getId());
     }
 
 }

@@ -6,6 +6,7 @@ import com.project.runningcrew.area.entity.GuArea;
 import com.project.runningcrew.area.entity.SidoArea;
 import com.project.runningcrew.board.entity.NoticeBoard;
 import com.project.runningcrew.member.entity.Member;
+import com.project.runningcrew.notification.entity.NotificationFactory;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.notification.entity.Notification;
@@ -45,7 +46,7 @@ class NotificationRepositoryTest {
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
-        Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+        Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
 
         ///when
         Notification savedNotification = notificationRepository.save(notification);
@@ -65,7 +66,7 @@ class NotificationRepositoryTest {
         Crew crew = testEntityFactory.getCrew(dongArea, 0);
         Member member = testEntityFactory.getMember(user, crew);
         RunningNotice regularRunningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
-        Notification notification = Notification.createRegularRunningNotification(user, crew, regularRunningNotice);
+        Notification notification = NotificationFactory.createRegularRunningNotification(user, crew, regularRunningNotice);
 
         ///when
         Notification savedNotification = notificationRepository.save(notification);
@@ -86,13 +87,13 @@ class NotificationRepositoryTest {
         Member member = testEntityFactory.getMember(user, crew);
         for (int i = 0; i < 10; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notificationRepository.save(notification);
         }
 
         for (int i = 0; i < 10; i++) {
             RunningNotice regularRunningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
-            Notification notification = Notification.createRegularRunningNotification(user, crew, regularRunningNotice);
+            Notification notification = NotificationFactory.createRegularRunningNotification(user, crew, regularRunningNotice);
             notificationRepository.save(notification);
         }
 
@@ -121,13 +122,13 @@ class NotificationRepositoryTest {
         Member member = testEntityFactory.getMember(user, crew);
         for (int i = 0; i < 10; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notificationRepository.save(notification);
         }
 
         for (int i = 0; i < 10; i++) {
             RunningNotice regularRunningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
-            Notification notification = Notification.createRegularRunningNotification(user, crew, regularRunningNotice);
+            Notification notification = NotificationFactory.createRegularRunningNotification(user, crew, regularRunningNotice);
             notificationRepository.save(notification);
         }
 
@@ -156,13 +157,13 @@ class NotificationRepositoryTest {
         Member member = testEntityFactory.getMember(user, crew);
         for (int i = 0; i < 10; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notificationRepository.save(notification);
         }
 
         for (int i = 0; i < 10; i++) {
             RunningNotice regularRunningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
-            Notification notification = Notification.createRegularRunningNotification(user, crew, regularRunningNotice);
+            Notification notification = NotificationFactory.createRegularRunningNotification(user, crew, regularRunningNotice);
             notificationRepository.save(notification);
         }
 
@@ -186,13 +187,13 @@ class NotificationRepositoryTest {
         Member member = testEntityFactory.getMember(user, crew);
         for (int i = 0; i < 10; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notificationRepository.save(notification);
         }
 
         for (int i = 0; i < 10; i++) {
             RunningNotice regularRunningNotice = testEntityFactory.getRegularRunningNotice(member, 0);
-            Notification notification = Notification.createRegularRunningNotification(user, crew, regularRunningNotice);
+            Notification notification = NotificationFactory.createRegularRunningNotification(user, crew, regularRunningNotice);
             notificationRepository.save(notification);
         }
 
@@ -218,7 +219,7 @@ class NotificationRepositoryTest {
         List<Notification> notifications = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notifications.add(notification);
         }
 
@@ -245,7 +246,7 @@ class NotificationRepositoryTest {
         List<Notification> notifications = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             NoticeBoard noticeBoard = testEntityFactory.getNoticeBoard(member, 0);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notifications.add(notification);
         }
 
