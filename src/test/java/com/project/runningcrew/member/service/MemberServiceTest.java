@@ -1,6 +1,7 @@
 package com.project.runningcrew.member.service;
 
 import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.fcm.FirebaseMessagingService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
@@ -33,6 +34,9 @@ class MemberServiceTest {
 
     @Mock
     private RecruitAnswerRepository recruitAnswerRepository;
+
+    @Mock
+    private FirebaseMessagingService firebaseMessagingService;
 
     @InjectMocks
     private MemberService memberService;
@@ -107,6 +111,7 @@ class MemberServiceTest {
         Long memberId = 1L;
         Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
         when(memberRepository.findByUserAndCrew(user, crew)).thenReturn(Optional.empty());
+        doNothing().when(firebaseMessagingService).sendCrewJoinMessage(crew, user);
         doNothing().when(recruitAnswerRepository).deleteByUserAndCrew(user, crew);
         when(memberRepository.save(member)).thenReturn(member);
 
@@ -116,6 +121,7 @@ class MemberServiceTest {
         //then
         assertThat(findMemberId).isSameAs(memberId);
         verify(memberRepository, times(1)).findByUserAndCrew(user, crew);
+        verify(firebaseMessagingService, times(1)).sendCrewJoinMessage(crew, user);
         verify(recruitAnswerRepository,times(1)).deleteByUserAndCrew(user, crew);
         verify(memberRepository, times(1)).save(member);
     }
