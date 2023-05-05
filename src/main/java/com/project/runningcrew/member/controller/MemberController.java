@@ -68,7 +68,7 @@ public class MemberController {
     })
     @GetMapping(value = "/api/members/{memberId}")
     public ResponseEntity<GetMemberResponse> getMember(@PathVariable("memberId") Long memberId,
-                                                     @Parameter(hidden = true) @CurrentUser User user) {
+                                                       @Parameter(hidden = true) @CurrentUser User user) {
         Member member = memberService.findById(memberId);
         memberAuthorizationChecker.checkMember(user, member.getCrew());
         return ResponseEntity.ok(new GetMemberResponse(member));
@@ -95,12 +95,17 @@ public class MemberController {
             throw new CrewJoinApplyException();
         }
 
+        User joinUser = userService.findById(createMemberRequest.getUserId());
+        Long memberId;
         if (crewCondition.isJoinQuestion()) {
             memberAuthorizationChecker.checkManager(user, crew);
+            memberId = memberService.acceptMember(new Member(joinUser, crew, MemberRole.ROLE_NORMAL));
+        } else {
+            if (!user.equals(joinUser)) {
+                throw new AuthorizationException();
+            }
+            memberId = memberService.saveMember(new Member(joinUser, crew, MemberRole.ROLE_NORMAL));
         }
-
-        User joinUser = userService.findById(createMemberRequest.getUserId());
-        Long memberId = memberService.acceptMember(new Member(joinUser, crew, MemberRole.ROLE_NORMAL));
 
         URI uri = UriComponentsBuilder
                 .fromHttpUrl(host)
