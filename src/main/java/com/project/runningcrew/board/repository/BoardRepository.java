@@ -15,28 +15,19 @@ import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    /**
-     * 특정 member 가 작성한 모든 게시물을 반환한다.
-     * @param member
-     * @return list of Board
-     */
-    Slice<Board> findByMember(Member member, Pageable pageable);
 
+    /**
+     * 특정 member 가 작성한 모든 게시물을 반환한다.(Dto 매핑)
+     * @param member 멤버 정보
+     * @param pageable 페이징 정보
+     * @return 특정 member 가 작성한 모든 게시물을 반환한다.(Dto 매핑)
+     */
     @Query("select new com.project.runningcrew.common.dto.SimpleBoardDto(b.id, b.createdDate, b.title, u.nickname) " +
             "from Board b " +
             "inner join Member m on b.member = :member " +
-            "inner join User u on m.user = u")
+            "inner join User u on m.user = u " +
+            "where b.member = m")
     Slice<SimpleBoardDto> findSimpleBoardDtoByMember(@Param("member") Member member, Pageable pageable);
-
-
-
-    /**
-     * 특정 keyword 를 제목 or 내용에 포함하는 게시물을 모두 반환한다.
-     * @param keyword
-     * @return list of Board
-     */
-    @Query("select b from Board b where b.member.crew = :crew and (b.title like %:keyword% or b.detail like %:keyword%)")
-    List<Board> findListAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew);
 
 
 
@@ -58,13 +49,14 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     void deleteAllByCrew(@Param("crew") Crew crew);
 
 
+
+
     /**
-     * 특정 keyword 를 제목 or 내용에 포함하는 게시물을 모두 반환한다. - 페이징 적용
-     * @param keyword
-     * @return slice of Board
-     *
-     @Query("select b from Board b where b.member.crew = :crew and (b.title like %:keyword% or b.detail like %:keyword%)")
-     Slice<Board> findSliceAllByCrewAndKeyWord(@Param("keyword") String keyword, @Param("crew") Crew crew, Pageable pageable);
+     * 미사용 예정!!
+     * 미사용 예정!!
+     * 미사용 예정!!
      */
+    Slice<Board> findByMember(Member member, Pageable pageable);
+
 
 }

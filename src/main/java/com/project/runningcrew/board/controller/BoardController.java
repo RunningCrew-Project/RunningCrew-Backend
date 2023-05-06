@@ -407,13 +407,15 @@ public class BoardController {
         @Parameter(hidden = true) @CurrentUser User user
     ){
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<SimpleBoardDto> simpleBoardSlice = freeBoardService.findFreeBoardDtoByCrew(crew, pageRequest);
-
+        Slice<SimpleBoardDto> simpleBoardSlice = freeBoardService.findFreeBoardDtoByCrew(crew, member, pageRequest);
         List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
+
+
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
         Map<Long, String> imageMaps = boardImageService.findFirstImageUrls(boardIds);
 
@@ -452,11 +454,12 @@ public class BoardController {
             @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<SimpleBoardDto> simpleBoardSlice = noticeBoardService.findNoticeBoardDtoByCrew(crew, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = noticeBoardService.findNoticeBoardDtoByCrew(crew, member, pageRequest);
 
         List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
@@ -494,11 +497,12 @@ public class BoardController {
             @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<SimpleBoardDto> simpleBoardSlice = reviewBoardService.findReviewBoardDtoByCrew(crew, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = reviewBoardService.findReviewBoardDtoByCrew(crew, member, pageRequest);
 
         List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);
@@ -511,7 +515,6 @@ public class BoardController {
         //note dtoList -> Slice
         Slice<PagingBoardDto> responseSlice = new SliceImpl<>(dtoList, simpleBoardSlice.getPageable(), simpleBoardSlice.hasNext());
         return ResponseEntity.ok(new PagingResponse<>(responseSlice));
-
     }
 
 
@@ -537,11 +540,12 @@ public class BoardController {
             @Parameter(hidden = true) @CurrentUser User user
     ) {
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
         //note 요청 user 의 크루 회원 여부 검증
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<SimpleBoardDto> simpleBoardSlice = infoBoardService.findInfoBoardDtoByCrew(crew, pageRequest);
+        Slice<SimpleBoardDto> simpleBoardSlice = infoBoardService.findInfoBoardDtoByCrew(crew, member, pageRequest);
 
         List<Long> boardIds = simpleBoardSlice.stream().map(SimpleBoardDto::getId).collect(Collectors.toList());
         Map<Long, Long> countMaps = commentService.countAllByBoardIds(boardIds);

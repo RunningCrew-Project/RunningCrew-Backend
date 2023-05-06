@@ -4,6 +4,7 @@ import com.project.runningcrew.common.dto.SimpleBoardDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.FreeBoard;
 import com.project.runningcrew.board.repository.FreeBoardRepository;
+import com.project.runningcrew.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -18,17 +19,25 @@ public class FreeBoardService {
     private final FreeBoardRepository freeBoardRepository;
 
     /**
-     * 입력받은 Crew 의 자유게시판 목록을 모두 보여준다.
-     * @param crew 입력받은 Crew
+     * 특정 Crew 의 자유게시판 목록 조회(Dto 매핑) - 페이징 & 차단 적용
+     * @param crew 크루 정보
+     * @param member 목록을 조회할 멤버 정보
      * @param pageable 페이징 정보
-     * @return 입력받은 Crew 의 자유게시판 목록(페이징 적용)
+     * @return 특정 Crew 의 자유게시판 목록 조회(Dto 매핑) - 페이징 & 차단 적용
+     */
+    public Slice<SimpleBoardDto> findFreeBoardDtoByCrew(Crew crew, Member member, Pageable pageable) {
+        return freeBoardRepository.findFreeBoardDtoByCrew(crew, member, pageable);
+    }
+
+
+    /**
+     * 입력받은 Crew 의 자유게시판 목록을 모두 보여준다.
+     * 미사용 예정!!
+     * 미사용 예정!!
+     * 미사용 예정!!
      */
     public Slice<FreeBoard> findFreeBoardByCrew(Crew crew, Pageable pageable) {
         return freeBoardRepository.findFreeBoardByCrew(crew, pageable);
-    }
-
-    public Slice<SimpleBoardDto> findFreeBoardDtoByCrew(Crew crew, Pageable pageable) {
-        return freeBoardRepository.findFreeBoardDtoByCrew(crew, pageable);
     }
 
 }
