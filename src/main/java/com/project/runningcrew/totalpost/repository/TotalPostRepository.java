@@ -36,17 +36,19 @@ public class TotalPostRepository {
 
 
     /**
-     * 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
+     * 모든 게시글 또는 런닝공지를 페이징하여 반환한다. - 차단기능 적용
      *
-     * @param crew     크루
-     * @param pageable
+     * @param crew 크루 정보
+     * @param pageable 페이징 정보
+     * @param member 정보를 조회할 멤버정보
      * @return 모든 게시글 또는 런닝공지
      */
-    public Slice<TotalPost> getTotalPost(Crew crew, Pageable pageable) {
+    public Slice<TotalPost> getTotalPost(Crew crew, Member member, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         Map<String, Object> params = Map.of(
                 "crewId", crew.getId(),
+                "memberId", member.getId(),
                 "number", page * size,
                 "size", size + 1);
 
@@ -60,19 +62,21 @@ public class TotalPostRepository {
     }
 
     /**
-     * keyword 가 title 이나 detail 에 포함된 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
+     * keyword 가 title 이나 detail 에 포함된 모든 게시글 또는 런닝공지를 페이징하여 반환한다. - 차단기능 적용
      *
-     * @param crew     크루
-     * @param keyword  검색어
-     * @param pageable
+     * @param crew 크루 정보
+     * @param keyword 검색어
+     * @param member 정보를 조회할 멤버 정보
+     * @param pageable 페이징 정보
      * @return keyword 가 title 이나 detail 에 포함된 모든 게시글 또는 런닝공지
      */
-    public Slice<TotalPost> getTotalPostByKeyword(Crew crew, String keyword, Pageable pageable) {
+    public Slice<TotalPost> getTotalPostByKeyword(Crew crew, String keyword, Member member, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         String wrappedKeyword = "%" + keyword + "%";
         Map<String, Object> params = Map.of(
                 "crewId", crew.getId(),
+                "memberId", member.getId(),
                 "keyword", wrappedKeyword,
                 "number", page * size,
                 "size", size + 1);

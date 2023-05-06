@@ -9,13 +9,22 @@ public class PostTypeSqlQuery {
             "inner join members as m on m.member_id = b.member_id " +
             "inner join users as u on m.user_id = u.user_id " +
             "where m.crew_id = :crewId " +
+            "and b.board_id not in " +
+            "(select b2.board_id from boards as b2 " +
+            "inner join blocked_info as bi on bi.blocked_member_id = b2.member_id " +
+            "where bi.member_id = :memberId) " +
             "union " +
             "select r.running_notice_id as id, r.created_date as created_date, r.title as title, " +
             "u.nickname as nickname, 'runningNotice' as post_type " +
             "from running_notices as r " +
             "inner join members as m on m.member_id = r.member_id " +
             "inner join users as u on m.user_id = u.user_id " +
-            "where m.crew_id = :crewId) e " +
+            "where m.crew_id = :crewId " +
+            "and r.running_notice_id not in " +
+            "(select r2.running_notice_id from running_notices as r2 " +
+            "inner join blocked_info as bi on bi.blocked_member_id = r2.member_id " +
+            "where bi.member_id = :memberId) " +
+            ") e " +
             "order by created_date desc " +
             "limit :size offset :number";
 
@@ -25,14 +34,23 @@ public class PostTypeSqlQuery {
             "from boards as b " +
             "inner join members as m on m.member_id = b.member_id " +
             "inner join users as u on m.user_id = u.user_id " +
-            "where m.crew_id = :crewId and b.title like :keyword or b.detail like :keyword " +
+            "where m.crew_id = :crewId and (b.title like :keyword or b.detail like :keyword) " +
+            "and b.board_id not in " +
+            "(select b2.board_id from boards as b2 " +
+            "inner join blocked_info as bi on bi.blocked_member_id = b2.member_id " +
+            "where bi.member_id = :memberId) " +
             "union " +
             "select r.running_notice_id as id, r.created_date as created_date, r.title as title, " +
             "u.nickname as nickname, 'runningNotice' as post_type " +
             "from running_notices as r " +
             "inner join members as m on m.member_id = r.member_id " +
             "inner join users as u on m.user_id = u.user_id " +
-            "where m.crew_id = :crewId and r.title like :keyword or r.detail like :keyword) e " +
+            "where m.crew_id = :crewId and (r.title like :keyword or r.detail like :keyword) " +
+            "and r.running_notice_id not in " +
+            "(select r2.running_notice_id from running_notices as r2 " +
+            "inner join blocked_info as bi on bi.blocked_member_id = r2.member_id " +
+            "where bi.member_id = :memberId) " +
+            ") e " +
             "order by created_date desc " +
             "limit :size offset :number";
 

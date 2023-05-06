@@ -73,10 +73,11 @@ public class TotalPostController {
             @Parameter(hidden = true) @CurrentUser User user) {
 
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPost(crew, pageRequest);
+        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPost(crew, member, pageRequest);
 
         return ResponseEntity.ok(new PagingResponse<>(getPagingTotalPostDtoSlice(totalPosts)));
     }
@@ -100,10 +101,11 @@ public class TotalPostController {
             @Parameter(hidden = true) @CurrentUser User user) {
 
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize);
-        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByKeyword(crew, keyword, pageRequest);
+        Slice<TotalPost> totalPosts = totalPostRepository.getTotalPostByKeyword(crew, keyword, member, pageRequest);
 
         return ResponseEntity.ok(new PagingResponse<>(getPagingTotalPostDtoSlice(totalPosts)));
     }
