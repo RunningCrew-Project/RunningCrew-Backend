@@ -178,39 +178,32 @@ public class RunningNoticeService {
         runningNoticeRepository.delete(runningNotice);
     }
 
+
     /**
-     * 특정 크루의 정기 런닝공지들을 페이징하여 반환
-     *
+     * 특정 크루의 정기 런닝공지들을 반환 - 페이징 & 차단기능 적용
      * @param crew
+     * @param member
      * @param pageable
-     * @return 페이징 조건에 맞고, NoticeType 이 REGULAR 인 특정 크루의 모든 RunningNotice
+     * @return @return 페이징 조건에 맞고, NoticeType 이 REGULAR 인 특정 크루의 모든 RunningNotice
      */
-    public Slice<NoticeWithUserDto> findRegularsByCrew(Crew crew, Pageable pageable) {
-        return runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.REGULAR, crew, pageable);
+    public Slice<NoticeWithUserDto> findRegularsByCrew(Crew crew, Member member, Pageable pageable) {
+        return runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.REGULAR, crew, member, pageable);
     }
 
     /**
-     * 특정 크루의 번개 런닝공지들을 페이징하여 반환
-     *
+     * 특정 크루의 번개 런닝공지들을 반환 - 페이징 & 차단기능 적용
      * @param crew
+     * @param member
      * @param pageable
-     * @return 페이징 조건에 맞고, NoticeType 이 INSTANT 인 특정 크루의 모든 RunningNotice
+     * @return @return 페이징 조건에 맞고, NoticeType 이 REGULAR 인 특정 크루의 모든 RunningNotice
      */
-    public Slice<NoticeWithUserDto> findInstantsByCrew(Crew crew, Pageable pageable) {
-        return runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, pageable);
+    public Slice<NoticeWithUserDto> findInstantsByCrew(Crew crew, Member member, Pageable pageable) {
+        return runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, member, pageable);
     }
 
-    /**
-     * 제목이나 내용에 keyword 가 포함된 특정 크루의 런닝 공지들을 페이징하여 반환
-     *
-     * @param crew
-     * @param keyword  검색어
-     * @param pageable
-     * @return 제목이나 내용에 keyword 가 포함된 특정 크루의 런닝 공지
-     */
-    public Slice<RunningNotice> findByCrewAndKeyword(Crew crew, String keyword, Pageable pageable) {
-        return runningNoticeRepository.findSliceAllByCrewAndKeyWord(keyword, crew, pageable);
-    }
+
+
+
 
     /**
      * 특정 user 가 신청한 예정된 런닝 공지들을 반환
@@ -320,5 +313,16 @@ public class RunningNoticeService {
         return runningNoticeRepository.findRunningNoticesByApplyMember(member, pageable);
     }
 
+
+
+
+    /**
+     * 미사용 예정!!
+     * 미사용 예정!!
+     * 미사용 예정!!
+     */
+    public Slice<RunningNotice> findByCrewAndKeyword(Crew crew, String keyword, Pageable pageable) {
+        return runningNoticeRepository.findSliceAllByCrewAndKeyWord(keyword, crew, pageable);
+    }
 
 }

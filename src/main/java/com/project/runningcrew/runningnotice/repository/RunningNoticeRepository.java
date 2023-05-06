@@ -95,23 +95,35 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
 
 
     /**
-     * 특정 noticeType 을 변수로 받아서 해당되는 런닝 공지를 모두 반환한다.
-     *
-     * @param noticeType
-     * @param pageable
-     * @return Slice of RunningNotice
+     * 미사용 예정!!
+     * 미사용 예정!!
+     * 미사용 예정!!
      */
     @Query("select rn from RunningNotice rn where rn.noticeType = :noticeType and rn.member.crew = :crew")
     Slice<RunningNotice> findAllByCrewAndNoticeType(@Param("noticeType") NoticeType noticeType, @Param("crew") Crew crew, Pageable pageable);
 
 
-
+    /**
+     * 특정 noticeType 을 변수로 받아서 해당되는 런닝 공지를 모두 반환한다. - 페이징 & 차단기능 적용
+     * @param noticeType
+     * @param crew
+     * @param member
+     * @param pageable
+     * @return 특정 noticeType 을 변수로 받아서 해당되는 런닝 공지를 모두 반환한다. - 페이징 & 차단기능 적용
+     */
     @Query("select new com.project.runningcrew.runningnotice.dto.NoticeWithUserDto(rn.id, rn.createdDate, rn.title, u.nickname) " +
             "from RunningNotice rn " +
             "inner join Member m on rn.member = m " +
             "inner join User u on m.user = u " +
-            "where rn.noticeType = :noticeType and m.crew = :crew")
-    Slice<NoticeWithUserDto> findAllDtoByCrewAndNoticeType(@Param("noticeType") NoticeType noticeType, @Param("crew") Crew crew, Pageable pageable);
+            "where rn.noticeType = :noticeType and m.crew = :crew " +
+            "and rn.id not in " +
+            "(select rn.id from RunningNotice rn inner join BlockedInfo bi on bi.blockedMemberId = rn.member.id where bi.blockerMember = :member)")
+    Slice<NoticeWithUserDto> findAllDtoByCrewAndNoticeType(
+            @Param("noticeType") NoticeType noticeType,
+            @Param("crew") Crew crew,
+            @Param("member") Member member,
+            Pageable pageable
+    );
 
     /**
      * 특정 유저가 신청한 특정 상태의 런닝 공지를 모두 반환한다.

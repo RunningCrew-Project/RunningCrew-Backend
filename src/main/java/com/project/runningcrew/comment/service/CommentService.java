@@ -12,6 +12,7 @@ import com.project.runningcrew.comment.repository.BoardCommentRepository;
 import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.comment.repository.RunningNoticeCommentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 public class CommentService {
@@ -186,8 +188,14 @@ public class CommentService {
      *
      */
     public Map<Long, Long> countAllByBoardIds(List<Long> boardIds) {
+
+        log.info("boardIds = {}", boardIds);
+
         Map<Long, Long> countMap = boardCommentRepository.countAllByBoardIds(boardIds)
                 .stream().collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
+
+
+        log.info("countMap ={}", countMap);
 
         return boardIds.stream()
                 .collect(Collectors.toMap(o -> o, o -> Objects.requireNonNullElse(countMap.get(o), 0L)));
