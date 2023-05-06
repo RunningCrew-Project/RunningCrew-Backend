@@ -269,10 +269,11 @@ public class RunningNoticeController {
                                                                                             @RequestParam("page") @PositiveOrZero int page,
                                                                                             @Parameter(hidden = true) @CurrentUser User user) {
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Slice<NoticeWithUserDto> regulars = runningNoticeService.findRegularsByCrew(crew, pageRequest);
+        Slice<NoticeWithUserDto> regulars = runningNoticeService.findRegularsByCrew(crew, member, pageRequest);
         List<Long> runningNoticeIds = regulars.stream().map(NoticeWithUserDto::getId).collect(Collectors.toList());
         Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);
@@ -302,10 +303,11 @@ public class RunningNoticeController {
                                                                                             @RequestParam("page") @PositiveOrZero int page,
                                                                                             @Parameter(hidden = true) @CurrentUser User user) {
         Crew crew = crewService.findById(crewId);
+        Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
 
         PageRequest pageRequest = PageRequest.of(page, pagingSize, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Slice<NoticeWithUserDto> instants = runningNoticeService.findInstantsByCrew(crew, pageRequest);
+        Slice<NoticeWithUserDto> instants = runningNoticeService.findInstantsByCrew(crew, member, pageRequest);
         List<Long> runningNoticeIds = instants.stream().map(NoticeWithUserDto::getId).collect(Collectors.toList());
         Map<Long, String> firstImages = runningNoticeImageService.findFirstImageUrls(runningNoticeIds);
         Map<Long, Long> commentCountMap = commentService.countAllByRunningNoticeIds(runningNoticeIds);

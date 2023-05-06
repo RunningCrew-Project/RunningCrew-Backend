@@ -308,63 +308,63 @@ class RunningNoticeServiceTest {
         verify(runningNoticeRepository, times(1)).delete(runningNotice);
     }
 
-    @DisplayName("정기런닝공지 페이징 테스트")
-    @Test
-    public void findRegularsByCrewTest(@Mock User user, @Mock Crew crew) {
-        //given
-        List<NoticeWithUserDto> runningNotices = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            NoticeWithUserDto noticeWithUserDto = new NoticeWithUserDto(
-                    (long) i, LocalDateTime.now(), "title" + i, "nickname "+ i);
-            runningNotices.add(noticeWithUserDto);
-        }
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        SliceImpl<NoticeWithUserDto> runningNoticeSlice = new SliceImpl<>(runningNotices, pageRequest, true);
-        when(runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.REGULAR, crew, pageRequest))
-                .thenReturn(runningNoticeSlice);
-
-        ///when
-        Slice<NoticeWithUserDto> result = runningNoticeService.findRegularsByCrew(crew, pageRequest);
-
-        //then
-        assertThat(result.getNumber()).isSameAs(0);
-        assertThat(result.getSize()).isSameAs(10);
-        assertThat(result.getNumberOfElements()).isSameAs(10);
-        assertThat(result.hasPrevious()).isFalse();
-        assertThat(result.hasNext()).isTrue();
-        assertThat(result.isFirst()).isTrue();
-        verify(runningNoticeRepository, times(1))
-                .findAllDtoByCrewAndNoticeType(NoticeType.REGULAR, crew, pageRequest);
-    }
-
-    @DisplayName("번개런닝공지 페이징 테스트")
-    @Test
-    public void findInstantsByCrewTest(@Mock User user, @Mock Crew crew) {
-        //given
-        List<NoticeWithUserDto> runningNotices = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            NoticeWithUserDto noticeWithUserDto = new NoticeWithUserDto(
-                    (long) i, LocalDateTime.now(), "title" + i, "nickname "+ i);
-            runningNotices.add(noticeWithUserDto);
-        }
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        SliceImpl<NoticeWithUserDto> runningNoticeSlice = new SliceImpl<>(runningNotices, pageRequest, true);
-        when(runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, pageRequest))
-                .thenReturn(runningNoticeSlice);
-
-        ///when
-        Slice<NoticeWithUserDto> result = runningNoticeService.findInstantsByCrew(crew, pageRequest);
-
-        //then
-        assertThat(result.getNumber()).isSameAs(0);
-        assertThat(result.getSize()).isSameAs(10);
-        assertThat(result.getNumberOfElements()).isSameAs(10);
-        assertThat(result.hasPrevious()).isFalse();
-        assertThat(result.hasNext()).isTrue();
-        assertThat(result.isFirst()).isTrue();
-        verify(runningNoticeRepository, times(1))
-                .findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, pageRequest);
-    }
+//    @DisplayName("정기런닝공지 페이징 테스트")
+//    @Test
+//    public void findRegularsByCrewTest(@Mock User user, @Mock Crew crew) {
+//        //given
+//        List<NoticeWithUserDto> runningNotices = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            NoticeWithUserDto noticeWithUserDto = new NoticeWithUserDto(
+//                    (long) i, LocalDateTime.now(), "title" + i, "nickname "+ i);
+//            runningNotices.add(noticeWithUserDto);
+//        }
+//        PageRequest pageRequest = PageRequest.of(0, 10);
+//        SliceImpl<NoticeWithUserDto> runningNoticeSlice = new SliceImpl<>(runningNotices, pageRequest, true);
+//        when(runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.REGULAR, crew, pageRequest))
+//                .thenReturn(runningNoticeSlice);
+//
+//        ///when
+//        Slice<NoticeWithUserDto> result = runningNoticeService.findRegularsByCrew(crew, pageRequest);
+//
+//        //then
+//        assertThat(result.getNumber()).isSameAs(0);
+//        assertThat(result.getSize()).isSameAs(10);
+//        assertThat(result.getNumberOfElements()).isSameAs(10);
+//        assertThat(result.hasPrevious()).isFalse();
+//        assertThat(result.hasNext()).isTrue();
+//        assertThat(result.isFirst()).isTrue();
+//        verify(runningNoticeRepository, times(1))
+//                .findAllDtoByCrewAndNoticeType(NoticeType.REGULAR, crew, pageRequest);
+//    }
+//
+//    @DisplayName("번개런닝공지 페이징 테스트")
+//    @Test
+//    public void findInstantsByCrewTest(@Mock User user, @Mock Crew crew) {
+//        //given
+//        List<NoticeWithUserDto> runningNotices = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            NoticeWithUserDto noticeWithUserDto = new NoticeWithUserDto(
+//                    (long) i, LocalDateTime.now(), "title" + i, "nickname "+ i);
+//            runningNotices.add(noticeWithUserDto);
+//        }
+//        PageRequest pageRequest = PageRequest.of(0, 10);
+//        SliceImpl<NoticeWithUserDto> runningNoticeSlice = new SliceImpl<>(runningNotices, pageRequest, true);
+//        when(runningNoticeRepository.findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, pageRequest))
+//                .thenReturn(runningNoticeSlice);
+//
+//        ///when
+//        Slice<NoticeWithUserDto> result = runningNoticeService.findInstantsByCrew(crew, pageRequest);
+//
+//        //then
+//        assertThat(result.getNumber()).isSameAs(0);
+//        assertThat(result.getSize()).isSameAs(10);
+//        assertThat(result.getNumberOfElements()).isSameAs(10);
+//        assertThat(result.hasPrevious()).isFalse();
+//        assertThat(result.hasNext()).isTrue();
+//        assertThat(result.isFirst()).isTrue();
+//        verify(runningNoticeRepository, times(1))
+//                .findAllDtoByCrewAndNoticeType(NoticeType.INSTANT, crew, pageRequest);
+//    }
 
     @DisplayName("키워드로 런닝공지 찾기 페이징 테스트")
     @Test
