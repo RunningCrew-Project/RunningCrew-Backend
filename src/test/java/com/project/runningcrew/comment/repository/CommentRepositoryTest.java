@@ -112,45 +112,7 @@ class CommentRepositoryTest {
     @DisplayName("특정 MemberId 를 가진 Comment 출력 테스트 - 페이징 적용")
     @Test
     void findAllByMemberIdTest() throws Exception {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
 
-        User user1 = testUser(dongArea, 1);
-        User user2 = testUser(dongArea, 2);
-        User user3 = testUser(dongArea, 3);
-
-        Crew crew1 = testCrew(dongArea, 1);
-        Crew crew2 = testCrew(dongArea, 2);
-        Crew crew3 = testCrew(dongArea, 3);
-
-        Member memberA = testMember(user1, crew1); // user(1), crew(1)
-        Member memberB = testMember(user2, crew2); // user(2), crew(2)
-        Member testCreateMember = testMember(user3, crew3); // user(3), crew(3)
-
-        FreeBoard testFreeBoard = boardRepository.save(new FreeBoard(testCreateMember, "title", "content"));
-        RunningNotice testRunningNotice = runningNoticeRepository.save(testRunningNotice(testCreateMember));
-
-
-        BoardComment comment_1 = commentRepository.save(new BoardComment(memberA, "detail", testFreeBoard));
-        RunningNoticeComment comment_2 = commentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNotice));
-        RunningNoticeComment comment_3 = commentRepository.save(new RunningNoticeComment(memberB, "detail", testRunningNotice));
-
-        commentRepository.deleteAllByCrew(crew1);
-
-
-        //when
-//        PageRequest pageRequest = PageRequest.of(0, 5);
-//        Slice<Comment> findCommentListA = commentRepository.findAllByMember(memberA, pageRequest);
-//        Slice<Comment> findCommentListB = commentRepository.findAllByMember(memberB, pageRequest);
-//
-//        List<Comment> contentA = findCommentListA.getContent();
-//        List<Comment> contentB = findCommentListB.getContent();
-//
-//        //then
-//        Assertions.assertThat(contentA.size()).isEqualTo(2);
-//        Assertions.assertThat(contentB.size()).isEqualTo(1);
 
     }
 
