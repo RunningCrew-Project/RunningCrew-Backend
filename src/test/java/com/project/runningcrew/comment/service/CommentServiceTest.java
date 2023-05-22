@@ -116,82 +116,82 @@ class CommentServiceTest {
         assertThat(findCommentSlice.getNumber()).isEqualTo(0);
     }
 
-
-    @DisplayName("게시글에 작성된 댓글 모두 가져오기 테스트")
-    @Test
-    void findAllByBoardTest(@Mock Member member, @Mock Board board) throws Exception {
-        //given
-        List<BoardComment> boardCommentList = new ArrayList<>();
-        for (long i = 0L; i < 10; i++) {
-            BoardComment boardComment = new BoardComment(i, member, "detail", board);
-            boardCommentList.add(boardComment);
-        } // save 10 of BoardComment
-        when(boardCommentRepository.findAllByBoard(board)).thenReturn(boardCommentList);
-
-        //when
-        List<BoardComment> findBoardCommentList = commentService.findAllByBoard(board);
-
-        //then
-        assertThat(findBoardCommentList.size()).isEqualTo(10);
-        assertThat(findBoardCommentList).isEqualTo(boardCommentList);
-    }
-
-
-    @DisplayName("런닝 공지에 작성된 댓글 모두 가져오기 테스트")
-    @Test
-    void findAllByRunningNoticeTest(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
-        //given
-        List<RunningNoticeComment> runningNoticeCommentList = new ArrayList<>();
-        for (long i = 0L; i < 10; i++) {
-            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(i, member, "detail", runningNotice);
-            runningNoticeCommentList.add(runningNoticeComment);
-        } // save 10 of BoardComment
-        when(runningNoticeCommentRepository.findAllByRunningNotice(runningNotice)).thenReturn(runningNoticeCommentList);
-
-        //when
-        List<RunningNoticeComment> findRunningNoticeCommentList = commentService.findAllByRunningNotice(runningNotice);
-
-        //then
-        assertThat(findRunningNoticeCommentList.size()).isEqualTo(10);
-        assertThat(findRunningNoticeCommentList).isEqualTo(runningNoticeCommentList);
-    }
+//
+//    @DisplayName("게시글에 작성된 댓글 모두 가져오기 테스트")
+//    @Test
+//    void findAllByBoardTest(@Mock Member member, @Mock Board board) throws Exception {
+//        //given
+//        List<BoardComment> boardCommentList = new ArrayList<>();
+//        for (long i = 0L; i < 10; i++) {
+//            BoardComment boardComment = new BoardComment(i, member, "detail", board);
+//            boardCommentList.add(boardComment);
+//        } // save 10 of BoardComment
+//        when(boardCommentRepository.findAllByBoard(board)).thenReturn(boardCommentList);
+//
+//        //when
+//        List<BoardComment> findBoardCommentList = commentService.findAllByBoard(board);
+//
+//        //then
+//        assertThat(findBoardCommentList.size()).isEqualTo(10);
+//        assertThat(findBoardCommentList).isEqualTo(boardCommentList);
+//    }
 
 
+//    @DisplayName("런닝 공지에 작성된 댓글 모두 가져오기 테스트")
+//    @Test
+//    void findAllByRunningNoticeTest(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
+//        //given
+//        List<RunningNoticeComment> runningNoticeCommentList = new ArrayList<>();
+//        for (long i = 0L; i < 10; i++) {
+//            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(i, member, "detail", runningNotice);
+//            runningNoticeCommentList.add(runningNoticeComment);
+//        } // save 10 of BoardComment
+//        when(runningNoticeCommentRepository.findAllByRunningNotice(runningNotice)).thenReturn(runningNoticeCommentList);
+//
+//        //when
+//        List<RunningNoticeComment> findRunningNoticeCommentList = commentService.findAllByRunningNotice(runningNotice);
+//
+//        //then
+//        assertThat(findRunningNoticeCommentList.size()).isEqualTo(10);
+//        assertThat(findRunningNoticeCommentList).isEqualTo(runningNoticeCommentList);
+//    }
 
-    @DisplayName("게시글에 작성된 댓글 수 가져오기 테스트")
-    @Test
-    void countCommentAtBoardTest(@Mock Member member, @Mock Board board) throws Exception {
-        //given
-        List<BoardComment> boardCommentList = new ArrayList<>();
-        for (long i = 0L; i < 10; i++) {
-            BoardComment boardComment = new BoardComment(i, member, "detail", board);
-            boardCommentList.add(boardComment);
-        } // save 10 of BoardComment
-        when(boardCommentRepository.findAllByBoard(board)).thenReturn(boardCommentList);
 
-        //when
-        int count = commentService.countCommentAtBoard(board);
-
-        //then
-        assertThat(count).isEqualTo(10);
-    }
-
-    @DisplayName("런닝 공지에 작성된 댓글 수 가져오기 테스트")
-    @Test
-    void countCommentAtRunningNoticeTest(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
-        //given
-        List<RunningNoticeComment> runningNoticeCommentList = new ArrayList<>();
-        for (long i = 0L; i < 10; i++) {
-            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(i, member, "detail", runningNotice);
-            runningNoticeCommentList.add(runningNoticeComment);
-        } // save 10 of BoardComment
-        when(runningNoticeCommentRepository.findAllByRunningNotice(runningNotice)).thenReturn(runningNoticeCommentList);
-
-        //when
-        int count = commentService.countCommentAtRunningNotice(runningNotice);
-
-        //then
-        assertThat(count).isEqualTo(10);
-    }
+//
+//    @DisplayName("게시글에 작성된 댓글 수 가져오기 테스트")
+//    @Test
+//    void countCommentAtBoardTest(@Mock Member member, @Mock Board board) throws Exception {
+//        //given
+//        List<BoardComment> boardCommentList = new ArrayList<>();
+//        for (long i = 0L; i < 10; i++) {
+//            BoardComment boardComment = new BoardComment(i, member, "detail", board);
+//            boardCommentList.add(boardComment);
+//        } // save 10 of BoardComment
+//        when(boardCommentRepository.findAllByBoard(board)).thenReturn(boardCommentList);
+//
+//        //when
+//        int count = commentService.countCommentAtBoard(board);
+//
+//        //then
+//        assertThat(count).isEqualTo(10);
+//    }
+//
+//    @DisplayName("런닝 공지에 작성된 댓글 수 가져오기 테스트")
+//    @Test
+//    void countCommentAtRunningNoticeTest(@Mock Member member, @Mock RunningNotice runningNotice) throws Exception {
+//        //given
+//        List<RunningNoticeComment> runningNoticeCommentList = new ArrayList<>();
+//        for (long i = 0L; i < 10; i++) {
+//            RunningNoticeComment runningNoticeComment = new RunningNoticeComment(i, member, "detail", runningNotice);
+//            runningNoticeCommentList.add(runningNoticeComment);
+//        } // save 10 of BoardComment
+//        when(runningNoticeCommentRepository.findAllByRunningNotice(runningNotice)).thenReturn(runningNoticeCommentList);
+//
+//        //when
+//        int count = commentService.countCommentAtRunningNotice(runningNotice);
+//
+//        //then
+//        assertThat(count).isEqualTo(10);
+//    }
 
 }

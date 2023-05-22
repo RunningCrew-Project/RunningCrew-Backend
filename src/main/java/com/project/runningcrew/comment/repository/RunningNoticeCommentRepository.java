@@ -2,6 +2,7 @@ package com.project.runningcrew.comment.repository;
 
 import com.project.runningcrew.comment.entity.RunningNoticeComment;
 import com.project.runningcrew.common.dto.SimpleCommentDto;
+import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -25,6 +26,19 @@ public interface RunningNoticeCommentRepository extends JpaRepository<RunningNot
             "inner join User u on m.user = u " +
             "where rc.runningNotice = :runningNotice")
     List<SimpleCommentDto> findAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
+
+
+
+    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(rc.id, m.id, rc.createdDate, rc.detail, u.nickname, u.imgUrl) " +
+            "from RunningNoticeComment rc " +
+            "inner join RunningNotice r on r = rc.runningNotice " +
+            "inner join Member m on m = rc.member " +
+            "inner join User u on m.user = u " +
+            "where rc.runningNotice = :runningNotice and rc.id not in " +
+            "(select rc.id from RunningNoticeComment rc inner join BlockedInfo bi on bi.blockedMemberId = rc.member.id where bi.blockerMember = :member)")
+    List<SimpleCommentDto> findAllByRunningNotice2(@Param("runningNotice") RunningNotice runningNotice, @Param("member") Member member);
+
+
 
 
     /**

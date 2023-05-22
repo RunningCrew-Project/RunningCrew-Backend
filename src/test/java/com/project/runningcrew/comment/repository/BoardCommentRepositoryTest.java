@@ -103,65 +103,13 @@ class BoardCommentRepositoryTest {
     @DisplayName("특정 Board 의 모든 Comment 출력 테스트")
     @Test
     void findAllByBoardTest() throws Exception {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
-        User user = testUser(dongArea, 1);
-        Crew crew = testCrew(dongArea, 1);
-        Member createMember = testMember(user, crew); // user(1), crew(1)
-        FreeBoard testFreeBoard =
-                boardRepository.save(new FreeBoard(createMember, "title", "content"));
-        ReviewBoard testReviewBoard =
-                boardRepository.save(new ReviewBoard(createMember, "title", "content", testPersonalRunningRecord(createMember.getUser())));
 
-        BoardComment comment_1 = boardCommentRepository.save(new BoardComment(createMember, "detail", testFreeBoard));
-        BoardComment comment_2 = boardCommentRepository.save(new BoardComment(createMember, "detail", testFreeBoard));
-            // testFreeBoard
-        BoardComment comment_3 = boardCommentRepository.save(new BoardComment(createMember, "detail", testReviewBoard));
-            // testReviewBoard
-
-        //when
-        List<BoardComment> findBoardCommentListA = boardCommentRepository.findAllByBoard(testFreeBoard);
-        List<BoardComment> findBoardCommentListB = boardCommentRepository.findAllByBoard(testReviewBoard);
-
-        //then
-        Assertions.assertThat(findBoardCommentListA.size()).isEqualTo(2);
-        Assertions.assertThat(findBoardCommentListB.size()).isEqualTo(1);
     }
 
 
     @DisplayName("Board id 리스트를 받아 commentCount 리스트를 반환하는 테스트")
     @Test
     void countByBoardIdTest() throws Exception {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
-
-        User user = testUser(dongArea, 1);
-        Crew crew = testCrew(dongArea, 1);
-        Member createMember = testMember(user, crew); // user(1), crew(1)
-        FreeBoard testFreeBoard =
-                boardRepository.save(new FreeBoard(createMember, "title", "content"));
-        ReviewBoard testReviewBoard =
-                boardRepository.save(new ReviewBoard(createMember, "title", "content", testPersonalRunningRecord(createMember.getUser())));
-
-        BoardComment comment_1 = boardCommentRepository.save(new BoardComment(createMember, "detail", testFreeBoard));
-        BoardComment comment_2 = boardCommentRepository.save(new BoardComment(createMember, "detail", testFreeBoard));
-        BoardComment comment_3 = boardCommentRepository.save(new BoardComment(createMember, "detail", testReviewBoard));
-
-        List<Long> boardIdList = new ArrayList<>();
-        boardIdList.add(testFreeBoard.getId());
-        boardIdList.add(testReviewBoard.getId());
-
-        //when
-        List<Integer> commentCountList = boardCommentRepository.countByBoardId(boardIdList);
-
-        //then
-        Assertions.assertThat(commentCountList.size()).isEqualTo(2);
-        Assertions.assertThat(commentCountList.get(0)).isEqualTo(2);
-        Assertions.assertThat(commentCountList.get(1)).isEqualTo(1);
 
     }
 

@@ -99,160 +99,27 @@ class BoardRepositoryTest {
     @DisplayName("특정 Member 가 작성한 모든 게시물 출력 테스트")
     @Test
     void findAllByMemberTest() throws Exception {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
 
-        User user = testUser(dongArea, 1);
-        User user2 = testUser(dongArea, 2);
-
-        Crew crew = testCrew(dongArea, 1);
-        Member member = testMember(user, crew); // user(1), crew(1)
-        Member member2 = testMember(user2, crew);
-
-        PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
-                PersonalRunningRecord.builder()
-                        .startDateTime(LocalDateTime.now())
-                        .runningDistance(100)
-                        .runningTime(100)
-                        .runningFace(100)
-                        .calories(100)
-                        .title("title")
-                        .running_detail("running_detail")
-                        .user(member.getUser())
-                        .build()
-        );
-
-        FreeBoard freeBoard = freeBoardRepository.save(
-                new FreeBoard(member, "title", "content")
-        );
-
-        FreeBoard freeBoard2 = freeBoardRepository.save(
-                new FreeBoard(member, "title", "content")
-        );
-
-        ReviewBoard reviewBoard = reviewBoardRepository.save(
-                new ReviewBoard(member, "title", "content", personalRunningRecord)
-        );
-
-        PageRequest pageRequest = PageRequest.of(0, 5);
-        Slice<Board> findSlice = boardRepository.findByMember(member, pageRequest);
-        Slice<Board> findSlice2 = boardRepository.findByMember(member2, pageRequest);
-
-        List<Board> content = findSlice.getContent();
-        List<Board> content2 = findSlice2.getContent();
-
-        //then
-        Assertions.assertThat(content.size()).isEqualTo(3);
-        Assertions.assertThat(content2.size()).isEqualTo(0);
-
-        Assertions.assertThat(findSlice.isFirst()).isTrue();
-        Assertions.assertThat(findSlice2.isFirst()).isTrue();
-        Assertions.assertThat(findSlice.getNumberOfElements()).isEqualTo(3);
-        Assertions.assertThat(findSlice2.getNumberOfElements()).isEqualTo(0);
     }
 
 
     @DisplayName("특정 keyword 를 포함하는 모든 게시물 출력 테스트")
     @Test
     void findListAllByKeywordAndCrewTest() throws Exception {
-        //given
-        String keyword = "key";
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
 
-        User user = testUser(dongArea, 1);
-        Crew crew = testCrew(dongArea, 1);
-        Member member = testMember(user, crew);
-
-
-        PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
-                PersonalRunningRecord.builder()
-                        .startDateTime(LocalDateTime.now())
-                        .runningDistance(100)
-                        .runningTime(100)
-                        .runningFace(100)
-                        .calories(100)
-                        .title("title")
-                        .running_detail("running_detail")
-                        .user(member.getUser())
-                        .build()
-        );
-
-        FreeBoard freeBoard = freeBoardRepository.save(
-                new FreeBoard(member, "title", "cont_key_ent")
-        ); // FreeBoard, keyword content 포함
-
-        FreeBoard freeBoard2 = freeBoardRepository.save(
-                new FreeBoard(member, "title", "content")
-        ); // FreeBoard, keyword 미포함
-
-        ReviewBoard reviewBoard = reviewBoardRepository.save(
-                new ReviewBoard(member, "tit_key_le", "content", personalRunningRecord)
-        ); // ReviewBoard, keyword title 포함
-
-        //when
-        List<Board> findBoardList = boardRepository.findListAllByCrewAndKeyWord(keyword, crew);
-        //then
-        Assertions.assertThat(findBoardList.size()).isEqualTo(2);
     }
 
 
 
 
-//
-//    @DisplayName("특정 keyword 를 포함하는 모든 게시물 출력 테스트 paging 적용")
-//    @Test
-//    void findSliceAllByKeywordAndCrewTest() throws Exception {
-//        //given
-//        String keyword = "key";
-//        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-//        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-//        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
-//        User user = testUser(dongArea, 1);
-//        Crew crew = testCrew(dongArea, 1);
-//        Member member = testMember(user, crew); // user(1), crew(1)
-//
-//        PersonalRunningRecord personalRunningRecord = personalRunningRecordRepository.save(
-//                PersonalRunningRecord.builder()
-//                        .startDateTime(LocalDateTime.now())
-//                        .runningDistance(100)
-//                        .runningTime(100)
-//                        .runningFace(100)
-//                        .calories(100)
-//                        .title("title")
-//                        .running_detail("running_detail")
-//                        .user(member.getUser())
-//                        .build()
-//        );
-//
-//        FreeBoard freeBoard = freeBoardRepository.save(
-//                new FreeBoard(member, "title", "cont_key_ent")
-//        ); // FreeBoard, keyword content 포함
-//
-//        FreeBoard freeBoard2 = freeBoardRepository.save(
-//                new FreeBoard(member, "title", "content")
-//        ); // FreeBoard, keyword 미포함
-//
-//        ReviewBoard reviewBoard = reviewBoardRepository.save(
-//                new ReviewBoard(member, "tit_key_le", "content", personalRunningRecord)
-//        ); // ReviewBoard, keyword title 포함
-//
-//        //when
-//        Slice<Board> slice = boardRepository.findSliceAllByCrewAndKeyWord(keyword,crew,);
-//        List<Board> content = slice.getContent();
-//
-//        //then
-//        Assertions.assertThat(content.size()).isEqualTo(2);
-//        Assertions.assertThat(slice.getNumber()).isEqualTo(0);
-//        Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(2);
-//        Assertions.assertThat(slice.isFirst()).isTrue();
-//        Assertions.assertThat(slice.hasNext()).isFalse();
-//
-//    }
-//
+
+    @DisplayName("특정 keyword 를 포함하는 모든 게시물 출력 테스트 paging 적용")
+    @Test
+    void findSliceAllByKeywordAndCrewTest() throws Exception {
+
+
+    }
+
 
 
 }

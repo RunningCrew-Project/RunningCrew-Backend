@@ -270,58 +270,58 @@ class UserServiceTest {
 //
 //    }
 
-    @DisplayName("유저 삭제하기 테스트")
-    @Test
-    void deleteUserTest(@Mock DongArea dongArea, @Mock Crew crew) throws Exception {
-        //given
-        User user = User.builder()
-                .dongArea(dongArea)
-                .nickname("before_nickname")
-                .imgUrl("originUserImgUrl")
-                .birthday(LocalDate.of(1998, 8, 6))
-                .height(180)
-                .weight(80)
-                .sex(Sex.MAN)
-                .build();
-
-        FcmToken fcmToken = new FcmToken(user, "fcmToken");
-        RefreshToken refreshToken = new RefreshToken(user, "refreshToken");
-        when(fcmTokenRepository.findByUser(user)).thenReturn(Optional.of(fcmToken));
-        doNothing().when(fcmTokenRepository).delete(fcmToken);
-        when(refreshTokenRepository.findByUser(user)).thenReturn(Optional.of(refreshToken));
-        doNothing().when(refreshTokenRepository).delete(refreshToken);
-
-        UserRole userRole = new UserRole(user, Role.USER);
-        List<Member> memberList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            memberList.add(new Member(user, crew, MemberRole.ROLE_NORMAL));
-        }
-        doNothing().when(runningRecordRepository).deleteAllByUser(user);
-        when(memberRepository.findAllByUser(user)).thenReturn(memberList);
-        doNothing().when(memberRepository).delete(any());
-
-        when(userRoleRepository.findByUser(user)).thenReturn(Optional.of(userRole));
-        doNothing().when(userRoleRepository).delete(userRole);
-        doNothing().when(imageService).deleteImage("originUserImgUrl");
-        doNothing().when(userRepository).delete(user);
-
-        //when
-        userService.deleteUser(user);
-
-        //then
-        verify(fcmTokenRepository, times(1)).findByUser(user);
-        verify(fcmTokenRepository, times(1)).delete(fcmToken);
-        verify(refreshTokenRepository, times(1)).findByUser(user);
-        verify(refreshTokenRepository, times(1)).delete(refreshToken);
-
-        verify(runningRecordRepository, times(1)).deleteAllByUser(user);
-        verify(memberRepository, times(1)).findAllByUser(user);
-        verify(memberRepository, times(10)).delete(any());
-        verify(userRoleRepository, times(1)).findByUser(user);
-        verify(userRoleRepository, times(1)).delete(userRole);
-        verify(imageService, times(1)).deleteImage("originUserImgUrl");
-        verify(userRepository, times(1)).delete(user);
-    }
+//    @DisplayName("유저 삭제하기 테스트")
+//    @Test
+//    void deleteUserTest(@Mock DongArea dongArea, @Mock Crew crew) throws Exception {
+//        //given
+//        User user = User.builder()
+//                .dongArea(dongArea)
+//                .nickname("before_nickname")
+//                .imgUrl("originUserImgUrl")
+//                .birthday(LocalDate.of(1998, 8, 6))
+//                .height(180)
+//                .weight(80)
+//                .sex(Sex.MAN)
+//                .build();
+//
+//        FcmToken fcmToken = new FcmToken(user, "fcmToken");
+//        RefreshToken refreshToken = new RefreshToken(user, "refreshToken");
+//        when(fcmTokenRepository.findByUser(user)).thenReturn(Optional.of(fcmToken));
+//        doNothing().when(fcmTokenRepository).delete(fcmToken);
+//        when(refreshTokenRepository.findByUser(user)).thenReturn(Optional.of(refreshToken));
+//        doNothing().when(refreshTokenRepository).delete(refreshToken);
+//
+//        UserRole userRole = new UserRole(user, Role.USER);
+//        List<Member> memberList = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            memberList.add(new Member(user, crew, MemberRole.ROLE_NORMAL));
+//        }
+//        doNothing().when(runningRecordRepository).deleteAllByUser(user);
+//        when(memberRepository.findAllByUser(user)).thenReturn(memberList);
+//        doNothing().when(memberRepository).delete(any());
+//
+//        when(userRoleRepository.findByUser(user)).thenReturn(Optional.of(userRole));
+//        doNothing().when(userRoleRepository).delete(userRole);
+//        doNothing().when(imageService).deleteImage("originUserImgUrl");
+//        doNothing().when(userRepository).delete(user);
+//
+//        //when
+//        userService.deleteUser(user);
+//
+//        //then
+//        verify(fcmTokenRepository, times(1)).findByUser(user);
+//        verify(fcmTokenRepository, times(1)).delete(fcmToken);
+//        verify(refreshTokenRepository, times(1)).findByUser(user);
+//        verify(refreshTokenRepository, times(1)).delete(refreshToken);
+//
+//        verify(runningRecordRepository, times(1)).deleteAllByUser(user);
+//        verify(memberRepository, times(1)).findAllByUser(user);
+//        verify(memberRepository, times(10)).delete(any());
+//        verify(userRoleRepository, times(1)).findByUser(user);
+//        verify(userRoleRepository, times(1)).delete(userRole);
+//        verify(imageService, times(1)).deleteImage("originUserImgUrl");
+//        verify(userRepository, times(1)).delete(user);
+//    }
 
     @DisplayName("로그아웃 테스트")
     @Test

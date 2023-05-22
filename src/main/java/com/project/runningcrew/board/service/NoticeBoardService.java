@@ -5,6 +5,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.board.entity.NoticeBoard;
 import com.project.runningcrew.fcm.FirebaseMessagingService;
+import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.resourceimage.entity.BoardImage;
 import com.project.runningcrew.board.repository.NoticeBoardRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
@@ -56,17 +57,25 @@ public class NoticeBoardService {
 
 
     /**
-     * 입력받은 Crew 의 공지게시판 목록을 모두 보여준다.
-     * @param crew 입력받은 Crew
-     * @param pageable
-     * @return 입력받은 Crew 의 공지게시판 목록(페이징 적용)
+     * 특정 Crew 의 공지게시판 목록 조회(Dto 매핑) - 페이징 & 차단 적용
+     * @param crew 크루 정보
+     * @param member 정보를 조회하는 멤버 정보
+     * @param pageable 페이징 정보
+     * @return 특정 Crew 의 공지게시판 목록 조회(Dto 매핑) - 페이징 & 차단 적용
+     */
+    public Slice<SimpleBoardDto> findNoticeBoardDtoByCrew(Crew crew, Member member, Pageable pageable) {
+        return noticeBoardRepository.findNoticeBoardDtoByCrew(crew, member, pageable);
+    }
+
+
+
+    /**
+     * 미사용 예정!!
+     * 미사용 예정!!
+     * 미사용 예정!!
      */
     public Slice<NoticeBoard> findNoticeBoardByCrew(Crew crew, Pageable pageable) {
         return noticeBoardRepository.findNoticeBoardByCrew(crew, pageable);
-    }
-
-    public Slice<SimpleBoardDto> findNoticeBoardDtoByCrew(Crew crew, Pageable pageable) {
-        return noticeBoardRepository.findNoticeBoardDtoByCrew(crew, pageable);
     }
 
 

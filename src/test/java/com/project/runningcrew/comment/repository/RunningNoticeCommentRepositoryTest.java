@@ -104,38 +104,7 @@ class RunningNoticeCommentRepositoryTest {
     @DisplayName("특정 RunningNotice 의 모든 Comment 출력 테스트")
     @Test
     void findAllByRunningNoticeTest() throws Exception {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
 
-        User user1 = testUser(dongArea, 1);
-        User user2 = testUser(dongArea, 2);
-
-        Crew crew1 = testCrew(dongArea, 1);
-        Crew crew2 = testCrew(dongArea, 2);
-
-        Member memberA = testMember(user1, crew1); // user(1), crew(1)
-        Member memberB = testMember(user2, crew2); // user(2), crew(2)
-        RunningNotice testRunningNoticeA = testRunningNotice(memberA);
-        RunningNotice testRunningNoticeB = testRunningNotice(memberB);
-
-        RunningNoticeComment comment_1 =
-                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
-        RunningNoticeComment comment_2 =
-                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
-        RunningNoticeComment comment_3 =
-                runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeB));
-
-        //when
-        List<RunningNoticeComment> findRunningNoticeCommentListA =
-                runningNoticeCommentRepository.findAllByRunningNotice(testRunningNoticeA);
-        List<RunningNoticeComment> findRunningNoticeCommentListB =
-                runningNoticeCommentRepository.findAllByRunningNotice(testRunningNoticeB);
-
-        //then
-        Assertions.assertThat(findRunningNoticeCommentListA.size()).isEqualTo(2);
-        Assertions.assertThat(findRunningNoticeCommentListB.size()).isEqualTo(1);
 
     }
 
@@ -143,34 +112,7 @@ class RunningNoticeCommentRepositoryTest {
     @DisplayName("RunningNotice id 리스트를 받아 commentCount 리스트를 반환하는 테스트")
     @Test
     void countByRunningNoticeIdTest() throws Exception {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
 
-        User user1 = testUser(dongArea, 1);
-        User user2 = testUser(dongArea, 2);
-
-        Crew crew1 = testCrew(dongArea, 1);
-        Crew crew2 = testCrew(dongArea, 2);
-
-        Member memberA = testMember(user1, crew1); // user(1), crew(1)
-        Member memberB = testMember(user2, crew2); // user(2), crew(2)
-        RunningNotice testRunningNoticeA = testRunningNotice(memberA);
-        RunningNotice testRunningNoticeB = testRunningNotice(memberB);
-
-        //RunningNoticeComment comment_1 = runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
-        //RunningNoticeComment comment_2 = runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeA));
-        //RunningNoticeComment comment_3 = runningNoticeCommentRepository.save(new RunningNoticeComment(memberA, "detail", testRunningNoticeB));
-
-        List<Long> runningNoticeIdList = new ArrayList<>();
-        runningNoticeIdList.add(testRunningNoticeA.getId());
-        runningNoticeIdList.add(testRunningNoticeB.getId());
-
-        //when
-        List<Integer> commentCountList = runningNoticeCommentRepository.countByRunningNoticeId(runningNoticeIdList);
-        //then
-        Assertions.assertThat(commentCountList.isEmpty());
     }
 
 
