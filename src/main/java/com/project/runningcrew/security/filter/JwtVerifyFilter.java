@@ -1,11 +1,11 @@
 package com.project.runningcrew.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.runningcrew.exception.notFound.ResourceNotFoundException;
+import com.project.runningcrew.exception.jwt.JwtErrorCode;
+import com.project.runningcrew.exception.notFound.NotFoundErrorCode;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
-import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.security.CustomUserDetail;
+import com.project.runningcrew.security.ResponseUtils;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.repository.UserRepository;
 import com.project.runningcrew.userrole.entity.UserRole;
@@ -13,7 +13,7 @@ import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +25,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 @Slf4j
 public class JwtVerifyFilter extends BasicAuthenticationFilter {
@@ -33,16 +32,19 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final String SECRET_KEY;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ResponseUtils responseUtils;
+
 
     public JwtVerifyFilter(AuthenticationManager authenticationManager,
                            UserRepository userRepository,
                            UserRoleRepository userRoleRepository,
-                           String SECRET_KEY) {
+                           String SECRET_KEY,
+                           ResponseUtils responseUtils) {
         super(authenticationManager);
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.SECRET_KEY = SECRET_KEY;
+        this.responseUtils = responseUtils;
     }
 
     @Override
@@ -54,32 +56,14 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
         }
 
         String jwtToken = jwtHeader.replace("Bearer ", "");
-        String email = null;
+        String email;
         try {
             email = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwtToken).getBody().getSubject();
         } catch (ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("utf-8");
-
-            ErrorResponse errorResponse = ErrorResponse.builder()
-                    .status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .messages("토큰 값이 만료되었습니다.")
-                    .errors(Map.of())
-                    .build();
-            objectMapper.writeValue(response.getOutputStream(), errorResponse);
+            responseUtils.setErrorResponse(response, HttpStatus.UNAUTHORIZED, JwtErrorCode.JWT_EXPIRED);
             return;
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("utf-8");
-
-            ErrorResponse errorResponse = ErrorResponse.builder()
-                    .status(HttpServletResponse.SC_FORBIDDEN)
-                    .messages("토큰 형식이 올바르지 않습니다.")
-                    .errors(Map.of())
-                    .build();
-            objectMapper.writeValue(response.getOutputStream(), errorResponse);
+            responseUtils.setErrorResponse(response, HttpStatus.BAD_REQUEST, JwtErrorCode.JWT_INVALID);
             return;
         }
 
@@ -93,17 +77,11 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 request.setAttribute("user", email);
-            } catch (ResourceNotFoundException e) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.setCharacterEncoding("utf-8");
-
-                ErrorResponse errorResponse = ErrorResponse.builder()
-                        .status(HttpServletResponse.SC_BAD_REQUEST)
-                        .messages(e.getMessage())
-                        .errors(Map.of())
-                        .build();
-                objectMapper.writeValue(response.getOutputStream(), errorResponse);
+            } catch (UserNotFoundException e) {
+                responseUtils.setErrorResponse(response, HttpStatus.NOT_FOUND, NotFoundErrorCode.USER_NOT_FOUND);
+                return;
+            } catch (UserRoleNotFoundException e) {
+                responseUtils.setErrorResponse(response, HttpStatus.NOT_FOUND, NotFoundErrorCode.USER_ROLE_NOT_FOUND);
                 return;
             }
         }
