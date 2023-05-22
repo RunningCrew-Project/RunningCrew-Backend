@@ -3,14 +3,12 @@ package com.project.runningcrew.member.service;
 import com.project.runningcrew.board.repository.BoardRepository;
 import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
-import com.project.runningcrew.crew.repository.CrewRepository;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
-import com.project.runningcrew.image.ImageService;
+import com.project.runningcrew.fcm.FirebaseMessagingService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
-import com.project.runningcrew.recruitquestion.repository.RecruitQuestionRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
 import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
@@ -44,6 +42,7 @@ public class MemberService {
     private final BoardImageRepository boardImageRepository;
     private final RunningNoticeImageRepository runningNoticeImageRepository;
     private final CrewService crewService;
+    private final FirebaseMessagingService firebaseMessagingService;
 
     /**
      * 입력받은 id 를 가진 Member 를 찾아 반환한다. 없다면 MemberNotFoundException 을 throw 한다.
@@ -87,6 +86,7 @@ public class MemberService {
             throw new MemberAlreadyExistsException(optionalMember.get().getId());
         }
 
+        firebaseMessagingService.sendCrewJoinMessage(member.getCrew(), member.getUser());
         recruitAnswerRepository.deleteByUserAndCrew(member.getUser(), member.getCrew());
         return memberRepository.save(member).getId();
     }

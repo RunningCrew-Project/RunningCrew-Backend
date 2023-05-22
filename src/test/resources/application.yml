@@ -43,7 +43,7 @@ s3:
 
 fcm:
   key:
-    path: fcm/running-crew-project-a1657-firebase-adminsdk-w9ud2-c06f1b3126.json
+    path: fcm/crew-running-firebase-adminsdk.json
 
 area:
   file:

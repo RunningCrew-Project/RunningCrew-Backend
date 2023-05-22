@@ -4,6 +4,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.board.entity.NoticeBoard;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
+import com.project.runningcrew.notification.entity.NotificationFactory;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.notification.entity.Notification;
 import com.project.runningcrew.notification.repository.NotificationRepository;
@@ -41,7 +42,7 @@ class NotificationServiceTest {
         List<Notification> notifications = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             NoticeBoard noticeBoard = new NoticeBoard(member, "title" + i, "content" + i);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notifications.add(notification);
         }
         SliceImpl<Notification> notificationSlice = new SliceImpl<>(notifications, pageRequest, true);
@@ -69,7 +70,7 @@ class NotificationServiceTest {
         List<Notification> notifications = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             NoticeBoard noticeBoard = new NoticeBoard(member, "title" + i, "content" + i);
-            Notification notification = Notification.createNoticeBoardNotification(user, crew, noticeBoard);
+            Notification notification = NotificationFactory.createNoticeBoardNotification(user, crew, noticeBoard);
             notifications.add(notification);
         }
         SliceImpl<Notification> notificationSlice = new SliceImpl<>(notifications, pageRequest, false);
