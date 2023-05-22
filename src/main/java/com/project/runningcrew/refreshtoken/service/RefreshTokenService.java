@@ -1,6 +1,7 @@
 package com.project.runningcrew.refreshtoken.service;
 
 import com.project.runningcrew.exception.jwt.JwtExpiredException;
+import com.project.runningcrew.exception.jwt.JwtInvalidException;
 import com.project.runningcrew.exception.jwt.JwtVerificationException;
 import com.project.runningcrew.exception.notFound.RefreshTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
@@ -50,13 +51,13 @@ public class RefreshTokenService {
         } catch (ExpiredJwtException e) {
             throw new JwtExpiredException();
         } catch (Exception e) {
-            throw new JwtVerificationException("토큰 형식이 올바르지 않습니다.");
+            throw new JwtInvalidException();
         }
 
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByUser(user)
                 .orElseThrow(RefreshTokenNotFoundException::new);
         if (!refreshTokenEntity.getRefreshToken().equals(refreshToken)) {
-            throw new JwtVerificationException("유효하지 않은 리프레시 토큰입니다.");
+            throw new JwtVerificationException();
         }
         UserRole userRole = userRoleRepository.findByUser(user).orElseThrow(UserRoleNotFoundException::new);
         String accessToken = jwtProvider.createAccessToken(user, userRole);

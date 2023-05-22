@@ -1,7 +1,9 @@
 package com.project.runningcrew.exception.jwt;
 
-public class JwtVerificationException extends RuntimeException {
-    public JwtVerificationException(String message) {
-        super(message);
+import com.project.runningcrew.exception.common.BaseException;
+
+public class JwtVerificationException extends BaseException {
+    public JwtVerificationException() {
+        super(JwtErrorCode.JWT_VERIFICATION);
     }
 }
