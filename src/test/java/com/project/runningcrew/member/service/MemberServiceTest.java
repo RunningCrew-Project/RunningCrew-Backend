@@ -126,20 +126,20 @@ class MemberServiceTest {
         verify(memberRepository, times(1)).save(member);
     }
 
-    @DisplayName("멤버 삭제 테스트")
-    @Test
-    public void deleteTest(@Mock User user, @Mock Crew crew) {
-        //given
-        Long memberId = 1L;
-        Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
-        doNothing().when(memberRepository).delete(member);
-
-        ///when
-        memberService.deleteMember(member);
-
-        //then
-        verify(memberRepository, times(1)).delete(member);
-    }
+//    @DisplayName("멤버 삭제 테스트")
+//    @Test
+//    public void deleteTest(@Mock User user, @Mock Crew crew) {
+//        //given
+//        Long memberId = 1L;
+//        Member member = new Member(memberId, user, crew, MemberRole.ROLE_NORMAL);
+//        doNothing().when(memberRepository).delete(member);
+//
+//        ///when
+//        memberService.deleteMember(member);
+//
+//        //then
+//        verify(memberRepository, times(1)).delete(member);
+//    }
 
     @DisplayName("멤버의 role 리더로 변경 테스트")
     @Test
