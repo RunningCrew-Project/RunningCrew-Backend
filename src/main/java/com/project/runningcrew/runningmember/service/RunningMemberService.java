@@ -1,12 +1,12 @@
 package com.project.runningcrew.runningmember.service;
 
-import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.auth.AuthorizationException;
 import com.project.runningcrew.runningmember.entity.RunningMember;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.exception.badinput.RunningDateTimeAfterException;
 import com.project.runningcrew.exception.badinput.RunningPersonnelException;
-import com.project.runningcrew.exception.alreadyExist.RunningMemberAlreadyExistsException;
+import com.project.runningcrew.exception.duplicate.RunningMemberDuplicateException;
 import com.project.runningcrew.exception.notFound.RunningMemberNotFoundException;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class RunningMemberService {
      * @return 생성된 runningMember 의 id
      * @throws RunningDateTimeAfterException 런닝시간 이후에 신청했을 때
      * @throws RunningPersonnelException 런닝 인원이 가득찼을 때
-     * @throws RunningMemberAlreadyExistsException runningNotice 에 member 가 이미 참여했을 때
+     * @throws RunningMemberDuplicateException runningNotice 에 member 가 이미 참여했을 때
      */
     @Transactional
     public Long saveRunningMember(Member member, RunningNotice runningNotice) {
@@ -53,7 +53,7 @@ public class RunningMemberService {
 
         boolean isExist = runningMemberRepository.existsByMemberAndRunningNotice(member, runningNotice);
         if (isExist) {
-            throw new RunningMemberAlreadyExistsException(runningNotice.getId());
+            throw new RunningMemberDuplicateException(runningNotice.getId());
         }
 
         RunningMember runningMember = new RunningMember(runningNotice, member);

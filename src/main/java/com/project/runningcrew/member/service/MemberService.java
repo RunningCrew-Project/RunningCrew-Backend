@@ -15,7 +15,7 @@ import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.repository.RunningNoticeRepository;
 import com.project.runningcrew.user.entity.User;
-import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
+import com.project.runningcrew.exception.duplicate.MemberDuplicateException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,13 +60,13 @@ public class MemberService {
      *
      * @param member 저장할 Member
      * @return Member 에 부여된 id
-     * @throws MemberAlreadyExistsException user 가 crew 에 이미 가입했을 때
+     * @throws MemberDuplicateException user 가 crew 에 이미 가입했을 때
      */
     @Transactional
     public Long saveMember(Member member) {
         Optional<Member> optionalMember = memberRepository.findByUserAndCrew(member.getUser(), member.getCrew());
         if (optionalMember.isPresent()) {
-            throw new MemberAlreadyExistsException(optionalMember.get().getId());
+            throw new MemberDuplicateException(optionalMember.get().getId());
         }
         return memberRepository.save(member).getId();
     }
@@ -77,13 +77,13 @@ public class MemberService {
      *
      * @param member 저장할 Member
      * @return Member 에 부여된 id
-     * @throws MemberAlreadyExistsException user 가 crew 에 이미 가입했을 때
+     * @throws MemberDuplicateException user 가 crew 에 이미 가입했을 때
      */
     @Transactional
     public Long acceptMember(Member member) {
         Optional<Member> optionalMember = memberRepository.findByUserAndCrew(member.getUser(), member.getCrew());
         if (optionalMember.isPresent()) {
-            throw new MemberAlreadyExistsException(optionalMember.get().getId());
+            throw new MemberDuplicateException(optionalMember.get().getId());
         }
 
         firebaseMessagingService.sendCrewJoinMessage(member.getCrew(), member.getUser());

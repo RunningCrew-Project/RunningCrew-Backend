@@ -1,7 +1,7 @@
 package com.project.runningcrew.member.service;
 
 import com.project.runningcrew.crew.entity.Crew;
-import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.auth.AuthorizationException;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.member.repository.MemberRepository;

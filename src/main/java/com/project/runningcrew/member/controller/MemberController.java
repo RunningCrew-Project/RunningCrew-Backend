@@ -5,7 +5,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
 import com.project.runningcrew.crewcondition.entity.CrewCondition;
 import com.project.runningcrew.crewcondition.service.CrewConditionService;
-import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.auth.AuthorizationException;
 import com.project.runningcrew.exception.badinput.CrewJoinApplyException;
 import com.project.runningcrew.exception.badinput.UpdateMemberRoleException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;

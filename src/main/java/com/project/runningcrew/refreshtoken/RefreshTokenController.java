@@ -1,7 +1,7 @@
 package com.project.runningcrew.refreshtoken;
 
 import com.project.runningcrew.common.annotation.CurrentUser;
-import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.auth.AuthorizationException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.refreshtoken.dto.TokensDto;
 import com.project.runningcrew.refreshtoken.service.RefreshTokenService;
