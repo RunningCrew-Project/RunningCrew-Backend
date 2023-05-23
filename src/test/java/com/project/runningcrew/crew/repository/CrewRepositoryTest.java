@@ -174,17 +174,26 @@ class CrewRepositoryTest {
     public void findRandomByDongAreaId() {
         //given
         int maxNum = 5;
-        String dongAreaName = "dong1";
-        Optional<DongArea> optDongArea = dongAreaRepository.findByName(dongAreaName);
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        for (int i = 50; i < 60; i++) {
+            Crew crew = Crew.builder().name("crew" + i)
+                    .introduction("introduction" + i)
+                    .crewImgUrl("crewImageUrl")
+                    .dongArea(dongArea)
+                    .build();
+            crewRepository.save(crew);
+        }
 
         ///when
-        Long dongAreaId = optDongArea.get().getId();
+        Long dongAreaId = dongArea.getId();
         List<Crew> randomCrewList = crewRepository.findRandomByDongAreaId(dongAreaId, maxNum);
 
         //then
         assertThat(randomCrewList.size()).isSameAs(maxNum);
         for (Crew crew : randomCrewList) {
-            assertThat(crew.getDongArea()).isEqualTo(optDongArea.get());
+            assertThat(crew.getDongArea()).isEqualTo(dongArea);
         }
     }
 

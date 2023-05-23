@@ -63,7 +63,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @return dongArea 에 포함되는 랜덤한 crew 들이 최대 maxsize 개 담긴 list
      */
     @Query(value = "select * from crews where crews.dong_area_id = :dongAreaId " +
-            "order by random() limit :maxSize", nativeQuery = true)
+            "order by rand() limit :maxSize", nativeQuery = true)
     List<Crew> findRandomByDongAreaId(@Param("dongAreaId") Long dongAreaId, @Param("maxSize") int maxSize);
 
     /**
@@ -76,7 +76,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
     @Query(value = "select * from crews as c " +
             "inner join dong_areas as d on d.dong_area_id = c.dong_area_id " +
             "where d.gu_areas_id = :guAreaId " +
-            "order by random() limit :maxSize", nativeQuery = true)
+            "order by rand() limit :maxSize", nativeQuery = true)
     List<Crew> findRandomByGuAreaId(@Param("guAreaId") Long guAreaId, @Param("maxSize") int maxSize);
 
     /**
