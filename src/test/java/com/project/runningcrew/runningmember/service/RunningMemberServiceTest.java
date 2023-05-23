@@ -163,31 +163,9 @@ class RunningMemberServiceTest {
         verify(runningMemberRepository, times(1)).delete(runningMember);
     }
 
-    @DisplayName("런닝 참여 취소 신청 시간 예외 테스트")
-    @Test
-    public void deleteRunningMemberTest2(@Mock Member member) {
-        //given
-        Long runningMemberId = 1L;
-        RunningNotice runningNotice = RunningNotice.builder()
-                .id(runningMemberId)
-                .title("title")
-                .detail("detail")
-                .member(member)
-                .noticeType(NoticeType.INSTANT)
-                .runningDateTime(LocalDateTime.now().minusDays(1))
-                .runningPersonnel(10)
-                .status(RunningStatus.READY)
-                .build();
-
-        ///when
-        //then
-        assertThatThrownBy(() -> runningMemberService.deleteRunningMember(member, runningNotice))
-                .isInstanceOf(RunningDateTimeAfterException.class);
-    }
-
     @DisplayName("런닝 참여 안한 멤버가 취소하는 예외 테스트")
     @Test
-    public void deleteRunningMemberTest3(@Mock Member member) {
+    public void deleteRunningMemberTest2(@Mock Member member) {
         //given
         RunningNotice runningNotice = RunningNotice.builder()
                 .title("title")
@@ -206,6 +184,31 @@ class RunningMemberServiceTest {
         assertThatThrownBy(() -> runningMemberService.deleteRunningMember(member, runningNotice))
                 .isInstanceOf(RunningMemberNotFoundException.class);
         verify(runningMemberRepository, times(1)).findByMemberAndRunningNotice(member, runningNotice);
+    }
+
+    @DisplayName("런닝 참여 취소 신청 시간 예외 테스트")
+    @Test
+    public void deleteRunningMemberTest3(@Mock Member member) {
+        //given
+        Long runningMemberId = 1L;
+        RunningNotice runningNotice = RunningNotice.builder()
+                .id(runningMemberId)
+                .title("title")
+                .detail("detail")
+                .member(member)
+                .noticeType(NoticeType.INSTANT)
+                .runningDateTime(LocalDateTime.now().minusDays(1))
+                .runningPersonnel(10)
+                .status(RunningStatus.READY)
+                .build();
+        RunningMember runningMember = new RunningMember(runningNotice, member);
+        when(runningMemberRepository.findByMemberAndRunningNotice(member, runningNotice))
+                .thenReturn(Optional.of(runningMember));
+
+        ///when
+        //then
+        assertThatThrownBy(() -> runningMemberService.deleteRunningMember(member, runningNotice))
+                .isInstanceOf(RunningDateTimeAfterException.class);
     }
 
     @DisplayName("런닝공지 참여 멤버수 반환 테스트")
