@@ -9,8 +9,8 @@ import java.util.Map;
 @Getter
 public class ErrorResponse {
 
-    @Schema(description = "HTTP status")
-    private int status;
+    @Schema(description = "에러 코드")
+    private String code;
 
     @Schema(description = "에러 메시지")
     private String messages;
@@ -19,8 +19,8 @@ public class ErrorResponse {
     private Map<String, String> errors;
 
     @Builder
-    public ErrorResponse(int status, String messages, Map<String, String> errors) {
-        this.status = status;
+    public ErrorResponse(String code, String messages, Map<String, String> errors) {
+        this.code = code;
         this.messages = messages;
         this.errors = errors;
     }
