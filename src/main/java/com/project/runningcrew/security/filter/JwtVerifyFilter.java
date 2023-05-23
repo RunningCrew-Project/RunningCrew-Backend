@@ -1,7 +1,7 @@
 package com.project.runningcrew.security.filter;
 
 import com.project.runningcrew.exception.jwt.JwtErrorCode;
-import com.project.runningcrew.exception.notFound.NotFoundErrorCode;
+import com.project.runningcrew.exception.notFound.ResourceNotFoundErrorCode;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
 import com.project.runningcrew.security.CustomUserDetail;
@@ -78,10 +78,10 @@ public class JwtVerifyFilter extends BasicAuthenticationFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 request.setAttribute("user", email);
             } catch (UserNotFoundException e) {
-                responseUtils.setErrorResponse(response, HttpStatus.NOT_FOUND, NotFoundErrorCode.USER_NOT_FOUND);
+                responseUtils.setErrorResponse(response, HttpStatus.NOT_FOUND, ResourceNotFoundErrorCode.USER_NOT_FOUND);
                 return;
             } catch (UserRoleNotFoundException e) {
-                responseUtils.setErrorResponse(response, HttpStatus.NOT_FOUND, NotFoundErrorCode.USER_ROLE_NOT_FOUND);
+                responseUtils.setErrorResponse(response, HttpStatus.NOT_FOUND, ResourceNotFoundErrorCode.USER_ROLE_NOT_FOUND);
                 return;
             }
         }
