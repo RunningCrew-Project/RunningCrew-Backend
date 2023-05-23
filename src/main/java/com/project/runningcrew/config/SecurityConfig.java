@@ -3,6 +3,7 @@ package com.project.runningcrew.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
 import com.project.runningcrew.refreshtoken.repository.RefreshTokenRepository;
+import com.project.runningcrew.security.ResponseUtils;
 import com.project.runningcrew.security.exceptionhandler.CustomAccessDeniedHandler;
 import com.project.runningcrew.security.exceptionhandler.CustomAuthenticationEntryPoint;
 import com.project.runningcrew.security.filter.JwtAuthenticationFilter;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final UserRoleRepository userRoleRepository;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final ResponseUtils responseUtils;
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
     private final String[] SWAGGER_URL = {
@@ -99,10 +101,10 @@ public class SecurityConfig {
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
-                    objectMapper, authenticationManager, jwtProvider, refreshTokenRepository, fcmTokenRepository);
+                    objectMapper, authenticationManager, jwtProvider, refreshTokenRepository, fcmTokenRepository, responseUtils);
             jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
             JwtVerifyFilter jwtVerifyFilter = new JwtVerifyFilter(
-                    authenticationManager, userRepository, userRoleRepository, SECRET_KEY);
+                    authenticationManager, userRepository, userRoleRepository, SECRET_KEY, responseUtils);
             builder.addFilter(jwtAuthenticationFilter)
                     .addFilter(jwtVerifyFilter);
         }

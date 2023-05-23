@@ -1,13 +1,13 @@
 package com.project.runningcrew.exception.duplicate;
 
-public class UserEmailDuplicateException extends DuplicateException{
+public class UserEmailDuplicateException extends DuplicateException {
 
     public UserEmailDuplicateException() {
-        super("이미 가입된 이메일 주소입니다.");
+        super(DuplicateErrorCode.USER_EMAIL_DUPLICATE);
     }
 
     public UserEmailDuplicateException(String email) {
-        super("이미 가입된 이메일 주소입니다.", "email", email);
+        super(DuplicateErrorCode.USER_EMAIL_DUPLICATE, "email", email);
     }
 
 }

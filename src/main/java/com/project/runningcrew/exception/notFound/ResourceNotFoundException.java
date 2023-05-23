@@ -1,7 +1,10 @@
 package com.project.runningcrew.exception.notFound;
 
-public class ResourceNotFoundException extends RuntimeException{
-    public ResourceNotFoundException(String message) {
-        super(message);
+import com.project.runningcrew.exception.common.BaseErrorCode;
+import com.project.runningcrew.exception.common.BaseException;
+
+public class ResourceNotFoundException extends BaseException {
+    public ResourceNotFoundException(BaseErrorCode errorCode) {
+        super(errorCode);
     }
 }

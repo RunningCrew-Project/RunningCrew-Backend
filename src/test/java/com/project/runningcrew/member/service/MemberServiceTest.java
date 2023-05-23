@@ -6,9 +6,8 @@ import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
-import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.user.entity.User;
-import com.project.runningcrew.exception.alreadyExist.MemberAlreadyExistsException;
+import com.project.runningcrew.exception.duplicate.MemberDuplicateException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -100,7 +99,7 @@ class MemberServiceTest {
         ///when
         //then
         assertThatThrownBy(() -> memberService.saveMember(member))
-                .isInstanceOf(MemberAlreadyExistsException.class);
+                .isInstanceOf(MemberDuplicateException.class);
         verify(memberRepository, times(1)).findByUserAndCrew(user, crew);
     }
 

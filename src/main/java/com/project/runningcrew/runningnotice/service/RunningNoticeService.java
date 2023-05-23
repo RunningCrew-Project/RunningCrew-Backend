@@ -13,7 +13,7 @@ import com.project.runningcrew.runningnotice.entity.NoticeType;
 import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
 import com.project.runningcrew.user.entity.User;
-import com.project.runningcrew.exception.AuthorizationException;
+import com.project.runningcrew.exception.auth.AuthorizationException;
 import com.project.runningcrew.exception.notFound.MemberNotFoundException;
 import com.project.runningcrew.exception.notFound.RunningNoticeNotFoundException;
 import com.project.runningcrew.fcm.FirebaseMessagingService;

@@ -1,12 +1,12 @@
 package com.project.runningcrew.exceptionhandler;
 
-import com.project.runningcrew.exception.AuthenticationException;
-import com.project.runningcrew.exception.AuthorizationException;
-import com.project.runningcrew.exception.alreadyExist.AlreadyExistsException;
-import com.project.runningcrew.exception.badinput.BadInputException;
+import com.project.runningcrew.exception.auth.AuthenticationException;
+import com.project.runningcrew.exception.auth.AuthorizationException;
 import com.project.runningcrew.exception.duplicate.DuplicateException;
+import com.project.runningcrew.exception.badinput.BadInputException;
 import com.project.runningcrew.exception.image.ImageException;
 import com.project.runningcrew.exception.jwt.JwtExpiredException;
+import com.project.runningcrew.exception.jwt.JwtInvalidException;
 import com.project.runningcrew.exception.jwt.JwtVerificationException;
 import com.project.runningcrew.exception.notFound.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> ResourceNotFoundExceptionHandler(ResourceNotFoundException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.NOT_FOUND.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(Map.of())
                 .build();
@@ -48,11 +48,27 @@ public class CommonExceptionHandler {
     @ExceptionHandler(JwtExpiredException.class)
     public ResponseEntity<ErrorResponse> JwtExpiredExceptionHandler(JwtExpiredException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.UNAUTHORIZED.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(Map.of())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * JwtInvalidException 이 발생하면, ErrorResponse 와 HttpStatus.BAD_REQUEST 를 담은 ResponseEntity 를 반환
+     *
+     * @param e
+     * @return ErrorResponse 와 HttpStatus.BAD_REQUEST 를 담은 ResponseEntity
+     */
+    @ExceptionHandler(JwtInvalidException.class)
+    public ResponseEntity<ErrorResponse> JwtInvalidExceptionExceptionHandler(JwtInvalidException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(e.getErrorCode().getCode())
+                .messages(e.getMessage())
+                .errors(Map.of())
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -64,7 +80,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(JwtVerificationException.class)
     public ResponseEntity<ErrorResponse> JwtVerificationExceptionHandler(JwtVerificationException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.FORBIDDEN.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(Map.of())
                 .build();
@@ -85,29 +101,11 @@ public class CommonExceptionHandler {
         }
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
+                .code("COM_01")
                 .messages("유효성 검사를 실패하였습니다.")
                 .errors(errors)
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * DuplicateException 이 발생하면, ErrorResponse 와 HttpStatus.BAD_REQUEST 를 담은 ResponseEntity 를 반환
-     * @param e
-     * @return ErrorResponse 와 HttpStatus.CONFLICT 를 담은 ResponseEntity
-     */
-    @ExceptionHandler(DuplicateException.class)
-    public ResponseEntity<ErrorResponse> DuplicateExceptionHandler(DuplicateException e) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put(e.getType(), e.getValue());
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.CONFLICT.value())
-                .messages(e.getMessage())
-                .errors(errors)
-                .build();
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     /**
@@ -119,7 +117,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> AuthenticationExceptionHandler(AuthenticationException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.UNAUTHORIZED.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(Map.of())
                 .build();
@@ -135,7 +133,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> AuthorizationExceptionHandler(AuthorizationException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.FORBIDDEN.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(Map.of())
                 .build();
@@ -143,18 +141,18 @@ public class CommonExceptionHandler {
     }
 
     /**
-     * AlreadyExistsException 이 발생하면, ErrorResponse 와 HttpStatus.CONFLICT 를 담은 ResponseEntity 를 반환
+     * DuplicateException 이 발생하면, ErrorResponse 와 HttpStatus.CONFLICT 를 담은 ResponseEntity 를 반환
      *
      * @param e
      * @return ErrorResponse 와 HttpStatus.CONFLICT 를 담은 ResponseEntity
      */
-    @ExceptionHandler(AlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> AlreadyExistsExceptionHandler(AlreadyExistsException e) {
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<ErrorResponse> AlreadyExistsExceptionHandler(DuplicateException e) {
         Map<String, String> errors = new HashMap<>();
-        errors.put(e.getType(), e.getValue().toString());
+        errors.put(e.getType(), e.getValue());
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.CONFLICT.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(errors)
                 .build();
@@ -170,7 +168,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(BadInputException.class)
     public ResponseEntity<ErrorResponse> BadInputExceptionHandler(BadInputException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(e.getBadInputMaps())
                 .build();
@@ -186,7 +184,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(ImageException.class)
     public ResponseEntity<ErrorResponse> ImageExceptionHandler(ImageException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
+                .code(e.getErrorCode().getCode())
                 .messages(e.getMessage())
                 .errors(e.getErrors())
                 .build();

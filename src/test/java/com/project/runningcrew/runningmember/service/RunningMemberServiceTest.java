@@ -7,7 +7,7 @@ import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import com.project.runningcrew.runningnotice.entity.RunningStatus;
 import com.project.runningcrew.exception.badinput.RunningDateTimeAfterException;
 import com.project.runningcrew.exception.badinput.RunningPersonnelException;
-import com.project.runningcrew.exception.alreadyExist.RunningMemberAlreadyExistsException;
+import com.project.runningcrew.exception.duplicate.RunningMemberDuplicateException;
 import com.project.runningcrew.exception.notFound.RunningMemberNotFoundException;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -133,7 +133,7 @@ class RunningMemberServiceTest {
         ///when
         //then
         assertThatThrownBy(() -> runningMemberService.saveRunningMember(member, runningNotice))
-                .isInstanceOf(RunningMemberAlreadyExistsException.class);
+                .isInstanceOf(RunningMemberDuplicateException.class);
         verify(runningMemberRepository, times(1)).existsByMemberAndRunningNotice(member, runningNotice);
     }
 

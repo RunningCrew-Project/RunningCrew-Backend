@@ -1,21 +1,21 @@
 package com.project.runningcrew.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.fcm.token.entity.FcmToken;
 import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
 import com.project.runningcrew.refreshtoken.entity.RefreshToken;
 import com.project.runningcrew.refreshtoken.repository.RefreshTokenRepository;
 import com.project.runningcrew.security.CustomUserDetail;
 import com.project.runningcrew.security.JwtProvider;
+import com.project.runningcrew.security.ResponseUtils;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.userrole.entity.UserRole;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -27,7 +27,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,16 +37,27 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final FcmTokenRepository fcmTokenRepository;
+    private final ResponseUtils responseUtils;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         if (!request.getMethod().equals("POST") || !request.getContentType().equals("application/json")) {
-            throw new AuthenticationServiceException("잘못된 형식의 요청입니다.");
+            try {
+                responseUtils.setErrorResponse(response, HttpStatus.BAD_REQUEST, LoginErrorCode.BAD_REQUEST);
+            } catch (IOException e) {
+                log.error("ErrorResponse mapping exception : {}", e);
+            }
+            return null;
         }
 
         String fcmToken = request.getHeader("FcmToken");
         if (fcmToken == null) {
-            throw new AuthenticationServiceException("FcmToken 이 누락되었습니다.");
+            try {
+                responseUtils.setErrorResponse(response, HttpStatus.BAD_REQUEST, LoginErrorCode.FCM_TOKEN);
+            } catch (IOException e) {
+                log.error("ErrorResponse mapping exception : {}", e);
+            }
+            return null;
         }
 
         try {
@@ -68,59 +78,38 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         User user = customUserDetail.getUser();
         UserRole userRole = customUserDetail.getUserRole();
 
-        try {
-            String fcmToken = request.getHeader("FcmToken");
-            if (fcmTokenRepository.existsByUser(user)) {
-                throw new RuntimeException("이미 로그인된 유저입니다.");
-            }
-            fcmTokenRepository.save(new FcmToken(user, fcmToken));
-
-            String accessToken = jwtProvider.createAccessToken(user, userRole);
-            if (refreshTokenRepository.findByUser(user).isPresent()) {
-                throw new RuntimeException("이미 로그인된 유저입니다.");
-            }
-            String refreshToken = jwtProvider.createRefreshToken(user);
-            refreshTokenRepository.save(new RefreshToken(user, refreshToken));
-
-
-
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("utf-8");
-
-            response.setHeader("Authorization", "Bearer " + accessToken);
-            Cookie cookie = new Cookie("refreshToken", refreshToken);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setMaxAge(60 * 60 * 24 * 14);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("utf-8");
-
-            ErrorResponse errorResponse = ErrorResponse.builder()
-                    .status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .messages(e.getMessage())
-                    .errors(Map.of())
-                    .build();
-            objectMapper.writeValue(response.getOutputStream(), errorResponse);
+        String fcmToken = request.getHeader("FcmToken");
+        if (fcmTokenRepository.existsByUser(user)) {
+            responseUtils.setErrorResponse(response, HttpStatus.CONFLICT, LoginErrorCode.ALREADY_LOGIN);
         }
+        fcmTokenRepository.save(new FcmToken(user, fcmToken));
+
+        String accessToken = jwtProvider.createAccessToken(user, userRole);
+        if (refreshTokenRepository.findByUser(user).isPresent()) {
+            responseUtils.setErrorResponse(response, HttpStatus.CONFLICT, LoginErrorCode.ALREADY_LOGIN);
+        }
+        String refreshToken = jwtProvider.createRefreshToken(user);
+        refreshTokenRepository.save(new RefreshToken(user, refreshToken));
+
+
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("utf-8");
+
+        response.setHeader("Authorization", "Bearer " + accessToken);
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(60 * 60 * 24 * 14);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("utf-8");
+        responseUtils.setErrorResponse(response, HttpStatus.UNAUTHORIZED, LoginErrorCode.INVALID);
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(HttpServletResponse.SC_UNAUTHORIZED)
-                .messages(failed.getMessage())
-                .errors(Map.of())
-                .build();
-        objectMapper.writeValue(response.getOutputStream(), errorResponse);
     }
 
     @Getter
@@ -128,5 +117,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         private String email;
         private String password;
     }
+
 
 }
