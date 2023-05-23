@@ -34,7 +34,7 @@ public class OAuthController {
     @Operation(summary = "소셜 로그인",
             description = "AccessToken 을 body 에 넣어주세요." +
                     "\n 구글은 AccessToken, idToken, origin 까지 총 3개." +
-                    "\n 네이버, 카카오는 AccessToken, origin 총 2개." +
+                    "\n 카카오는 AccessToken, origin 총 2개." +
                     "\n 애플은 idToken, origin 총 2개."
     )
     @ApiResponses({
@@ -65,8 +65,6 @@ public class OAuthController {
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "CONFLICT",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
