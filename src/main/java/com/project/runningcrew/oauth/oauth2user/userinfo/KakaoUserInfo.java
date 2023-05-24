@@ -1,5 +1,8 @@
 package com.project.runningcrew.oauth.oauth2user.userinfo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class KakaoUserInfo extends Oauth2UserInfo {
@@ -10,8 +13,9 @@ public class KakaoUserInfo extends Oauth2UserInfo {
 
     @Override
     public String getEmail() {
-        return (String) attributes.get("account_email");
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> kakaoAccount = objectMapper.convertValue(attributes.get("kakao_account"), HashMap.class);
+        return (String) kakaoAccount.get("email");
     }
-
 
 }
