@@ -57,7 +57,8 @@ public class SecurityConfig {
     private final String[] POST_PERMIT_API_URL = {
             "/api/login",
             "/api/users",
-            "/api/users/duplicate/**"
+            "/api/users/duplicate/**",
+            "/api/login/oauth"
     };
 
     @Bean
