@@ -5,12 +5,10 @@ import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.SimpleUserDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
-import com.project.runningcrew.exception.badinput.PasswordCheckFailException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
 import com.project.runningcrew.user.dto.request.*;
-import com.project.runningcrew.user.dto.request.change.UpdateUserPasswordRequest;
 import com.project.runningcrew.user.dto.request.change.UpdateUserRequest;
 import com.project.runningcrew.user.dto.request.checkduplicate.CheckEmailRequest;
 import com.project.runningcrew.user.dto.request.checkduplicate.CheckNicknameRequest;
@@ -88,19 +86,12 @@ public class UserController {
     @PostMapping(value = "/api/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createUser(@ModelAttribute @Valid CreateUserRequest createUserRequest) {
 
-        if (!createUserRequest.getPassword().equals(createUserRequest.getPasswordCheck())) {
-            //note 비밀번호 & 비밀번호 재입력 Equal Check -> 일치하지 않으면 예외 발생
-            throw new PasswordCheckFailException();
-        }
-
 
         //note 필수 값 Build : [ 프로필 이미지 : 기본 값 자동 설정됨 ]
         User user = User.builder()
                 .email(createUserRequest.getEmail())
                 .name(createUserRequest.getName())
-                .password(createUserRequest.getPassword())
                 .nickname(createUserRequest.getNickname())
-                .phoneNumber(createUserRequest.getPhoneNumber())
                 .dongArea(dongAreaService.findById(createUserRequest.getDongId()))
                 .login_type(LoginType.EMAIL)
                 .build();
@@ -195,42 +186,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
 
     }
-
-
-
-//
-//    @Operation(
-//            summary = "유저 비밀번호 수정하기",
-//            description = "유저 비밀번호를 수정한다.",
-//            security = {@SecurityRequirement(name = "Bearer-Key")}
-//    )
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "204", description = "NO CONTENT", content = @Content()),
-//            @ApiResponse(responseCode = "400", description = "BAD REQUEST",
-//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-//            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
-//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-//            @ApiResponse(responseCode = "403", description = "FORBIDDEN",
-//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-//            @ApiResponse(responseCode = "404", description = "NOT FOUND",
-//                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-//    })
-//    @PutMapping(value = "/api/users/{userId}/password")
-//    public ResponseEntity<Void> updateUserPassword(
-//            @PathVariable("userId") Long userId,
-//            @RequestBody @Valid UpdateUserPasswordRequest updateUserPasswordRequest,
-//            @Parameter(hidden = true) @CurrentUser User user
-//    ) {
-//
-//        if (!updateUserPasswordRequest.getPassword().equals(updateUserPasswordRequest.getPasswordCheck())) {
-//            throw new PasswordCheckFailException();
-//        }
-//
-//        userService.updateUserPassword(user, updateUserPasswordRequest.getPassword());
-//        return ResponseEntity.noContent().build();
-//
-//    }
-
 
 
     @Operation(summary = "유저 삭제하기", description = "유저 정보를 삭제한다.", security = {@SecurityRequirement(name = "Bearer-Key")})
