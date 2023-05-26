@@ -75,7 +75,8 @@ public class UserController {
 
     @Operation(summary = "유저 생성하기",
             description = "자체 회원가입 기능으로, 현재는 소셜 회원가입만을 제공합니다. \n" +
-                    "기능테스트를 위해 남겨둔 API 입니다.")
+                    "기능테스트를 위해 남겨두었습니다. \n" +
+                    "기존 필요 정보중 비밀번호, 전화번호 값을 삭제하였습니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED", content = @Content()),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",
