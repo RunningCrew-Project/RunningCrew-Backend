@@ -3,7 +3,6 @@ package com.project.runningcrew.oauth;
 
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.service.DongAreaService;
-import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
 import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.oauth.dto.request.OauthDto;
 import com.project.runningcrew.oauth.dto.request.SignUpDto;
@@ -13,13 +12,9 @@ import com.project.runningcrew.security.JwtProvider;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.repository.UserRepository;
 import com.project.runningcrew.user.service.UserService;
-import com.project.runningcrew.userrole.entity.UserRole;
-import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -29,6 +24,7 @@ public class OAuthService {
     private final JwtProvider jwtProvider;
     private final Oauth2UserFactory oauth2UserFactory;
     private final UserService userService;
+    private final UserRepository userRepository;
     private final DongAreaService dongAreaService;
     private final ImageService imageService;
 
@@ -61,7 +57,7 @@ public class OAuthService {
      */
     public void signUpData(User user, SignUpDto signUpDto) {
         //note 필수 추가 정보 [ 이름, 닉네임, 동 ]
-        userService.duplicateNickname(user.getNickname());
+        userService.duplicateNickname(signUpDto.getNickname());
         user.updateNickname(signUpDto.getNickname());
         user.updateName(signUpDto.getName());
         DongArea dongArea = dongAreaService.findById(signUpDto.getDongId());
@@ -86,6 +82,7 @@ public class OAuthService {
             user.updateWeight(signUpDto.getWeight());
         }
 
+        userRepository.save(user);
     }
 
 
