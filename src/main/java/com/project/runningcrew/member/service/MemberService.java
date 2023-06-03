@@ -1,5 +1,7 @@
 package com.project.runningcrew.member.service;
 
+import com.project.runningcrew.blocked.repository.BlockedInfoRepository;
+import com.project.runningcrew.blocked.service.BlockedInfoService;
 import com.project.runningcrew.board.repository.BoardRepository;
 import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
@@ -9,6 +11,7 @@ import com.project.runningcrew.fcm.FirebaseMessagingService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
+import com.project.runningcrew.reported.totalpost.ReportedTotalPostRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
 import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
@@ -43,6 +46,9 @@ public class MemberService {
     private final RunningNoticeImageRepository runningNoticeImageRepository;
     private final CrewService crewService;
     private final FirebaseMessagingService firebaseMessagingService;
+
+    private final ReportedTotalPostRepository reportedTotalPostRepository;
+    private final BlockedInfoRepository blockedInfoRepository;
 
     /**
      * 입력받은 id 를 가진 Member 를 찾아 반환한다. 없다면 MemberNotFoundException 을 throw 한다.
@@ -102,6 +108,8 @@ public class MemberService {
             Crew crew = member.getCrew();
             crewService.deleteCrew(crew);
         } else {
+            reportedTotalPostRepository.deleteAllByMember(member);
+            blockedInfoRepository.deleteAllByBlockerMember(member);
             boardImageRepository.deleteAllByMember(member);
             commentRepository.deleteAllByMember(member);
             boardRepository.deleteAllByMember(member);
