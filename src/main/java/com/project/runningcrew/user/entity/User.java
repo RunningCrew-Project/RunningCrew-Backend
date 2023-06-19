@@ -36,14 +36,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private LoginType login_type;
 
-
-
-    //note 필수 X
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dong_area_id")
     private DongArea dongArea;
 
+
+    //note 필수 X
 
     @Column()
     private String name;

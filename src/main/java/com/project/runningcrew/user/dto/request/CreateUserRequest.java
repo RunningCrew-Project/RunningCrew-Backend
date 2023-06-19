@@ -35,18 +35,6 @@ public class CreateUserRequest {
     @NotBlank(message = "닉네임은 필수 값입니다.")
     private String nickname;
 
-    @Schema(description = "생성 유저 휴대폰 번호", example = "01012345678")
-    @NotBlank(message = "휴대폰 번호는 필수 값입니다.")
-    private String phoneNumber;
-
-    @Schema(description = "생성 유저 비밀번호 입력", example = "same_password")
-    @NotBlank(message = "비밀번호는 필수 값입니다.")
-    private String password;
-
-    @Schema(description = "생성 유저 비밀번호 재입력", example = "same_password")
-    @NotBlank(message = "비밀번호 재입력은 필수 값입니다.")
-    private String passwordCheck;
-
     @Schema(description = "생성 유저 동네 아이디", example = "1")
     @NotNull(message = "동네 아이디는 필수 값입니다.")
     @Positive(message = "동네 아이디는 1 이상의 수입니다.")

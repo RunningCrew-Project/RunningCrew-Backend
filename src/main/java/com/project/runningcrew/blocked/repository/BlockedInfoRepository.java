@@ -3,6 +3,7 @@ package com.project.runningcrew.blocked.repository;
 import com.project.runningcrew.blocked.entity.BlockedInfo;
 import com.project.runningcrew.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -41,5 +42,12 @@ public interface BlockedInfoRepository extends JpaRepository<BlockedInfo, Long> 
     BlockedInfo findByTwoMemberId(@Param("blockerId") Long blockerId, @Param("blockedId") Long blockedId);
 
 
+    /**
+     * Blocker Member 가 차단한 멤버 목록 전체를 삭제한다.
+     * @param member Blocker Member 정보
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from BlockedInfo bi where bi.blockerMember = :member")
+    void deleteAllByBlockerMember(@Param("member") Member member);
 
 }

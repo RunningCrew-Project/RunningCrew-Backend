@@ -27,10 +27,6 @@ public class UpdateUserRequest {
     @NotBlank(message = "수정할 닉네임을 입력해주세요.")
     private String nickname;
 
-    @Schema(description = "수정할 전화번호", example = "010-1234-5678")
-    @NotBlank(message = "전화번호 값은 필수입니다.")
-    private String phoneNumber;
-
     @Schema(description = "수정 동네 아이디", example = "1")
     @NotNull(message = "동네 아이디는 필수 값입니다.")
     @Positive(message = "동네 아이디는 1 이상의 수입니다.")

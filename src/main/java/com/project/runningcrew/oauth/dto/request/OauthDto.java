@@ -6,6 +6,10 @@ import lombok.Getter;
 @Getter
 public class OauthDto {
 
+
+    @Schema(example = "Fcm 토큰")
+    private String fcmToken;
+
     @Schema(example = "엑세스 토큰")
     private String accessToken;
 
@@ -14,5 +18,6 @@ public class OauthDto {
 
     @Schema(description = "소셜 로그인 origin (전부 소문자)", example = "kakao")
     private String origin;
+
 
 }

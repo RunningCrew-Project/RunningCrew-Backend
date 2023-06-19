@@ -18,6 +18,9 @@ public class GetUserResponse {
     @Schema(description = "유저 이메일", example = "example@gmail.com")
     private String email;
 
+    @Schema(description = "유저 이름", example = "name")
+    private String name;
+
     @Schema(description = "유저 닉네임", example = "nickname")
     private String nickname;
 
@@ -27,8 +30,8 @@ public class GetUserResponse {
     @Schema(description = "유저 로그인 타입", example = "EMAIL")
     private LoginType loginType;
 
-    @Schema(description = "유저 휴대폰 번호 정보", example = "01012345678")
-    private String phoneNumber;
+    //@Schema(description = "유저 휴대폰 번호 정보", example = "01012345678")
+    //private String phoneNumber;
 
     @Schema(description = "유저 성별 정보", example = "MAN")
     private Sex sex;
@@ -45,10 +48,11 @@ public class GetUserResponse {
     public GetUserResponse(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
+        this.name = user.getName();
         this.nickname = user.getNickname();
         this.imgUrl = user.getImgUrl();
         this.loginType = user.getLogin_type();
-        this.phoneNumber = user.getPhoneNumber();
+        //this.phoneNumber = user.getPhoneNumber();
         this.sex = user.getSex();
         this.birthday = user.getBirthday();
         this.height = user.getHeight();

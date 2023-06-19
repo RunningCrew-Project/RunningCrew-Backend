@@ -156,8 +156,7 @@ public class UserService {
     @Transactional
     public void updateUser(User originUser, User newUser, MultipartFile multipartFile) {
 
-        //note NotNull [ 닉네임, 동, 전화번호 ]
-
+        //note [프로필 이미지] 제외 수정
         if (!originUser.getNickname().equals(newUser.getNickname())) {
             if (userRepository.existsByNickname(newUser.getNickname())) {
                 throw new UserNickNameDuplicateException(newUser.getNickname());
@@ -165,28 +164,51 @@ public class UserService {
                 originUser.updateNickname(newUser.getNickname());
             }
         }
-        if (!originUser.getDongArea().equals(newUser.getDongArea())) {
-            originUser.updateDongArea(newUser.getDongArea());
-        }
-        if(!originUser.getPhoneNumber().equals(newUser.getPhoneNumber())){
-            originUser.updatePhoneNumber(newUser.getPhoneNumber());
+
+        //거주 동 : 필수 값 X
+        if(!ObjectUtils.isEmpty(newUser.getDongArea())) {
+            if (!originUser.getDongArea().equals(newUser.getDongArea()) || ObjectUtils.isEmpty(originUser.getDongArea())) {
+                originUser.updateDongArea(newUser.getDongArea());
+            }
         }
 
 
-        //note Nullable [ 키, 체중, 생일, 성별 ]
+        //휴대폰 번호 : 필수 값 X
+        if(!ObjectUtils.isEmpty(newUser.getPhoneNumber())) {
+            if(!originUser.getPhoneNumber().equals(newUser.getPhoneNumber()) || ObjectUtils.isEmpty(originUser.getPhoneNumber())) {
+                originUser.updatePhoneNumber(newUser.getPhoneNumber());
+            }
+        }
 
-        if(newUser.getHeight() != null) {
-            originUser.updateHeight(newUser.getHeight());
+
+        //키 : 필수 값 X
+        if(!ObjectUtils.isEmpty(newUser.getHeight())) {
+            if(!originUser.getHeight().equals(newUser.getHeight()) || ObjectUtils.isEmpty(originUser.getHeight())) {
+                originUser.updateHeight(newUser.getHeight());
+            }
         }
-        if (newUser.getWeight() != null) {
-            originUser.updateWeight(newUser.getWeight());
+
+        //체중 : 필수 값 X
+        if(!ObjectUtils.isEmpty(newUser.getWeight())) {
+            if(!originUser.getWeight().equals(newUser.getWeight()) || ObjectUtils.isEmpty(originUser.getWeight())) {
+                originUser.updateWeight(newUser.getWeight());
+            }
         }
-        if (newUser.getBirthday() != null) {
-            originUser.updateBirthday(newUser.getBirthday());
+
+        //생일 : 필수 값 X
+        if(!ObjectUtils.isEmpty(newUser.getBirthday())) {
+            if(!originUser.getBirthday().equals(newUser.getBirthday()) || ObjectUtils.isEmpty(originUser.getBirthday())) {
+                originUser.updateBirthday(newUser.getBirthday());
+            }
         }
-        if (newUser.getSex() != null) {
-            originUser.updateSex(newUser.getSex());
+
+        //성별 : 필수 값 X
+        if(!ObjectUtils.isEmpty(newUser.getSex())) {
+            if(!originUser.getSex().equals(newUser.getSex()) || ObjectUtils.isEmpty(originUser.getSex())) {
+                originUser.updateSex(newUser.getSex());
+            }
         }
+
 
 
         //note [ 프로필 이미지 ]
@@ -194,6 +216,9 @@ public class UserService {
         String decodeURL = imageService.decodeURL(originUser.getImgUrl());
         log.info("decodeURL={}", decodeURL);
 
+        //업데이트 프로필 이미지 null 체크
+        //기본 이미지의 경우 S3 에서 삭제 X -> S3 업로드 및 프로필 이미지 갱신
+        //사용자 설정 이미지의 경우 S3 에서 삭제 O -> S3 업로드 및 프로필 이미지 갱신
         if(!ObjectUtils.isEmpty(multipartFile)) {
             String imageUrl = imageService.uploadImage(multipartFile, USER_IMG_DIR_NAME);
             if (decodeURL.equals(DEFAULT_USER_IMG_PATH)) {
@@ -205,28 +230,6 @@ public class UserService {
         }
 
     }
-
-
-    /**
-     * user 비밀번호를 수정한다.
-     * @param user 비밀번호를 수정할 user
-     * @param newPassword 새로운 비밀번호 정보
-     */
-    @Transactional
-    public void updateUserPassword(User user, String newPassword) {
-        String encode = passwordEncoder.encode(newPassword);
-        user.updatePassword(encode);
-    }
-
-
-
-
-
-
-
-
-
-
 
 
 
