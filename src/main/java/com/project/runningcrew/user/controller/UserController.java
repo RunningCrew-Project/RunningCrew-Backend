@@ -158,31 +158,20 @@ public class UserController {
         //note 필수 값 Build
         User originUSer = userService.findById(userId);
         User updateUser = User.builder()
-                .email(originUSer.getEmail()) // 변경 불가
-                .name(updateUserRequest.getName())
-                .nickname(updateUserRequest.getNickname())
-                .dongArea(dongAreaService.findById(updateUserRequest.getDongId()))
-                .login_type(originUSer.getLogin_type()) // 변경 불가
+                .email(originUSer.getEmail())
+                .name(updateUserRequest.getName()) //수정
+                .nickname(updateUserRequest.getNickname()) //수정
+                .dongArea(dongAreaService.findById(updateUserRequest.getDongId())) //수정
+                .birthday(updateUserRequest.getBirthday()) //수정
+                .height(updateUserRequest.getHeight()) //수정
+                .weight(updateUserRequest.getWeight()) //수정
+                .sex(updateUserRequest.getSex()) //수정
+                .login_type(originUSer.getLogin_type())
                 .build();
 
 
         MultipartFile file = updateUserRequest.getFile();
         userService.updateUser(originUSer, updateUser, file);
-
-
-        //note 필수 아닌 값 Update
-        if (updateUserRequest.getSex() != null) {
-            updateUser.updateSex(updateUserRequest.getSex());
-        }
-        if (updateUserRequest.getBirthday() != null) {
-            updateUser.updateBirthday(updateUserRequest.getBirthday());
-        }
-        if (updateUserRequest.getHeight() != null) {
-            updateUser.updateHeight(updateUserRequest.getHeight());
-        }
-        if (updateUserRequest.getWeight() != null) {
-            updateUser.updateWeight(updateUserRequest.getWeight());
-        }
 
         return ResponseEntity.noContent().build();
 
