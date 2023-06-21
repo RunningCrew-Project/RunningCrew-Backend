@@ -32,12 +32,10 @@ public class UpdateUserRequest {
     @Positive(message = "동네 아이디는 1 이상의 수입니다.")
     private Long dongId;
 
-    @Schema(description = "수정할 프로필 이미지", example = "imgUrl")
-    @NotNull(message = "프로필 이미지는 필수 값입니다.")
-    private MultipartFile file;
-
-
     //note 필수 아닌 값
+
+    @Schema(description = "수정할 프로필 이미지", example = "imgUrl")
+    private MultipartFile file;
 
     @Schema(description = "수정 생년월일 정보", example = "2022-02-22")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
