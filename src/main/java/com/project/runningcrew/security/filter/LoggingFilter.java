@@ -34,15 +34,15 @@ public class LoggingFilter extends OncePerRequestFilter {
         String queryString = request.getQueryString();
         String uri = queryString == null ? request.getRequestURI() :
                 request.getRequestURI() + '?' + URLDecoder.decode(queryString, StandardCharsets.UTF_8);
-        String addr = request.getRemoteAddr();
+        String ip = request.getHeader("X-Forwarded-For");
         String user = Objects.requireNonNullElse((String) request.getAttribute("user"), "non-login");
 
         int status = response.getStatus();
 
         log.info("\n" +
-                        "[REQUEST] {} uri='{}' addr='{}' user='{}'\n" +
+                        "[REQUEST] {} uri='{}' ip='{}' user='{}'\n" +
                         "[RESPONSE] status={} times={}ms",
-                method, uri, addr, user, status, times);
+                method, uri, ip, user, status, times);
     }
 
 }
