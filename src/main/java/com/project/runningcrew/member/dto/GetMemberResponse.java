@@ -22,14 +22,14 @@ public class GetMemberResponse {
     @Schema(description = "멤버의 유저")
     private SimpleUserDto user;
 
-    @Schema(description = "멤버 권한", example = "MEMBER_NORMAL")
-    private MemberRole role;
+    @Schema(description = "멤버 권한", example = "크루원")
+    private String role;
 
     public GetMemberResponse(Member member) {
         this.id = member.getId();
         this.createdDate = member.getCreatedDate();
         this.user = new SimpleUserDto(member.getUser());
-        this.role = member.getRole();
+        this.role = member.getRole().getName();
     }
 
 }
