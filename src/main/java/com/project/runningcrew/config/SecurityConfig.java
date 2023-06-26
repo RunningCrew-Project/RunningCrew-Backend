@@ -1,8 +1,6 @@
 package com.project.runningcrew.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
-import com.project.runningcrew.refreshtoken.repository.RefreshTokenRepository;
 import com.project.runningcrew.security.ResponseUtils;
 import com.project.runningcrew.security.exceptionhandler.CustomAccessDeniedHandler;
 import com.project.runningcrew.security.exceptionhandler.CustomAuthenticationEntryPoint;
@@ -25,6 +23,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 
 @EnableWebSecurity
@@ -33,8 +32,6 @@ public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final FcmTokenRepository fcmTokenRepository;
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -75,6 +72,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        JwtVerifyFilter jwtVerifyFilter = new JwtVerifyFilter(
+                userRepository, userRoleRepository, SECRET_KEY, responseUtils);
+
         http.csrf().disable()
                 .formLogin().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -92,7 +92,8 @@ public class SecurityConfig {
                 .and()
                 .apply(new MyCustomDsl())
                 .and()
-                .addFilterBefore(new LoggingFilter(), WebAsyncManagerIntegrationFilter.class);
+                .addFilterBefore(new LoggingFilter(), WebAsyncManagerIntegrationFilter.class)
+                .addFilterBefore(jwtVerifyFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -102,12 +103,9 @@ public class SecurityConfig {
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(
-                    objectMapper, authenticationManager, jwtProvider, refreshTokenRepository, fcmTokenRepository, responseUtils);
+                    objectMapper, authenticationManager, jwtProvider, responseUtils);
             jwtAuthenticationFilter.setFilterProcessesUrl("/api/login");
-            JwtVerifyFilter jwtVerifyFilter = new JwtVerifyFilter(
-                    authenticationManager, userRepository, userRoleRepository, SECRET_KEY, responseUtils);
-            builder.addFilter(jwtAuthenticationFilter)
-                    .addFilter(jwtVerifyFilter);
+            builder.addFilter(jwtAuthenticationFilter);
         }
     }
 
