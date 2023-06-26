@@ -39,4 +39,8 @@ public class FcmToken extends BaseEntity {
         this.fcmToken = fcmToken;
     }
 
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
 }
