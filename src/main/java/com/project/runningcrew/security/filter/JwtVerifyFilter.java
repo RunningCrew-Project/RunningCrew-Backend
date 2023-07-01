@@ -12,13 +12,13 @@ import com.project.runningcrew.userrole.entity.UserRole;
 import com.project.runningcrew.userrole.repository.UserRoleRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,28 +27,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
-public class JwtVerifyFilter extends BasicAuthenticationFilter {
+@RequiredArgsConstructor
+public class JwtVerifyFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final String SECRET_KEY;
-    private ResponseUtils responseUtils;
-
-
-    public JwtVerifyFilter(AuthenticationManager authenticationManager,
-                           UserRepository userRepository,
-                           UserRoleRepository userRoleRepository,
-                           String SECRET_KEY,
-                           ResponseUtils responseUtils) {
-        super(authenticationManager);
-        this.userRepository = userRepository;
-        this.userRoleRepository = userRoleRepository;
-        this.SECRET_KEY = SECRET_KEY;
-        this.responseUtils = responseUtils;
-    }
+    private final ResponseUtils responseUtils;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+
         String jwtHeader = request.getHeader("Authorization");
         if (jwtHeader == null || !jwtHeader.startsWith("Bearer ")) {
             chain.doFilter(request, response);

@@ -3,6 +3,7 @@ package com.project.runningcrew.oauth;
 
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.service.DongAreaService;
+import com.project.runningcrew.exception.badinput.FcmTokenEmptyException;
 import com.project.runningcrew.fcm.token.entity.FcmToken;
 import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
 import com.project.runningcrew.image.ImageService;
@@ -20,9 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -56,20 +54,22 @@ public class OAuthService {
         String accessToken = jwtProvider.createAccessToken(oAuth2User.getUser(), oAuth2User.getUserRole());
         String refreshToken = jwtProvider.createRefreshToken(oAuth2User.getUser());
         boolean initData = initDataInput(oAuth2User.getUser());
-        //note : 소셜로그인 정보에 추가정보 기입 유무 포함.
 
-
-        if(!fcmTokenRepository.existsByUser(oAuth2User.getUser()) && fcmToken != null) {
-            fcmTokenRepository.save(new FcmToken(oAuth2User.getUser(), fcmToken));
+        if (fcmToken == null) {
+            throw new FcmTokenEmptyException();
+        } else {
+            fcmTokenRepository.findByUser(oAuth2User.getUser())
+                    .ifPresentOrElse(
+                            existingToken -> existingToken.updateFcmToken(fcmToken),
+                            () -> fcmTokenRepository.save(new FcmToken(oAuth2User.getUser(), fcmToken))
+                    );
         }
-        //note : 해당 소셜 로그인 유저의 Fcm 토큰이 존재하지 않는 경우 Fcm Token 을 저장한다.
 
-
-        if(refreshToken != null) {
-            refreshTokenRepository.save(new RefreshToken(oAuth2User.getUser(), refreshToken));
-        }
-        //note : 로그인과 동시에 해당 소셜 로그인 유저의 리프레시 Token 을 저장한다.
-
+        refreshTokenRepository.findByUser(oAuth2User.getUser())
+                .ifPresentOrElse(
+                        existingToken -> existingToken.updateRefreshToken(refreshToken),
+                        () -> refreshTokenRepository.save(new RefreshToken(oAuth2User.getUser(), refreshToken))
+                );
 
         return new LoginResponse(accessToken, refreshToken, initData);
     }

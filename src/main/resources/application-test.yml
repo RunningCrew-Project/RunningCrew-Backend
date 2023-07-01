@@ -19,3 +19,7 @@ spring:
 
 domain:
   name: https://runningcrew-test.ddns.net
+
+logging:
+  file:
+    name: /back_logs/back.log

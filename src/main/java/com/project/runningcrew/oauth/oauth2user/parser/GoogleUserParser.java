@@ -73,7 +73,6 @@ public class GoogleUserParser {
         return WebClient.create()
                 .get()
                 .uri("https://oauth2.googleapis.com/tokeninfo?id_token=" + oauthDto.getIdToken())
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(oauthDto.getAccessToken()))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                 })
