@@ -50,7 +50,7 @@ public class GoogleUserParser {
 
             User user = User.builder()
                     .email(email)
-                    .login_type(LoginType.KAKAO)
+                    .login_type(LoginType.GOOGLE)
                     .build();
 
             User savedUser = userRepository.save(user);
