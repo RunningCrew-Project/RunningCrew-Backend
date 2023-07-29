@@ -30,7 +30,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Slice<SimpleBoardDto> findSimpleBoardDtoByMember(@Param("member") Member member, Pageable pageable);
 
 
-
     /**
      * 특정 Member 가 작성한 Board 를 모두 삭제한다.
      * @param member
