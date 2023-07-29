@@ -75,7 +75,8 @@ public class BoardController {
 
     @Operation(summary = "게시글 가져오기", description = "게시글 정보를 가져온다.", security = {@SecurityRequirement(name = "Bearer-Key")})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetBoardResponse.class))),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "NOT FOUND",
@@ -346,7 +347,6 @@ public class BoardController {
     }
 
 
-
     @Operation(summary = "특정 작성자의 모든 게시글 정보 가져오기"
             , description = "특정 작성자의 모든 게시글을 가져온다."
             , security = {@SecurityRequirement(name = "Bearer-Key")}
@@ -384,7 +384,6 @@ public class BoardController {
                 new SliceImpl<>(dtoList, simpleBoardSlice.getPageable(), simpleBoardSlice.hasNext())));
 
     }
-
 
     @Operation(summary = "특정 크루의 자유 게시판 정보 가져오기"
             , description = "자유 게시판의 모든 게시글을 가져온다."
