@@ -9,12 +9,16 @@ import com.project.runningcrew.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
+@SQLDelete(sql = "update notifications set deleted = true where notification_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "notifications")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -45,6 +49,9 @@ public class Notification extends BaseEntity {
     @Column
     private Long referenceId;
 
+    @Column
+    private boolean deleted = false;
+
     public Notification(User user, Crew crew, String content, NotificationType type,
                          Long referenceId) {
         this.user = user;
@@ -62,6 +69,10 @@ public class Notification extends BaseEntity {
         this.content = content;
         this.type = type;
         this.referenceId = referenceId;
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
 }

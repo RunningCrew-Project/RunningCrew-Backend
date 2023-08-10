@@ -7,10 +7,12 @@ import com.project.runningcrew.reported.totalpost.ReportedTotalPost;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 
 @Entity
+@SQLDelete(sql = "update reported_total_posts set deleted = true where reported_total_post_id = ?")
 @Getter
 @DiscriminatorValue("board")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

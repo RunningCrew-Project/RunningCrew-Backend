@@ -5,12 +5,16 @@ import com.project.runningcrew.member.entity.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
+@SQLDelete(sql = "update boards set deleted = true where board_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "boards")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -37,6 +41,9 @@ public abstract class Board extends BaseEntity {
     @Column(nullable = false, length = 1000)
     private String detail;
 
+    @Column
+    private boolean deleted = false;
+
     public Board(Member member, String title, String detail) {
         this.member = member;
         this.title = title;
@@ -48,6 +55,10 @@ public abstract class Board extends BaseEntity {
         this.member = member;
         this.title = title;
         this.detail = detail;
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public void updateTitle(String title) {

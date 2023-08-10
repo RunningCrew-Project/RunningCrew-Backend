@@ -4,6 +4,8 @@ import com.project.runningcrew.common.BaseEntity;
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.member.entity.Member;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -12,15 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "update users set deleted = true where user_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Setter(AccessLevel.PROTECTED)
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-
     //note 필수
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -73,6 +75,9 @@ public class User extends BaseEntity {
     @Column()
     private Integer weight;
 
+    @Column
+    private boolean deleted = false;
+
     public static User createBasicUser(String email, String name, String nickname, String imgUrl,
                                   LoginType login_type, String phoneNumber) {
         return User.builder().email(email)
@@ -108,6 +113,10 @@ public class User extends BaseEntity {
         this.height = height;
         this.weight = weight;
 
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public void updateName(String name) {

@@ -6,10 +6,14 @@ import com.project.runningcrew.reported.ReportType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Entity
+@SQLDelete(sql = "update reported_total_posts set deleted = true where reported_total_post_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "reported_total_posts")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -29,6 +33,9 @@ public abstract class ReportedTotalPost extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
+    @Column
+    private boolean deleted = false;
+
     public ReportedTotalPost(Member member, ReportType reportType) {
         this.member = member;
         this.reportType = reportType;
@@ -39,5 +46,8 @@ public abstract class ReportedTotalPost extends BaseEntity {
         this.reportType = reportType;
     }
 
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
 }

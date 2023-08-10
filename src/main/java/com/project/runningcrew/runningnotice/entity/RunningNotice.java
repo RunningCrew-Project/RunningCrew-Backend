@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -16,6 +18,8 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
+@SQLDelete(sql = "update running_notices set deleted = true where running_notice_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "running_notices")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -61,6 +65,9 @@ public class RunningNotice extends BaseEntity {
     @JoinColumn(name = "running_record_id")
     private RunningRecord preRunningRecord;
 
+    @Column
+    private boolean deleted = false;
+
     @Builder
     public RunningNotice(Long id, String title, String detail, Member member, NoticeType noticeType,
                          LocalDateTime runningDateTime, int runningPersonnel, RunningStatus status,
@@ -74,6 +81,10 @@ public class RunningNotice extends BaseEntity {
         this.runningPersonnel = runningPersonnel;
         this.status = status;
         this.preRunningRecord = preRunningRecord;
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public void updateTitle(String title) {

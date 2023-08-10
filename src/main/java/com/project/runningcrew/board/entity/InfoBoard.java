@@ -5,6 +5,7 @@ import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 @Entity
+@SQLDelete(sql = "update boards set deleted = true where board_id = ?")
 @Getter
 @DiscriminatorValue("info")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

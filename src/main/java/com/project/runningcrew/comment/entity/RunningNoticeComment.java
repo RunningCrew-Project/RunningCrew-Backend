@@ -5,10 +5,12 @@ import com.project.runningcrew.runningnotice.entity.RunningNotice;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 
 @Entity
+@SQLDelete(sql = "update comments set deleted = true where comment_id = ?")
 @Getter
 @DiscriminatorValue("runningNotice")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
