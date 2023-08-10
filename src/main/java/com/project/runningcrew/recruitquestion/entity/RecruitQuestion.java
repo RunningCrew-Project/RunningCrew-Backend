@@ -5,11 +5,15 @@ import com.project.runningcrew.crew.entity.Crew;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 @Entity
+@SQLDelete(sql = "update recruit_questions set deleted = true where recruit_question_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "recruit_questions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,6 +37,9 @@ public class RecruitQuestion extends BaseEntity {
     @Column(nullable = false)
     private int questionOffset;
 
+    @Column
+    private boolean deleted = false;
+
     public RecruitQuestion(Crew crew, String question, int questionOffset) {
         this.crew = crew;
         this.question = question;
@@ -44,6 +51,10 @@ public class RecruitQuestion extends BaseEntity {
         this.crew = crew;
         this.question = question;
         this.questionOffset = questionOffset;
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
 }

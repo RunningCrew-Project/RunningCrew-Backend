@@ -6,12 +6,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
+@SQLDelete(sql = "update crews set deleted = true where crew_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "crews")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,7 +31,6 @@ public class Crew extends BaseEntity {
     @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-
     @NotBlank(message = "크루 소개는 필수값입니다.")
     @Size(min = 1, max = 500, message = "크루 소개는 1 자 이상 500 자 이하입니다.")
     @Column(nullable = false, length = 500)
@@ -41,6 +44,9 @@ public class Crew extends BaseEntity {
     @JoinColumn(name = "dong_area_id", nullable = false)
     private DongArea dongArea;
 
+    @Column
+    private boolean deleted = false;
+
     @Builder
     public Crew(Long id, String name, String introduction, String crewImgUrl, DongArea dongArea) {
         this.id = id;
@@ -48,6 +54,10 @@ public class Crew extends BaseEntity {
         this.introduction = introduction;
         this.crewImgUrl = crewImgUrl;
         this.dongArea = dongArea;
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public void updateName(String name) {

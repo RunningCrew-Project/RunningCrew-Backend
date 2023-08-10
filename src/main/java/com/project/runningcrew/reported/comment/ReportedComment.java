@@ -7,10 +7,14 @@ import com.project.runningcrew.member.entity.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Entity
+@SQLDelete(sql = "update reported_comments set deleted = true where reported_comment_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "reported_comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,11 +36,17 @@ public class ReportedComment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
+    @Column
+    private boolean deleted = false;
+
     public ReportedComment(Comment comment, Member member, ReportType reportType) {
         this.comment = comment;
         this.member = member;
         this.reportType = reportType;
     }
 
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
 }

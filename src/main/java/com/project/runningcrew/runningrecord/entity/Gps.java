@@ -5,11 +5,15 @@ import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.PositiveOrZero;
 
 @Entity
+@SQLDelete(sql = "update gps set deleted = true where gps_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "gps")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,6 +37,8 @@ public class Gps extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "running_record_id", nullable = false)
     private RunningRecord runningRecord;
+    @Column
+    private boolean deleted = false;
 
     public Gps(Double latitude, Double longitude, int gpsOffset, RunningRecord runningRecord) {
         this.latitude = latitude;
@@ -53,6 +59,10 @@ public class Gps extends BaseEntity {
         if (runningRecord != null) {
             setRunningRecord(runningRecord);
         }
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     private void setRunningRecord(RunningRecord runningRecord) {

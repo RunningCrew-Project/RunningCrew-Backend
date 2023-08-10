@@ -5,6 +5,8 @@ import com.project.runningcrew.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SQLDelete(sql = "update running_records set deleted = true where running_record_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "running_records")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -62,6 +66,9 @@ public abstract class RunningRecord extends BaseEntity {
     @OneToMany(mappedBy = "runningRecord", cascade = CascadeType.ALL)
     private List<Gps> gpsList = new ArrayList<>();
 
+    @Column
+    private boolean deleted = false;
+
     public RunningRecord(Long id, String title, LocalDateTime startDateTime, String location,
                          double runningDistance, int runningTime, int runningFace,
                          int calories, String runningDetail, User user) {
@@ -77,5 +84,8 @@ public abstract class RunningRecord extends BaseEntity {
         this.user = user;
     }
 
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
 }

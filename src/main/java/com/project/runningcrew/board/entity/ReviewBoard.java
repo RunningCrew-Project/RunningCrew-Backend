@@ -4,10 +4,12 @@ import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.runningrecord.entity.RunningRecord;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 
 @Entity
+@SQLDelete(sql = "update boards set deleted = true where board_id = ?")
 @Getter
 @DiscriminatorValue("review")
 @NoArgsConstructor

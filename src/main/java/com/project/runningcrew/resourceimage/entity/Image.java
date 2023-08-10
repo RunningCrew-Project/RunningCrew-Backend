@@ -4,12 +4,16 @@ import com.project.runningcrew.common.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
+@SQLDelete(sql = "update images set deleted = true where image_id = ?")
+@Where(clause = "deleted = false")
 @Getter
 @Table(name = "images")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -27,6 +31,9 @@ public abstract class Image extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String fileName;
 
+    @Column
+    private boolean deleted = false;
+
     public Image(String fileName) {
         this.fileName = fileName;
     }
@@ -34,6 +41,10 @@ public abstract class Image extends BaseEntity {
     public Image(Long id, String fileName) {
         this.id = id;
         this.fileName = fileName;
+    }
+
+    public void updateDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
 }
