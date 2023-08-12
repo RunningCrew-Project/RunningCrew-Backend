@@ -18,14 +18,18 @@ public interface ReviewBoardRepository extends JpaRepository<ReviewBoard, Long> 
      * @param crew 크루 정보
      * @param member 정보를 조회하는 멤버 정보
      * @param pageable 페이징 정보
-     * @return 특정 Crew 의 리뷰게시판 목록 조회(Dto 매핑) - 페이징 & 차단 적용
+     * @return 특정 Crew 의 리뷰게시판 목록 조회(Dto 매핑)
+     * SOFT DELETE 적용
      */
     @Query("select new com.project.runningcrew.common.dto.SimpleBoardDto(rb.id, rb.createdDate, rb.title, u.nickname) " +
             "from ReviewBoard rb " +
-            "inner join Member m on m.crew = :crew " +
-            "inner join User u on m.user = u " +
-            "where rb.id not in " +
-            "(select rb.id from ReviewBoard rb inner join BlockedInfo bi on bi.blockedMemberId = rb.member.id where bi.blockerMember = :member) " +
+            "inner join Member m on m.crew = :crew and m.deleted = false " +
+            "inner join User u on m.user = u and u.deleted = false " +
+            "where rb.id not in ( " +
+            "select rb.id " +
+            "from ReviewBoard rb " +
+            "inner join BlockedInfo bi on bi.blockedMemberId = rb.member.id and bi.deleted = false " +
+            "where bi.blockerMember = :member ) " +
             "and rb.member = m")
     Slice<SimpleBoardDto> findReviewBoardDtoByCrew(@Param("crew") Crew crew, @Param("member") Member member, Pageable pageable);
 

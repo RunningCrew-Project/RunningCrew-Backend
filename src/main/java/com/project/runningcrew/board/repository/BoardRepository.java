@@ -17,37 +17,44 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
 
     /**
-     * 특정 member 가 작성한 모든 게시물을 반환한다.(Dto 매핑)
+     * 특정 member 가 작성한 모든 게시물을 반환한다.
      * @param member 멤버 정보
      * @param pageable 페이징 정보
-     * @return 특정 member 가 작성한 모든 게시물을 반환한다.(Dto 매핑)
+     * @return SimpleBoardDto 정보
+     * SOFT DELETE 적용
      */
     @Query("select new com.project.runningcrew.common.dto.SimpleBoardDto(b.id, b.createdDate, b.title, u.nickname) " +
             "from Board b " +
-            "inner join Member m on b.member = :member " +
-            "inner join User u on m.user = u " +
-            "where b.member = m")
+            "inner join Member m on b.member = m and m.deleted = false " +
+            "inner join User u on m.user = u and u.deleted = false " +
+            "where b.member = :member")
     Slice<SimpleBoardDto> findSimpleBoardDtoByMember(@Param("member") Member member, Pageable pageable);
 
 
     /**
      * 특정 Member 가 작성한 Board 를 모두 삭제한다.
-     * @param member
+     * @param member 멤저 정보
+     * SOFT DELETE 적용
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Board b where b.member = :member")
+    @Query("update Board b " +
+            "set b.deleted = true " +
+            "where b.member = :member")
     void deleteAllByMember(@Param("member") Member member);
-
 
     /**
      * 특정 crew 의 모든 Board 를 삭제한다.
-     * @param crew
+     * @param crew 크루 정보
+     * SOFT DELETE 적용
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Board b where b in (select b2 from Board b2 where b2.member.crew = :crew)")
+    @Query("update Board b " +
+            "set b.deleted = true " +
+            "where b in ( " +
+            "select b2 " +
+            "from Board b2 " +
+            "where b2.member.crew = :crew )")
     void deleteAllByCrew(@Param("crew") Crew crew);
-
-
 
 
     /**

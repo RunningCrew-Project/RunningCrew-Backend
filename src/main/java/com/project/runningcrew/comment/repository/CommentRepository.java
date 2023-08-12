@@ -16,28 +16,39 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     /**
      * 특정 Member 의 모든 Comment 를 가져온다. (페이징 적용)
-     * @param member
-     * @param pageable
+     * @param member 멤버 정보
+     * @param pageable 페이징 정보
      * @return slice of Comment
      */
+    @Query("select c " +
+            "from Comment c " +
+            "inner join Member m on c.member = m and m.deleted = false " +
+            "where c.member = :member")
     Slice<Comment> findAllByMember(Member member, Pageable pageable);
 
     /**
      * 해당 member 가 작성한 모든 comment 를 삭제한다.
-     * @param member
+     * @param member 멤버 정보
+     * SOFT DELETE 적용
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Comment c where c.member = :member")
+    @Query("update Comment c " +
+            "set c.deleted = true " +
+            "where c.member = :member")
     void deleteAllByMember(@Param("member") Member member);
 
     /**
      * 해당 crew 의 모든 comment 를 삭제한다.
-     * @param crew
+     * @param crew 크루 정보
+     * SOFT DELETE 적용
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Comment c where c in (select c2 from Comment c2 where c.member.crew = :crew)")
+    @Query("update Comment c " +
+            "set c.deleted = true " +
+            "where c in ( " +
+            "select c2 from Comment c2 " +
+            "where c.member.crew = :crew )")
     void deleteAllByCrew(@Param("crew") Crew crew);
-
 
 
 }

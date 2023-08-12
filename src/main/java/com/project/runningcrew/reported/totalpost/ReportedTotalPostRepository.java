@@ -16,16 +16,24 @@ public interface ReportedTotalPostRepository extends JpaRepository<ReportedTotal
      * @param crew 크루
      * @param pageable 페이징 정보
      * @return 신고글 정보 목록
+     * SOFT DELETE 적용
      */
-    @Query("select rp from ReportedTotalPost rp where rp.member.crew = :crew")
+    @Query("select rp " +
+            "from ReportedTotalPost rp " +
+            "inner join Member m on rp.member = m and m.deleted = false " +
+            "inner join Crew c on m.crew = c and c.deleted = false " +
+            "where c = :crew")
     Slice<ReportedTotalPost> findByCrew(@Param("crew") Crew crew, Pageable pageable);
 
     /**
      * 입력받은 멤버가 작성한 신고글 정보 전체 목록을 삭제한다
      * @param member 멤버 정보
+     * SOFT DELETE 적용
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from ReportedTotalPost rp where rp.member = :member")
+    @Query("update ReportedTotalPost rp " +
+            "set rp.deleted = true " +
+            "where rp.member = :member")
     void deleteAllByMember(@Param("member") Member member);
 
 }
