@@ -26,7 +26,7 @@ public interface CrewConditionRepository extends JpaRepository<CrewCondition, Lo
      * @param crew
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from CrewCondition c where c.crew = :crew")
+    @Query("update CrewCondition c set c.deleted = true where c.crew = :crew")
     void deleteByCrew(@Param("crew") Crew crew);
 
 }
