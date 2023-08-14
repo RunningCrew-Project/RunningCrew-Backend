@@ -29,7 +29,7 @@ public interface RunningNoticeImageRepository extends JpaRepository<RunningNotic
      * @param runningNotice
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from RunningNoticeImage r where r.runningNotice = :runningNotice")
+    @Query("update RunningNoticeImage r set r.deleted = true where r.runningNotice = :runningNotice")
     void deleteAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
     /**
@@ -38,7 +38,9 @@ public interface RunningNoticeImageRepository extends JpaRepository<RunningNotic
      * @param runningNoticeIds RunningRecord 의 id 를 가진 리스트
      * @return RunningNotice 의 id 가 runningNoticeIds 에 포함된 모든 RunningNoticeImage.
      */
-    @Query("select r from RunningNoticeImage r where r.runningNotice.id in (:runningNoticeIds)")
+    @Query("select i from RunningNoticeImage i " +
+            "inner join i.runningNotice r on r.deleted = false " +
+            "where r.id in (:runningNoticeIds)")
     List<RunningNoticeImage> findImagesByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
 
     /**
@@ -47,8 +49,10 @@ public interface RunningNoticeImageRepository extends JpaRepository<RunningNotic
      * @param member
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from RunningNoticeImage i where i in " +
-            "(select img from RunningNoticeImage img where img.runningNotice.member = :member)")
+    @Query("update RunningNoticeImage i set i.deleted = true where i in " +
+            "(select img from RunningNoticeImage img " +
+            "inner join img.runningNotice r on r.deleted = false " +
+            "where r.member = :member)")
     void deleteAllByMember(@Param("member") Member member);
 
     /**
@@ -57,8 +61,11 @@ public interface RunningNoticeImageRepository extends JpaRepository<RunningNotic
      * @param crew
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from RunningNoticeImage i where i in " +
-            "(select img from RunningNoticeImage img where img.runningNotice.member.crew = :crew)")
+    @Query("update RunningNoticeImage i set i.deleted = true where i in " +
+            "(select img from RunningNoticeImage img " +
+            "inner join img.runningNotice r on r.deleted = false " +
+            "inner join r.member m on m.deleted = false " +
+            "where m.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
 }
