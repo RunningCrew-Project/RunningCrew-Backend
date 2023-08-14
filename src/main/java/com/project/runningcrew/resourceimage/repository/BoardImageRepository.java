@@ -39,7 +39,7 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
      * @return Board 의 id 가 boardIds 에 포함된 모든 BoardImage.
      */
     @Query("select i from BoardImage i " +
-            "inner join Board b on i.board = b and b.deleted = false " +
+            "inner join i.board b on b.deleted = false " +
             "where b.id in (:boardIds)")
     List<BoardImage> findImagesByBoardIds(@Param("boardIds") List<Long> boardIds);
 
@@ -51,7 +51,7 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update BoardImage i set i.deleted = true where i in " +
             "(select img from BoardImage img " +
-            "inner join Board b on img.board = b and b.deleted = false " +
+            "inner join img.board b on b.deleted = false " +
             "where b.member = :member)")
     void deleteAllByMember(@Param("member") Member member);
 
@@ -63,8 +63,8 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update BoardImage i set i.deleted = true where i in " +
             "(select img from BoardImage img " +
-            "inner join Board b on img.board = b and b.deleted = false " +
-            "inner join Member m on b.member = m and m.deleted = false " +
+            "inner join img.board b on b.deleted = false " +
+            "inner join b.member m on m.deleted = false " +
             "where m.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 

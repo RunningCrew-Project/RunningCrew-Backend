@@ -21,9 +21,9 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @return name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 의 list
      */
     @Query(value = "select c from Crew c " +
-            "inner join DongArea d on c.dongArea = d " +
-            "inner join GuArea g on d.guArea = g " +
-            "inner join SidoArea s on g.sidoArea = s " +
+            "inner join c.dongArea d " +
+            "inner join d.guArea g " +
+            "inner join g.sidoArea s " +
             "where c.name like %:keyword% " +
             "or c.introduction like %:keyword% " +
             "or d.name like %:keyword% " +
@@ -38,9 +38,9 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @return name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 의 개수
      */
     @Query(value = "select count(c) from Crew c " +
-            "inner join DongArea d on c.dongArea = d " +
-            "inner join GuArea g on d.guArea = g " +
-            "inner join SidoArea s on g.sidoArea = s " +
+            "inner join c.dongArea d " +
+            "inner join d.guArea g " +
+            "inner join g.sidoArea s " +
             "where c.name like %:keyword% " +
             "or c.introduction like %:keyword% " +
             "or d.name like %:keyword% " +
@@ -57,9 +57,9 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * 들이 담긴 Slice
      */
     @Query(value = "select count(c) from Crew c " +
-            "inner join DongArea d on c.dongArea = d " +
-            "inner join GuArea g on d.guArea = g " +
-            "inner join SidoArea s on g.sidoArea = s " +
+            "inner join c.dongArea d " +
+            "inner join d.guArea g " +
+            "inner join g.sidoArea s " +
             "where c.name like %:keyword% " +
             "or c.introduction like %:keyword% " +
             "or d.name like %:keyword% " +
@@ -98,8 +98,8 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @return User 가 속한 모든 Crew
      */
     @Query(value = "select c from Member m " +
-            "inner join Crew c on m.crew = c and c.deleted = false " +
-            "inner join User u on m.user = u and u.deleted = false " +
+            "inner join m.crew c on c.deleted = false " +
+            "inner join m.user u on u.deleted = false " +
             "where u = :user ")
     List<Crew> findAllByUser(@Param("user") User user);
 
