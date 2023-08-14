@@ -17,8 +17,10 @@ public interface GpsRepository extends JpaRepository<Gps, Long> {
      * @param user
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Gps g1 where g1 in " +
-            "(select g2 from Gps g2 where g2.runningRecord.user = :user)")
+    @Query("update Gps g1 set g1.deleted = true where g1 in " +
+            "(select g2 from Gps g2 " +
+            "inner join g2.runningRecord r on r.deleted = false " +
+            "where r.user = :user)")
     void deleteAllByUser(@Param("user") User user);
 
 }
