@@ -20,11 +20,15 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @param keyword
      * @return name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 의 list
      */
-    @Query(value = "select c from Crew c where c.name like %:keyword% " +
+    @Query(value = "select c from Crew c " +
+            "inner join DongArea d on c.dongArea = d " +
+            "inner join GuArea g on d.guArea = g " +
+            "inner join SidoArea s on g.sidoArea = s " +
+            "where c.name like %:keyword% " +
             "or c.introduction like %:keyword% " +
-            "or c.dongArea.name like %:keyword% " +
-            "or c.dongArea.guArea.name like %:keyword% " +
-            "or c.dongArea.guArea.sidoArea.name like %:keyword%")
+            "or d.name like %:keyword% " +
+            "or g.name like %:keyword% " +
+            "or s.name like %:keyword%")
     List<Crew> findAllByNameOrIntroductionOrArea(@Param("keyword") String keyword);
 
     /**
@@ -33,11 +37,15 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @param keyword
      * @return name 또는 introduction 또는 area 에 keyword 가 포함된 모든 crew 의 개수
      */
-    @Query(value = "select count(c) from Crew c where c.name like %:keyword% " +
+    @Query(value = "select count(c) from Crew c " +
+            "inner join DongArea d on c.dongArea = d " +
+            "inner join GuArea g on d.guArea = g " +
+            "inner join SidoArea s on g.sidoArea = s " +
+            "where c.name like %:keyword% " +
             "or c.introduction like %:keyword% " +
-            "or c.dongArea.name like %:keyword% " +
-            "or c.dongArea.guArea.name like %:keyword% " +
-            "or c.dongArea.guArea.sidoArea.name like %:keyword%")
+            "or d.name like %:keyword% " +
+            "or g.name like %:keyword% " +
+            "or s.name like %:keyword%")
     Long countAllByNameOrIntroductionOrArea(@Param("keyword") String keyword);
 
     /**
@@ -48,11 +56,15 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @return 페이징 조건에 맞는 name 또는 introduction 또는 area 에 keyword 가 포함된 crew
      * 들이 담긴 Slice
      */
-    @Query(value = "select c from Crew c where c.name like %:keyword% " +
+    @Query(value = "select count(c) from Crew c " +
+            "inner join DongArea d on c.dongArea = d " +
+            "inner join GuArea g on d.guArea = g " +
+            "inner join SidoArea s on g.sidoArea = s " +
+            "where c.name like %:keyword% " +
             "or c.introduction like %:keyword% " +
-            "or c.dongArea.name like %:keyword% " +
-            "or c.dongArea.guArea.name like %:keyword% " +
-            "or c.dongArea.guArea.sidoArea.name like %:keyword%")
+            "or d.name like %:keyword% " +
+            "or g.name like %:keyword% " +
+            "or s.name like %:keyword%")
     Slice<Crew> findByNameOrIntroductionOrArea(Pageable pageable, @Param("keyword") String keyword);
 
     /**
@@ -74,7 +86,7 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @return dongArea 에 포함되는 랜덤한 crew 들이 최대 maxsize 개 담긴 list
      */
     @Query(value = "select * from crews as c " +
-            "inner join dong_areas as d on d.dong_area_id = c.dong_area_id " +
+            "inner join dong_areas as d on d.dong_area_id = c.dong_area_id and c.deleted = false " +
             "where d.gu_areas_id = :guAreaId " +
             "order by rand() limit :maxSize", nativeQuery = true)
     List<Crew> findRandomByGuAreaId(@Param("guAreaId") Long guAreaId, @Param("maxSize") int maxSize);
@@ -85,7 +97,10 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
      * @param user
      * @return User 가 속한 모든 Crew
      */
-    @Query(value = "select m.crew from Member m where m.user = :user")
+    @Query(value = "select c from Member m " +
+            "inner join Crew c on m.crew = c and c.deleted = false " +
+            "inner join User u on m.user = u and u.deleted = false " +
+            "where u = :user ")
     List<Crew> findAllByUser(@Param("user") User user);
 
     /**
