@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +31,9 @@ class BoardImageRepositoryTest {
 
     @Autowired
     TestEntityFactory testEntityFactory;
+
+    @Autowired
+    EntityManager em;
 
     @DisplayName("BoardImage save 테스트")
     @Test
@@ -89,6 +93,8 @@ class BoardImageRepositoryTest {
 
         ///when
         boardImageRepository.delete(boardImage);
+        em.flush();
+        em.clear();
 
         //then
         Optional<BoardImage> optBoardImage = boardImageRepository.findById(boardImage.getId());

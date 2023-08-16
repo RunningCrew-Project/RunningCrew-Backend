@@ -28,7 +28,7 @@ public interface RunningRecordImageRepository extends JpaRepository<RunningRecor
      * @param runningRecord
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from RunningRecordImage r where r.runningRecord = :runningRecord")
+    @Query("update RunningRecordImage r set r.deleted = true where r.runningRecord = :runningRecord")
     void deleteAllByRunningRecord(@Param("runningRecord") RunningRecord runningRecord);
 
     /**
@@ -47,8 +47,10 @@ public interface RunningRecordImageRepository extends JpaRepository<RunningRecor
      * @param user
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from RunningRecordImage i where i in " +
-            "(select img from RunningRecordImage img where img.runningRecord.user = :user)")
+    @Query("update RunningRecordImage i set i.deleted = true where i in " +
+            "(select img from RunningRecordImage img " +
+            "inner join img.runningRecord r on r.deleted = false " +
+            "where r.user = :user)")
     void deleteAllByUser(@Param("user") User user);
 
 }

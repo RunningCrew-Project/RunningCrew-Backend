@@ -54,7 +54,7 @@ public interface RunningRecordRepository extends JpaRepository<RunningRecord, Lo
      * @param user RunningRecord 를 삭제할 user
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from RunningRecord r where r.user = :user")
+    @Query("update RunningRecord r set r.deleted = true where r.user = :user")
     void deleteAllByUser(@Param("user") User user);
 
 

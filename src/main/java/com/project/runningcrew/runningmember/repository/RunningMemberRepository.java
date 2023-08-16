@@ -65,7 +65,7 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
      * @param runningNotice
      */
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("delete from RunningMember r where r.runningNotice = :runningNotice")
+    @Query("update RunningMember r set r.deleted = true where r.runningNotice = :runningNotice")
     void deleteAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
     /**
@@ -74,7 +74,7 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
      * @param member
      */
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("delete from RunningMember r where r.member = :member")
+    @Query("update RunningMember r set r.deleted = true where r.member = :member")
     void deleteAllByMember(@Param("member") Member member);
 
     /**
@@ -83,8 +83,10 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
      * @param crew
      */
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("delete from RunningMember r1 where r1 in " +
-            "(select r2 from RunningMember r2 where r2.member.crew = :crew)")
+    @Query("update RunningMember r1 set r1.deleted = true where r1 in " +
+            "(select r2 from RunningMember r2 " +
+            "inner join r2.member m on m.deleted = false " +
+            "where m.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
     /**
@@ -94,7 +96,9 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
      * @return runningNoticeId 와 RunningNotice 의 멤버수가 담긴 Object[] 의 리스트. Object[0] 에는 Long 타입인
      * runningNoticeId, Object[1] 에는  Long 타입인 RunningNotice 의 RunningMember 수
      */
-    @Query("select r.runningNotice.id, count(r) from RunningMember r where r.runningNotice.id in (:runningNoticeIds) group by r.runningNotice")
+    @Query("select r.runningNotice.id, count(r) from RunningMember r " +
+            "where r.runningNotice.id in (:runningNoticeIds) " +
+            "group by r.runningNotice")
     List<Object[]> countRunningMembersByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
 
 }

@@ -29,7 +29,7 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
      * @param board
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from BoardImage b where b.board = :board")
+    @Query("update BoardImage b set b.deleted = true where b.board = :board")
     void deleteAllByBoard(@Param("board") Board board);
 
     /**
@@ -38,7 +38,9 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
      * @param boardIds Board 의 id 를 가진 리스트
      * @return Board 의 id 가 boardIds 에 포함된 모든 BoardImage.
      */
-    @Query("select b from BoardImage b where b.board.id in (:boardIds)")
+    @Query("select i from BoardImage i " +
+            "inner join i.board b on b.deleted = false " +
+            "where b.id in (:boardIds)")
     List<BoardImage> findImagesByBoardIds(@Param("boardIds") List<Long> boardIds);
 
     /**
@@ -47,8 +49,10 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
      * @param member
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from BoardImage i where i in " +
-            "(select img from BoardImage img where img.board.member = :member)")
+    @Query("update BoardImage i set i.deleted = true where i in " +
+            "(select img from BoardImage img " +
+            "inner join img.board b on b.deleted = false " +
+            "where b.member = :member)")
     void deleteAllByMember(@Param("member") Member member);
 
     /**
@@ -57,8 +61,11 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
      * @param crew
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from BoardImage i where i in " +
-            "(select img from BoardImage img where img.board.member.crew = :crew)")
+    @Query("update BoardImage i set i.deleted = true where i in " +
+            "(select img from BoardImage img " +
+            "inner join img.board b on b.deleted = false " +
+            "inner join b.member m on m.deleted = false " +
+            "where m.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
 }
