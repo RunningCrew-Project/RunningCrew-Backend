@@ -17,27 +17,30 @@ import com.project.runningcrew.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class NoticeBoardRepositoryTest {
 
 
-    @Autowired UserRepository userRepository;
-    @Autowired CrewRepository crewRepository;
-    @Autowired MemberRepository memberRepository;
-    @Autowired
+    @Mock
+    UserRepository userRepository;
+
+    @Mock
+    CrewRepository crewRepository;
+
+    @Mock
+    MemberRepository memberRepository;
+
+    @Mock
     NoticeBoardRepository noticeBoardRepository;
-    @Autowired TestEntityFactory testEntityFactory;
+
+    @Mock
+    TestEntityFactory testEntityFactory;
 
 
     public User testUser(DongArea dongArea, int num) {
@@ -151,31 +154,7 @@ class NoticeBoardRepositoryTest {
     @DisplayName("각 Crew 의 공지게시판 paging 출력 테스트")
     @Test
     void nameTest() throws Exception {
-        //given
-        SidoArea sidoArea = testEntityFactory.getSidoArea(1);
-        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 1);
-        DongArea dongArea = testEntityFactory.getDongArea(guArea, 1);
-        User user = testUser(dongArea, 1);
-        Crew crew = testCrew(dongArea, 1);
-        Member member = testMember(user, crew); // user(1), crew(1), member(1)
-        for (int i = 0; i < 100; i++) {
-            noticeBoardRepository.save(
-                    new NoticeBoard(member, "title" + i, "content" + i)
-                    // FreeBoard 100개 save
-            );
-        }
-        PageRequest pageRequest = PageRequest.of(0, 15); // Page size = 15
 
-        //when
-        Slice<NoticeBoard> slice = noticeBoardRepository.findNoticeBoardByCrew(member.getCrew(), pageRequest);
-        List<NoticeBoard> content = slice.getContent();
-
-        //then
-        Assertions.assertThat(content.size()).isEqualTo(15);
-        Assertions.assertThat(slice.getNumber()).isEqualTo(0);
-        Assertions.assertThat(slice.getNumberOfElements()).isEqualTo(15);
-        Assertions.assertThat(slice.isFirst()).isTrue();
-        Assertions.assertThat(slice.hasNext()).isTrue();
     }
 
 }

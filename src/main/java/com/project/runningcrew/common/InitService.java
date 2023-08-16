@@ -69,6 +69,9 @@ public class InitService implements ApplicationListener<ContextRefreshedEvent> {
                 .height(100)
                 .weight(100)
                 .build();
+
+        System.out.println("user = " + user);
+
         userRepository.save(user);
         userRoleRepository.save(new UserRole(user, Role.ADMIN));
     }

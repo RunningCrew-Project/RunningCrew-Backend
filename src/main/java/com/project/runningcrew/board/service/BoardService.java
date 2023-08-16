@@ -113,36 +113,18 @@ public class BoardService {
 
     /**
      * 입력받은 Board 를 삭제한다.
-     * @param board
+     * @param board 게시글 정보
      */
     public void deleteBoard(Board board) {
 
         List<BoardImage> deleteBoards = boardImageRepository.findAllByBoard(board);
-
         for (BoardImage deleteBoard : deleteBoards) {
             imageService.deleteImage(deleteBoard.getFileName());
         }
-        // s3 이미지 delete
 
         boardImageRepository.deleteAll(deleteBoards);
-        // boardImage delete
-
         commentService.deleteCommentAtBoard(board);
-        // boardComment delete
-
         boardRepository.delete(board);
-        // board delete
-
-    }
-
-
-    /**
-     * 입력받은 Member 가 작성한 모든 Board 를 반환한다.
-     * @param member 작성자 member
-     * @return 입력받은 Member 가 작성한 모든 Board List
-     */
-    public Slice<Board> findBoardByMember(Member member, Pageable pageable) {
-        return boardRepository.findByMember(member, pageable);
     }
 
     /**

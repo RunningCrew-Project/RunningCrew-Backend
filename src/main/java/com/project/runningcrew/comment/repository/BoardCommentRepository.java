@@ -15,72 +15,40 @@ import java.util.stream.Collectors;
 
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
 
-
     /**
-     * 입력받은 Board 에 작성된 댓글 리스트를 반환한다.
+     * 입력받은 Board 에 작성된 댓글의 SimpleCommentDto 리스트를 반환한다.
      * @param board 입력받은 board
-     * @return 입력받은 Board 의 Comment -> SimpleCommentDto 리스트
+     * @return 입력받은 Board 의 SimpleCommentDto 리스트
+     * SOFT DELETE 적용
      */
     @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(bc.id, m.id, bc.createdDate, bc.detail, u.nickname, u.imgUrl) " +
             "from BoardComment bc " +
-            "inner join Board b on b = bc.board " +
-            "inner join Member m on m = bc.member " +
-            "inner join User u on m.user = u " +
+            "inner join Board b on b = bc.board and b.deleted = false " +
+            "inner join Member m on m = bc.member and m.deleted = false " +
+            "inner join User u on m.user = u and u.deleted = false " +
             "where bc.board = :board")
     List<SimpleCommentDto> findAllByBoard(@Param("board") Board board);
-
-
-    /**
-     * 입력받은 Board 에 작성된 댓글 리스트를 반환한다.(차단 멤버가 작성한 댓글 제외)
-     * @param board 입력받은 Board
-     * @param member 댓글 리스트를 조회할 Member
-     * @return 입력받은 Board 의 Comment -> SimpleCommentDto 리스트(차단 멤버가 작성한 댓글 제외)
-     */
-    @Query("select new com.project.runningcrew.common.dto.SimpleCommentDto(bc.id, m.id, bc.createdDate, bc.detail, u.nickname, u.imgUrl) " +
-            "from BoardComment bc " +
-            "inner join Board b on b = bc.board " +
-            "inner join Member m on m = bc.member " +
-            "inner join User u on m.user = u " +
-            "where bc.board = :board and bc.id not in " +
-            "(select bc.id from BoardComment bc inner join BlockedInfo bi on bi.blockedMemberId = bc.member.id where bi.blockerMember = :member)")
-    List<SimpleCommentDto> findAllByBoard2(@Param("board") Board board, @Param("member") Member member);
-
-
 
     /**
      * 입력받은 Board 에 작성된 댓글을 모두 삭제한다.
      * @param board 댓글을 삭제할 board
+     * SOFT DELETE 적용
      */
     @Modifying
-    @Query("delete from BoardComment bc where bc.board = :board")
+    @Query("update BoardComment bc " +
+            "set bc.deleted = true " +
+            "where bc.board = :board")
     void deleteCommentAtBoard(@Param("board") Board board);
-
 
     /**
      * Board 의 id 정보를 리스트로 입력받아 각 Board 의 댓글 갯수 정보를 반환한다.
      * @param boardIds boardId Board Id 리스트 정보
      * @return 각 Board 의 댓글 수 리스트
      */
-    @Query("select bc.board.id, count(bc) from BoardComment bc where bc.board.id in (:boardIds) group by bc.board.id")
+    @Query("select bc.board.id, count(bc) " +
+            "from BoardComment bc " +
+            "where bc.board.id in (:boardIds) " +
+            "group by bc.board.id")
     List<Object[]> countAllByBoardIds(@Param("boardIds") List<Long> boardIds);
-
-
-
-
-
-
-
-
-
-    /**
-     * 미사용 예정, Test 코드 컴파일 오류때문에 남겨둠.
-     * 미사용 예정, Test 코드 컴파일 오류때문에 남겨둠.
-     * 미사용 예정, Test 코드 컴파일 오류때문에 남겨둠.
-     */
-    @Query("select count(bc) from BoardComment bc where bc.board.id in (:boardId) group by bc.board.id")
-    List<Integer> countByBoardId(@Param("boardId") List<Long> boardId);
-
-
-
 
 }

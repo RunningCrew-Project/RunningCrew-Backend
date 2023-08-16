@@ -1,6 +1,8 @@
 package com.project.runningcrew.user.service;
 
 
+import com.project.runningcrew.crew.entity.Crew;
+import com.project.runningcrew.crew.repository.CrewRepository;
 import com.project.runningcrew.exception.notFound.FcmTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.RefreshTokenNotFoundException;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
@@ -12,6 +14,7 @@ import com.project.runningcrew.fcm.token.repository.FcmTokenRepository;
 import com.project.runningcrew.image.ImageService;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.member.repository.MemberRepository;
+import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.member.service.MemberService;
 import com.project.runningcrew.notification.repository.NotificationRepository;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
@@ -58,6 +61,7 @@ public class UserService {
     private final GpsRepository gpsRepository;
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final CrewRepository crewRepository;
 
     private final String USER_IMG_DIR_NAME = "user";
     private final String DEFAULT_USER_IMG = "유저 기본 이미지.svg";
@@ -264,6 +268,7 @@ public class UserService {
             imageService.deleteImage(user.getImgUrl());
         }
 
+        //note 최종 유저 삭제
         userRepository.delete(user);
     }
 

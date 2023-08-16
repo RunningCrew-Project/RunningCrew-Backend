@@ -34,27 +34,23 @@ public class CommentService {
     private final BoardCommentRepository boardCommentRepository;
     private final RunningNoticeCommentRepository runningNoticeCommentRepository;
 
-
-
     public Comment findById(Long id) {
         return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     }
 
-
     /**
      * 입력된 Comment 를 저장한다.
-     * @param comment
+     * @param comment 댓글 정보
      * @return 저장된 BoardComment 의 id
      */
     public Long saveComment(Comment comment) {
         return commentRepository.save(comment).getId();
     }
 
-
     /**
      * 새로운 내용이 기존의 내용과 다르다면 댓글 수정이 가능하다.
-     * @param comment
-     * @param newDetail
+     * @param comment 댓글 정보
+     * @param newDetail 새로운 내용 정보
      */
     public void changeComment(Comment comment, String newDetail) {
         if(!comment.getDetail().equals(newDetail)) {
@@ -62,29 +58,13 @@ public class CommentService {
         }
     }
 
-
-
-
-
-
-
-
-
-
-    /**
-     * delete
-     */
-
-
-
     /**
      * 하나의 Comment 를 삭제한다.
-     * @param comment
+     * @param comment 댓글 정보
      */
     public void deleteComment(Comment comment) {
         commentRepository.delete(comment);
     }
-
 
     /**
      * 입력받은 Board 에 작성된 BoardComment 를 모두 삭제한다.
@@ -92,26 +72,6 @@ public class CommentService {
      */
     public void deleteCommentAtBoard(Board board) {
         boardCommentRepository.deleteCommentAtBoard(board);
-    }
-
-
-    /**
-     * 입력받은 RunningNotice 에 작성된 RunningNoticeComment 를 모두 삭제한다.
-     * @param runningNotice 댓글을 삭제할 RunningNotice
-     */
-    public void deleteCommentAtRunningNotice(RunningNotice runningNotice) {
-        runningNoticeCommentRepository.deleteCommentAtRunningNotice(runningNotice);
-    }
-
-
-    /**
-     * 입력된 Member 가 작성한 Comment Slice 를 반환한다.
-     * @param member
-     * @param pageable
-     * @return 입력받은 member 가 작성한 Comment Slice
-     */
-    public Slice<Comment> findAllByMember(Member member, Pageable pageable) {
-        return commentRepository.findAllByMember(member, pageable);
     }
 
     /**
@@ -132,21 +92,6 @@ public class CommentService {
         return runningNoticeCommentRepository.findAllByRunningNotice(runningNotice);
     }
 
-
-
-
-
-
-
-
-
-
-    /**
-     * 하나의 Board 에 작성된 Comment 와
-     * 하나의 RunningNotice 에 작성된 Comment 의 갯수를 반환하는 메소드들
-     */
-
-
     /**
      * 입력된 Board 에 작성된 Comment 의 수를 반환한다.
      * @param board
@@ -155,30 +100,6 @@ public class CommentService {
     public int countCommentAtBoard(Board board) {
         return boardCommentRepository.findAllByBoard(board).size();
     }
-
-
-    /**
-     * 입력된 RunningNotice 에 작성된 Comment 의 수를 반환한다.
-     * @param runningNotice
-     * @return 입력받은 RunningNotice 에 작성된 Comment 의 수
-     */
-    public int countCommentAtRunningNotice(RunningNotice runningNotice) {
-        return runningNoticeCommentRepository.findAllByRunningNotice(runningNotice).size();
-    }
-
-
-
-
-
-
-
-
-
-    /**
-     * 입력받은 Board 와 RunningNotice 의 idList 값으로
-     * commentCountList 값을 반환하는 메소드들
-     */
-
 
     /**
      * boardIdList 로 commentCountList 받아오기
@@ -190,18 +111,13 @@ public class CommentService {
     public Map<Long, Long> countAllByBoardIds(List<Long> boardIds) {
 
         log.info("boardIds = {}", boardIds);
-
         Map<Long, Long> countMap = boardCommentRepository.countAllByBoardIds(boardIds)
                 .stream().collect(Collectors.toMap(o -> (Long) o[0], o -> (Long) o[1]));
 
-
         log.info("countMap ={}", countMap);
-
         return boardIds.stream()
                 .collect(Collectors.toMap(o -> o, o -> Objects.requireNonNullElse(countMap.get(o), 0L)));
     }
-
-
 
     /**
      * runningNoticeIdList 로 commentCountList 받아오기
@@ -218,7 +134,5 @@ public class CommentService {
                 .collect(Collectors.toMap(o -> o, o -> Objects.requireNonNullElse(countMap.get(o), 0L)));
 
     }
-
-
 
 }

@@ -60,8 +60,6 @@ public class ReportService {
         return savedRunningNotice.getId();
     }
 
-
-
     /**
      * 입력받은 크루의 신고글 정보 전체 목록을 반환한다. - 페이징 적용
      * @param crew 크루
@@ -71,7 +69,6 @@ public class ReportService {
     public Slice<ReportedTotalPost> findReportedTotalPostsByCrew(Crew crew, Pageable pageable) {
         return reportedTotalPostRepository.findByCrew(crew, pageable);
     }
-
 
     /**
      * 입력받은 크루의 댓글 신고 정보 전체 목록을 반환한다. - 페이징 적용

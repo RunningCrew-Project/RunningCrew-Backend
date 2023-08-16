@@ -36,7 +36,7 @@ public class TotalPostRepository {
 
 
     /**
-     * 모든 게시글 또는 런닝공지를 페이징하여 반환한다. - 차단기능 적용
+     * 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
      *
      * @param crew 크루 정보
      * @param pageable 페이징 정보
@@ -62,7 +62,7 @@ public class TotalPostRepository {
     }
 
     /**
-     * keyword 가 title 이나 detail 에 포함된 모든 게시글 또는 런닝공지를 페이징하여 반환한다. - 차단기능 적용
+     * keyword 가 title 이나 detail 에 포함된 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
      *
      * @param crew 크루 정보
      * @param keyword 검색어
@@ -94,7 +94,7 @@ public class TotalPostRepository {
      * member 가 작성한 모든 게시글 또는 런닝공지를 페이징하여 반환한다.
      *
      * @param member   글을 작성한 Member
-     * @param pageable
+     * @param pageable 페이징 정보
      * @return memberId 에 해당하는 member 가 작성한 모든 게시글 또는 런닝공지
      */
     public Slice<TotalPost> getTotalPostByMember(Member member, Pageable pageable) {

@@ -21,16 +21,6 @@ public class InfoBoardService {
     private final InfoBoardRepository infoBoardRepository;
 
     /**
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    public Slice<InfoBoard> findInfoBoardByCrew(Crew crew, Pageable pageable) {
-        return infoBoardRepository.findInfoBoardByCrew(crew, pageable);
-    }
-
-
-    /**
      * 특정 Crew 의 정보게시판 목록 조회(Dto 매핑) - 페이징 & 차단 적용
      * @param crew 크루 정보
      * @param member 정보를 조회하는 멤버 정보
@@ -40,6 +30,5 @@ public class InfoBoardService {
     public Slice<SimpleBoardDto> findInfoBoardDtoByCrew(Crew crew, Member member, Pageable pageable) {
         return infoBoardRepository.findInfoBoardDtoByCrew(crew, member, pageable);
     }
-
 
 }
