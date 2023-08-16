@@ -27,7 +27,6 @@ public class BlockedInfoService {
         return blockedInfoRepository.findBlockedListByMember(member);
     }
 
-
     /**
      * Blocker Member 의 Blocked Member 차단 여부를 반환한다.
      * @param blockerId 차단을 실행한 Member 의 아이디 정보
@@ -37,7 +36,6 @@ public class BlockedInfoService {
     public boolean isBlocked(Long blockerId, Long blockedId) {
         return blockedInfoRepository.isBlocked(blockerId, blockedId);
     }
-
 
     /**
      * 차단 정보와 관련된 두 Member 의 아이디 값으로 BlockedInfo 를 찾아 반환한다.
@@ -53,20 +51,30 @@ public class BlockedInfoService {
         return blockedInfoRepository.findByTwoMemberId(blockerId, blockedId);
     }
 
-
+    /**
+     * 입력받은 아이디 값으로 차단 정보를 반환한다.
+     * @param id 아이디 정보
+     * @return 차단 정보
+     */
     public BlockedInfo findById(Long id) {
         return blockedInfoRepository.findById(id).orElseThrow(BlockedInfoNotFoundException::new);
     }
 
-
+    /**
+     * 입력받은 차단 정보를 저장하고 아이디 값을 반환한다.
+     * @param blockedInfo 차단 정보
+     * @return 아이디 값
+     */
     public Long saveBlockedInfo(BlockedInfo blockedInfo) {
         return blockedInfoRepository.save(blockedInfo).getId();
     }
 
-
-
+    /**
+     * 유저 차단 정보를 삭제한다.
+     * @param blockedInfo 유저 차단정보
+     */
     public void deleteBlockedInfo(BlockedInfo blockedInfo) {
-        blockedInfoRepository.delete(blockedInfo);
+        blockedInfo.updateDeleted(true);
     }
 
 }

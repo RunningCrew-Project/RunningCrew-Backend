@@ -33,14 +33,4 @@ public interface ReviewBoardRepository extends JpaRepository<ReviewBoard, Long> 
             "and rb.member = m")
     Slice<SimpleBoardDto> findReviewBoardDtoByCrew(@Param("crew") Crew crew, @Param("member") Member member, Pageable pageable);
 
-
-    /**
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    @Query("select rb from ReviewBoard rb where rb.member.crew = :crew")
-    Slice<ReviewBoard> findReviewBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
-
-
 }

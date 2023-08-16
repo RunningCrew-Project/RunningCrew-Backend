@@ -29,15 +29,4 @@ public class FreeBoardService {
         return freeBoardRepository.findFreeBoardDtoByCrew(crew, member, pageable);
     }
 
-
-    /**
-     * 입력받은 Crew 의 자유게시판 목록을 모두 보여준다.
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    public Slice<FreeBoard> findFreeBoardByCrew(Crew crew, Pageable pageable) {
-        return freeBoardRepository.findFreeBoardByCrew(crew, pageable);
-    }
-
 }

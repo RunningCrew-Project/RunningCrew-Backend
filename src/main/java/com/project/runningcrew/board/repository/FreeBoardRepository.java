@@ -33,16 +33,4 @@ public interface FreeBoardRepository extends JpaRepository<FreeBoard, Long> {
             "and fb.member = m")
     Slice<SimpleBoardDto> findFreeBoardDtoByCrew(@Param("crew") Crew crew, @Param("member") Member member, Pageable pageable);
 
-
-
-    /**
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    @Query("select fb from FreeBoard fb where fb.member.crew = :crew")
-    Slice<FreeBoard> findFreeBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
-
-
-
 }

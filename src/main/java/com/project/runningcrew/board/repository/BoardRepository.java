@@ -15,7 +15,6 @@ import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-
     /**
      * 특정 member 가 작성한 모든 게시물을 반환한다.
      * @param member 멤버 정보
@@ -55,14 +54,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "from Board b2 " +
             "where b2.member.crew = :crew )")
     void deleteAllByCrew(@Param("crew") Crew crew);
-
-
-    /**
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    Slice<Board> findByMember(Member member, Pageable pageable);
-
 
 }

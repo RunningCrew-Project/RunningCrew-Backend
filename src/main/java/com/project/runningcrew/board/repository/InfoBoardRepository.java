@@ -31,14 +31,4 @@ public interface InfoBoardRepository extends JpaRepository<InfoBoard, Long> {
             "and ib.member = m")
     Slice<SimpleBoardDto> findInfoBoardDtoByCrew(@Param("crew") Crew crew, @Param("member") Member member, Pageable pageable);
 
-
-    /**
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    @Query("select ib from InfoBoard ib where ib.member.crew = :crew")
-    Slice<InfoBoard> findInfoBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
-
-
 }

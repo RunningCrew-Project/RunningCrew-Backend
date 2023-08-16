@@ -33,14 +33,4 @@ public interface NoticeBoardRepository extends JpaRepository<NoticeBoard, Long> 
             "and nb.member = m")
     Slice<SimpleBoardDto> findNoticeBoardDtoByCrew(@Param("crew") Crew crew, @Param("member") Member member, Pageable pageable);
 
-
-
-    /**
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    @Query("select nb from NoticeBoard nb where nb.member.crew = :crew")
-    Slice<NoticeBoard> findNoticeBoardByCrew(@Param("crew") Crew crew, Pageable pageable);
-
 }

@@ -20,15 +20,6 @@ public class ReviewBoardService {
     private final ReviewBoardRepository reviewBoardRepository;
 
     /**
-     * 미사용 예정!!
-     * 미사용 예정!!
-     * 미사용 예정!!
-     */
-    public Slice<ReviewBoard> findReviewBoardByCrew(Crew crew, Pageable pageable) {
-        return reviewBoardRepository.findReviewBoardByCrew(crew, pageable);
-    }
-
-    /**
      * 특정 Crew 의 리뷰게시판 목록 조회(Dto 매핑) - 페이징 & 차단 적용
      * @param crew 크루 정보
      * @param member 정보를 조회하는 멤버 정보

@@ -113,7 +113,7 @@ public class BoardService {
 
     /**
      * 입력받은 Board 를 삭제한다.
-     * @param board
+     * @param board 게시글 정보
      */
     public void deleteBoard(Board board) {
 
@@ -130,19 +130,9 @@ public class BoardService {
         commentService.deleteCommentAtBoard(board);
         // boardComment delete
 
-        boardRepository.delete(board);
+        board.updateDeleted(true);
         // board delete
 
-    }
-
-
-    /**
-     * 입력받은 Member 가 작성한 모든 Board 를 반환한다.
-     * @param member 작성자 member
-     * @return 입력받은 Member 가 작성한 모든 Board List
-     */
-    public Slice<Board> findBoardByMember(Member member, Pageable pageable) {
-        return boardRepository.findByMember(member, pageable);
     }
 
     /**

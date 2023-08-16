@@ -264,7 +264,9 @@ public class UserService {
             imageService.deleteImage(user.getImgUrl());
         }
 
-        userRepository.delete(user);
+        //note 최종 유저 삭제
+        user.updateDeleted(true);
+        //userRepository.delete(user);
     }
 
     /**
