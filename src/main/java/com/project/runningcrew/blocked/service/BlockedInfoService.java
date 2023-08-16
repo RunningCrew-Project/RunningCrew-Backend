@@ -74,7 +74,7 @@ public class BlockedInfoService {
      * @param blockedInfo 유저 차단정보
      */
     public void deleteBlockedInfo(BlockedInfo blockedInfo) {
-        blockedInfo.updateDeleted(true);
+        blockedInfoRepository.delete(blockedInfo);
     }
 
 }

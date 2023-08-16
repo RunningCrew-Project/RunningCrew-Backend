@@ -124,7 +124,7 @@ public class BoardService {
 
         boardImageRepository.deleteAll(deleteBoards);
         commentService.deleteCommentAtBoard(board);
-        board.updateDeleted(true);
+        boardRepository.delete(board);
     }
 
     /**

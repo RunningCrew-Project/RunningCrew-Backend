@@ -63,7 +63,7 @@ public class CommentService {
      * @param comment 댓글 정보
      */
     public void deleteComment(Comment comment) {
-        comment.updateDeleted(true);
+        commentRepository.delete(comment);
     }
 
     /**
