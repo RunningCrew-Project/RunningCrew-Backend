@@ -43,7 +43,7 @@ public class RecruitQuestionService {
      */
     @Transactional
     public void deleteOneQuestion(RecruitQuestion question) {
-        recruitQuestionRepository.delete(question);
+        question.updateDeleted(true);
     }
 
     /**
