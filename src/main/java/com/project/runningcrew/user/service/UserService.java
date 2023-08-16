@@ -266,7 +266,6 @@ public class UserService {
 
         //note 최종 유저 삭제
         user.updateDeleted(true);
-        //userRepository.delete(user);
     }
 
     /**
