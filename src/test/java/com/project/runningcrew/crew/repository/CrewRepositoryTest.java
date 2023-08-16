@@ -20,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +45,9 @@ class CrewRepositoryTest {
 
     @Autowired
     TestEntityFactory testEntityFactory;
+
+    @Autowired
+    EntityManager em;
 
     @BeforeEach
     public void saveTestCrews() {
@@ -101,13 +106,15 @@ class CrewRepositoryTest {
                 .dongArea(dongArea)
                 .build();
         crewRepository.save(crew);
+        em.flush();
+        em.clear();
 
         ///when
         Optional<Crew> optCrew = crewRepository.findById(crew.getId());
 
         //then
         assertThat(optCrew).isNotEmpty();
-        assertThat(optCrew).hasValue(crew);
+        assertThat(optCrew.get().getId()).isEqualTo(crew.getId());
     }
 
     @Test
@@ -126,6 +133,8 @@ class CrewRepositoryTest {
 
         ///when
         crewRepository.delete(crew);
+        em.flush();
+        em.clear();
 
         //then
         Optional<Crew> optCrew = crewRepository.findById(crew.getId());
@@ -138,9 +147,12 @@ class CrewRepositoryTest {
         String keyword = "ng1";
 
         ///when
+        long start = System.currentTimeMillis();
         List<Crew> crewList = crewRepository.findAllByNameOrIntroductionOrArea(keyword);
+        long end = System.currentTimeMillis();
 
         //then
+        System.out.println("time = " + (end - start) + "ms");
         assertThat(crewList.size()).isEqualTo(25);
     }
 
@@ -214,6 +226,8 @@ class CrewRepositoryTest {
             crewRepository.save(crew);
             memberRepository.save(new Member(user, crew, MemberRole.ROLE_NORMAL));
         }
+        em.flush();
+        em.clear();
 
         ///when
         List<Crew> crews = crewRepository.findAllByUser(user);

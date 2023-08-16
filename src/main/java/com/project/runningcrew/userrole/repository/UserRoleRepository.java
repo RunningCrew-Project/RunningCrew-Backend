@@ -28,7 +28,7 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
      * @param user
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from UserRole u where u.user = :user")
+    @Query("update UserRole u set u.deleted = true where u.user = :user")
     void deleteByUser(@Param("user") User user);
 
 }

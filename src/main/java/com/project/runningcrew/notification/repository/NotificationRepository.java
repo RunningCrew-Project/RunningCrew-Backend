@@ -31,7 +31,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
      * @param user
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Notification n where n.user = :user")
+    @Query("update Notification n set n.deleted = true where n.user = :user")
     void deleteAllByUser(@Param("user") User user);
 
     /**
@@ -40,7 +40,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
      * @param crew
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Notification n where n.crew = :crew")
+    @Query("update Notification n set n.deleted = true where n.crew = :crew")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
 }

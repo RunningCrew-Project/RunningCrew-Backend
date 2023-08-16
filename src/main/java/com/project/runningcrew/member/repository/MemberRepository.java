@@ -63,7 +63,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * @param runningNotice Member 들을 확인할 RunningNotice
      * @return 특정 RunningNotice 에 참가한 모든 Member 를 반환
      */
-    @Query(value = "select rm.member from RunningMember rm join fetch rm.member.user " +
+    @Query(value = "select m from RunningMember rm " +
+            "inner join rm.member m on m.deleted = false " +
+            "join fetch m.user " +
             "where rm.runningNotice = :runningNotice")
     List<Member> findAllByRunningNotice(@Param("runningNotice") RunningNotice runningNotice);
 
@@ -101,7 +103,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * @param crew
      */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("delete from Member m where m.crew = :crew")
+    @Query("update Member m set m.deleted = true where m.crew = :crew")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
 }
