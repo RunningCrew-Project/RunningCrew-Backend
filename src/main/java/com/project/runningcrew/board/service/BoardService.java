@@ -118,21 +118,13 @@ public class BoardService {
     public void deleteBoard(Board board) {
 
         List<BoardImage> deleteBoards = boardImageRepository.findAllByBoard(board);
-
         for (BoardImage deleteBoard : deleteBoards) {
             imageService.deleteImage(deleteBoard.getFileName());
         }
-        // s3 이미지 delete
 
         boardImageRepository.deleteAll(deleteBoards);
-        // boardImage delete
-
         commentService.deleteCommentAtBoard(board);
-        // boardComment delete
-
         board.updateDeleted(true);
-        // board delete
-
     }
 
     /**
