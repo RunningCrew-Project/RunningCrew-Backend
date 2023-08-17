@@ -29,6 +29,19 @@ public class CrewConditionService {
     }
 
     /**
+     * originCondition 을 newCondition 의 값들로 변경한다.
+     *
+     * @param originCondition 수정 이전 CrewCondition
+     * @param joinApply       크루 가입 가능 여부
+     * @param joinQuestion    크루 가입 질문 여부
+     */
+    @Transactional
+    public void updateCrewCondition(CrewCondition originCondition, boolean joinApply, boolean joinQuestion) {
+        originCondition.updateJoinApply(joinApply);
+        originCondition.updateJoinQuestion(joinQuestion);
+    }
+
+    /**
      * crewCondition 의 joinApply 를 true 로 변경한다.
      *
      * @param crewCondition

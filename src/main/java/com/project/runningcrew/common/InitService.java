@@ -60,7 +60,7 @@ public class InitService implements ApplicationListener<ContextRefreshedEvent> {
                 .password(passwordEncoder.encode("admin123!"))
                 .name("admin")
                 .nickname("admin")
-                .imgUrl("https://running-crew-s3.s3.ap-northeast-2.amazonaws.com/test/aeeb740e-ec8a-495e-a232-627bffcb2940-test.png")
+                .imgUrl("https://running-crew-test-s3.s3.ap-northeast-2.amazonaws.com/user/%EC%9C%A0%EC%A0%80%20%EA%B8%B0%EB%B3%B8%20%EC%9D%B4%EB%AF%B8%EC%A7%80.svg")
                 .login_type(LoginType.EMAIL)
                 .phoneNumber("phoneNumber")
                 .dongArea(dongArea)

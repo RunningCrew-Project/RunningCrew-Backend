@@ -28,6 +28,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      * @param user 찾는 member 를 가지는 user
      * @return user 에 속한 member 들의 list
      */
+    @EntityGraph(attributePaths = {"crew"})
     List<Member> findAllByUser(User user);
 
     /**

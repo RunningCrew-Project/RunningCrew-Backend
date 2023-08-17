@@ -5,6 +5,7 @@ import com.project.runningcrew.common.annotation.CurrentUser;
 import com.project.runningcrew.common.dto.SimpleUserDto;
 import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.crew.service.CrewService;
+import com.project.runningcrew.exception.auth.AuthorizationException;
 import com.project.runningcrew.exceptionhandler.ErrorResponse;
 import com.project.runningcrew.member.service.MemberAuthorizationChecker;
 import com.project.runningcrew.recruitanswer.service.RecruitAnswerService;
@@ -18,6 +19,9 @@ import com.project.runningcrew.user.dto.response.UserListResponse;
 import com.project.runningcrew.user.entity.LoginType;
 import com.project.runningcrew.user.entity.User;
 import com.project.runningcrew.user.service.UserService;
+import com.project.runningcrew.userrole.entity.Role;
+import com.project.runningcrew.userrole.entity.UserRole;
+import com.project.runningcrew.userrole.service.UserRoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,6 +55,7 @@ public class UserController {
     private final DongAreaService dongAreaService;
     private final CrewService crewService;
     private final RecruitAnswerService recruitAnswerService;
+    private final UserRoleService userRoleService;
     private final MemberAuthorizationChecker memberAuthorizationChecker;
 
     @Value("${domain.name}")
@@ -76,7 +81,7 @@ public class UserController {
     @Operation(summary = "유저 생성하기",
             description = "자체 회원가입 기능으로, 현재는 소셜 회원가입만을 제공합니다. \n" +
                     "기능테스트를 위해 남겨두었습니다. \n" +
-                    "기존 필요 정보중 비밀번호, 전화번호 값을 삭제하였습니다.")
+                    "기존 필요 정보중 전화번호 값을 삭제하였습니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "CREATED", content = @Content()),
             @ApiResponse(responseCode = "400", description = "BAD REQUEST",
@@ -93,10 +98,10 @@ public class UserController {
                 .email(createUserRequest.getEmail())
                 .name(createUserRequest.getName())
                 .nickname(createUserRequest.getNickname())
+                .password(createUserRequest.getPassword())
                 .dongArea(dongAreaService.findById(createUserRequest.getDongId()))
                 .login_type(LoginType.EMAIL)
                 .build();
-
 
 
         //note 필수 아닌 값 Update
@@ -154,6 +159,9 @@ public class UserController {
             @ModelAttribute @Valid UpdateUserRequest updateUserRequest,
             @Parameter(hidden = true) @CurrentUser User user
     ) {
+        if (user.getId() != userId) {
+            throw new AuthorizationException();
+        }
 
         //note 필수 값 Build
         User originUSer = userService.findById(userId);
@@ -189,10 +197,12 @@ public class UserController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/api/users/{userId}")
-    public ResponseEntity<Void> deleteUser(
-            @PathVariable("userId") Long userId,
-            @Parameter(hidden = true) @CurrentUser User user
-    ) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("userId") Long userId,
+                                           @Parameter(hidden = true) @CurrentUser User user) {
+        UserRole userRole = userRoleService.findByUser(user);
+        if (user.getId() != userId && userRole.getRole() != Role.ADMIN) {
+            throw new AuthorizationException();
+        }
         User findUser = userService.findById(userId);
         userService.deleteUser(findUser);
         return ResponseEntity.noContent().build();
