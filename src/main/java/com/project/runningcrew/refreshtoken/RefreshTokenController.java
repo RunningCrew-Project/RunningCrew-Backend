@@ -54,9 +54,10 @@ public class RefreshTokenController {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + tokensDto.getAccessToken());
 
-        if (tokensDto.getRefreshToken() != null) {
+        String newRefreshToken = tokensDto.getRefreshToken();
+        if (newRefreshToken != null) {
             ResponseCookie cookie = ResponseCookie
-                    .from("refreshToken", refreshToken)
+                    .from("refreshToken", "Bearer " + newRefreshToken)
                     .httpOnly(true)
                     .secure(true)
                     .maxAge(60 * 60 * 24 * 14)
