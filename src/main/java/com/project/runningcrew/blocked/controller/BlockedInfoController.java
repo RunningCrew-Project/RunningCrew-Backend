@@ -65,7 +65,7 @@ public class BlockedInfoController {
         Member member = memberService.findByUserAndCrew(user, crew);
         memberAuthorizationChecker.checkMember(user, crew);
 
-        BlockedInfo blockedInfo = new BlockedInfo(member, blockedId);
+        BlockedInfo blockedInfo = new BlockedInfo(crew, member, blockedId);
         blockedInfoService.saveBlockedInfo(blockedInfo);
         return ResponseEntity.created(null).build();
     }

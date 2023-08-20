@@ -96,7 +96,7 @@ public class ReportController {
         Member reporter = memberService.findById(createReportedBoardRequest.getReporterMemberId());
         Board board = boardService.findById(createReportedBoardRequest.getBoardId());
         ReportType reportType = ReportType.getReportType(createReportedBoardRequest.getReportType());
-        reportService.saveReportedBoard(new ReportedBoard(board, reporter, reportType));
+        reportService.saveReportedBoard(new ReportedBoard(board, crew, reporter, reportType));
 
         return ResponseEntity.created(null).build();
     }
@@ -132,7 +132,7 @@ public class ReportController {
         Member reporter = memberService.findById(createReportedCommentRequest.getReporterMemberId());
         Comment comment = commentService.findById(createReportedCommentRequest.getCommentId());
         ReportType reportType = ReportType.getReportType(createReportedCommentRequest.getReportType());
-        reportService.saveReportedComment(new ReportedComment(comment, reporter, reportType));
+        reportService.saveReportedComment(new ReportedComment(crew, comment, reporter, reportType));
 
         return ResponseEntity.created(null).build();
     }
@@ -167,7 +167,7 @@ public class ReportController {
         Member reporter = memberService.findById(createReportedRunningNoticeRequest.getReporterMemberId());
         RunningNotice runningNotice = runningNoticeService.findById(createReportedRunningNoticeRequest.getRunningNoticeId());
         ReportType reportType = ReportType.getReportType(createReportedRunningNoticeRequest.getReportType());
-        reportService.saveReportedRunningNotice(new ReportedRunningNotice(runningNotice, reporter, reportType));
+        reportService.saveReportedRunningNotice(new ReportedRunningNotice(runningNotice, crew, reporter, reportType));
 
         return ResponseEntity.created(null).build();
     }

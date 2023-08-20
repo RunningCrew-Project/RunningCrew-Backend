@@ -1,5 +1,6 @@
 package com.project.runningcrew.reported.comment;
 
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.reported.ReportType;
 import com.project.runningcrew.comment.entity.Comment;
 import com.project.runningcrew.common.BaseEntity;
@@ -26,6 +27,10 @@ public class ReportedComment extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crew_id", nullable = false)
+    private Crew crew;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
@@ -39,7 +44,8 @@ public class ReportedComment extends BaseEntity {
     @Column
     private boolean deleted = false;
 
-    public ReportedComment(Comment comment, Member member, ReportType reportType) {
+    public ReportedComment(Crew crew, Comment comment, Member member, ReportType reportType) {
+        this.crew = crew;
         this.comment = comment;
         this.member = member;
         this.reportType = reportType;

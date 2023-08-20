@@ -36,4 +36,14 @@ public interface ReportedTotalPostRepository extends JpaRepository<ReportedTotal
             "where rp.member = :member")
     void deleteAllByMember(@Param("member") Member member);
 
+    /**
+     * 입력받은 크루에 존재하는 신고글 정보 전체목록을 삭제한다.
+     * @param crew 크루 정보
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ReportedTotalPost rp " +
+            "set rp.deleted = true " +
+            "where rp.crew = :crew")
+    void deleteAllByCrew(@Param("crew") Crew crew);
+
 }

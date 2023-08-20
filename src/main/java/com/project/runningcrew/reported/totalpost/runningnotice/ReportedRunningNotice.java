@@ -1,5 +1,6 @@
 package com.project.runningcrew.reported.totalpost.runningnotice;
 
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.reported.ReportType;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.reported.totalpost.ReportedTotalPost;
@@ -22,13 +23,13 @@ public class ReportedRunningNotice extends ReportedTotalPost {
     @JoinColumn(name = "running_notice_id")
     private RunningNotice runningNotice;
 
-    public ReportedRunningNotice(RunningNotice runningNotice, Member member, ReportType reportType) {
-        super(member, reportType);
+    public ReportedRunningNotice(RunningNotice runningNotice, Crew crew, Member member, ReportType reportType) {
+        super(crew, member, reportType);
         this.runningNotice = runningNotice;
     }
 
-    public ReportedRunningNotice(Long id, RunningNotice runningNotice, Member member, ReportType reportType) {
-        super(id, member, reportType);
+    public ReportedRunningNotice(Long id, RunningNotice runningNotice, Crew crew, Member member, ReportType reportType) {
+        super(id, crew, member, reportType);
         this.runningNotice = runningNotice;
     }
 

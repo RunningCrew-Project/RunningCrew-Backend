@@ -2,6 +2,7 @@ package com.project.runningcrew.crew.service;
 
 import com.project.runningcrew.area.entity.DongArea;
 import com.project.runningcrew.area.entity.GuArea;
+import com.project.runningcrew.blocked.repository.BlockedInfoRepository;
 import com.project.runningcrew.board.repository.BoardRepository;
 import com.project.runningcrew.comment.repository.CommentRepository;
 import com.project.runningcrew.crew.entity.Crew;
@@ -12,6 +13,8 @@ import com.project.runningcrew.member.entity.MemberRole;
 import com.project.runningcrew.notification.repository.NotificationRepository;
 import com.project.runningcrew.recruitanswer.repository.RecruitAnswerRepository;
 import com.project.runningcrew.recruitquestion.repository.RecruitQuestionRepository;
+import com.project.runningcrew.reported.comment.ReportedCommentRepository;
+import com.project.runningcrew.reported.totalpost.ReportedTotalPostRepository;
 import com.project.runningcrew.resourceimage.repository.BoardImageRepository;
 import com.project.runningcrew.resourceimage.repository.RunningNoticeImageRepository;
 import com.project.runningcrew.runningmember.repository.RunningMemberRepository;
@@ -48,6 +51,9 @@ public class CrewService {
     private final RecruitQuestionRepository recruitQuestionRepository;
     private final NotificationRepository notificationRepository;
     private final CrewConditionRepository crewConditionRepository;
+    private final BlockedInfoRepository blockedInfoRepository;
+    private final ReportedTotalPostRepository reportedTotalPostRepository;
+    private final ReportedCommentRepository reportedCommentRepository;
     private final ImageService imageService;
     private final String CREW_IMAGE_DIR_NAME = "crew";
     private final String DEFAULT_CREW_IMG = "크루 기본 이미지.svg";
@@ -125,6 +131,9 @@ public class CrewService {
      */
     @Transactional
     public void deleteCrew(Crew crew) {
+        blockedInfoRepository.deleteAllByCrew(crew);
+        reportedTotalPostRepository.deleteAllByCrew(crew);
+        reportedCommentRepository.deleteAllByCrew(crew);
         recruitAnswerRepository.deleteAllByCrew(crew);
         recruitQuestionRepository.deleteAllByCrew(crew);
         runningNoticeImageRepository.deleteAllByCrew(crew);

@@ -4,6 +4,7 @@ import com.project.runningcrew.crew.entity.Crew;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,5 +23,15 @@ public interface ReportedCommentRepository extends JpaRepository<ReportedComment
             "inner join Crew c on m.crew = c and c.deleted = false " +
             "where c = :crew")
     Slice<ReportedComment> findByCrew(@Param("crew") Crew crew, Pageable pageable);
+
+    /**
+     * 입력받은 크루의 신고 정보를 모두 삭제한다.
+     * @param crew 크루 정보
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ReportedComment rc " +
+            "set rc.deleted = true " +
+            "where rc.crew = :crew")
+    void deleteAllByCrew(@Param("crew") Crew crew);
 
 }

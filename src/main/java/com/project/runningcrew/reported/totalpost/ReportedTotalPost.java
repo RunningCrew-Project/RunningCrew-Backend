@@ -1,6 +1,7 @@
 package com.project.runningcrew.reported.totalpost;
 
 import com.project.runningcrew.common.BaseEntity;
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
 import com.project.runningcrew.reported.ReportType;
 import lombok.AccessLevel;
@@ -27,6 +28,10 @@ public abstract class ReportedTotalPost extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crew_id", nullable = false)
+    private Crew crew;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
@@ -36,12 +41,14 @@ public abstract class ReportedTotalPost extends BaseEntity {
     @Column
     private boolean deleted = false;
 
-    public ReportedTotalPost(Member member, ReportType reportType) {
+    public ReportedTotalPost(Crew crew, Member member, ReportType reportType) {
+        this.crew = crew;
         this.member = member;
         this.reportType = reportType;
     }
-    public ReportedTotalPost(Long id, Member member, ReportType reportType) {
+    public ReportedTotalPost(Long id, Crew crew, Member member, ReportType reportType) {
         this.id = id;
+        this.crew = crew;
         this.member = member;
         this.reportType = reportType;
     }
