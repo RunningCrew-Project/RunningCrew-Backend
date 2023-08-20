@@ -1,5 +1,6 @@
 package com.project.runningcrew.blocked.entity;
 
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,9 +24,12 @@ public class BlockedInfo {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crew_id")
+    private Crew crew;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member blockerMember;
-
 
     @Column(name = "blocked_member_id")
     private Long blockedMemberId;
@@ -33,7 +37,8 @@ public class BlockedInfo {
     @Column
     private boolean deleted = false;
 
-    public BlockedInfo(Member blockerMember, Long blockedMemberId) {
+    public BlockedInfo(Crew crew, Member blockerMember, Long blockedMemberId) {
+        this.crew = crew;
         this.blockerMember = blockerMember;
         this.blockedMemberId = blockedMemberId;
     }

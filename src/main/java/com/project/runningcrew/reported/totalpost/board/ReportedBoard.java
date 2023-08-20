@@ -1,5 +1,6 @@
 package com.project.runningcrew.reported.totalpost.board;
 
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.reported.ReportType;
 import com.project.runningcrew.board.entity.Board;
 import com.project.runningcrew.member.entity.Member;
@@ -22,13 +23,13 @@ public class ReportedBoard extends ReportedTotalPost {
     @JoinColumn(name = "board_id")
     private Board board;
 
-    public ReportedBoard(Board board, Member member, ReportType reportType) {
-        super(member, reportType);
+    public ReportedBoard(Board board, Crew crew, Member member, ReportType reportType) {
+        super(crew, member, reportType);
         this.board = board;
     }
 
-    public ReportedBoard(Long id, Board board, Member member, ReportType reportType) {
-        super(id, member, reportType);
+    public ReportedBoard(Long id, Board board, Crew crew, Member member, ReportType reportType) {
+        super(id, crew, member, reportType);
         this.board = board;
     }
 

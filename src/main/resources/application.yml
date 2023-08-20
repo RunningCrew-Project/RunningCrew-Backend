@@ -1,6 +1,6 @@
 spring:
   profiles:
-    default: dev
+    default: create
 
 cloud:
   aws:

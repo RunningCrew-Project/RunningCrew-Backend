@@ -1,6 +1,7 @@
 package com.project.runningcrew.blocked.repository;
 
 import com.project.runningcrew.blocked.entity.BlockedInfo;
+import com.project.runningcrew.crew.entity.Crew;
 import com.project.runningcrew.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -58,5 +59,15 @@ public interface BlockedInfoRepository extends JpaRepository<BlockedInfo, Long> 
             "set bi.deleted = true " +
             "where bi.blockerMember = :member")
     void deleteAllByBlockerMember(@Param("member") Member member);
+
+    /**
+     * 입력받은 크루의 모든 차단 정보를 삭제한다.
+     * @param crew 크루정보
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update BlockedInfo bi " +
+            "set bi.deleted = true " +
+            "where bi.crew = :crew")
+    void deleteAllByCrew(@Param("crew") Crew crew);
 
 }
