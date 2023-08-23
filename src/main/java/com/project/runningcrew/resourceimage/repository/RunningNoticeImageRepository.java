@@ -68,4 +68,13 @@ public interface RunningNoticeImageRepository extends JpaRepository<RunningNotic
             "where m.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
+    @Query("select img.id from RunningNoticeImage img " +
+            "inner join img.runningNotice r on r.deleted = false " +
+            "where r.member = :member")
+    List<Long> findIdsByMember(@Param("member") Member member);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update RunningNoticeImage i set i.deleted = true where i.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
+
 }
