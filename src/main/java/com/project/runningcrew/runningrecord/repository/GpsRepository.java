@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface GpsRepository extends JpaRepository<Gps, Long> {
 
@@ -22,5 +24,14 @@ public interface GpsRepository extends JpaRepository<Gps, Long> {
             "inner join g2.runningRecord r on r.deleted = false " +
             "where r.user = :user)")
     void deleteAllByUser(@Param("user") User user);
+
+    @Query("select g.id from Gps g " +
+            "inner join g.runningRecord r on r.deleted = false " +
+            "where r.user = :user")
+    List<Long> findIdsByUser(@Param("user") User user);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Gps g set g.deleted = true where g.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
 
 }

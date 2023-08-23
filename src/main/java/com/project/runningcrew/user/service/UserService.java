@@ -246,8 +246,12 @@ public class UserService {
     @Transactional
     public void deleteUser(User user) {
         logOut(user);
-        runningRecordImageRepository.deleteAllByUser(user);
-        gpsRepository.deleteAllByUser(user);
+        List<Long> runningRecordImageIds = runningRecordImageRepository.findIdsByUser(user);
+        runningRecordImageRepository.deleteAllByIds(runningRecordImageIds);
+
+        List<Long> gpsIds = gpsRepository.findIdsByUser(user);
+        gpsRepository.deleteAllByIds(gpsIds);
+
         runningRecordRepository.deleteAllByUser(user);
         notificationRepository.deleteAllByUser(user);
         recruitAnswerRepository.deleteAllByUser(user);
