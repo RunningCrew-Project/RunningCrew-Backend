@@ -12,6 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
+import java.util.List;
+
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     /**
@@ -50,5 +52,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "where c.member.crew = :crew )")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
+    @Query("select c.id from Comment c " +
+            "inner join c.member m on m.deleted = false " +
+            "where m.crew = :crew")
+    List<Long> findIdsByCrew(@Param("crew") Crew crew);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Comment c set c.deleted = true where c.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
 
 }

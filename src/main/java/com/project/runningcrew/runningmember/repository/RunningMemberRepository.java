@@ -101,4 +101,13 @@ public interface RunningMemberRepository extends JpaRepository<RunningMember, Lo
             "group by r.runningNotice")
     List<Object[]> countRunningMembersByRunningNoticeIds(@Param("runningNoticeIds") List<Long> runningNoticeIds);
 
+    @Query("select r.id from RunningMember r " +
+            "inner join r.member m on m.deleted = false "+
+            "where m.crew = :crew")
+    List<Long> findIdsByCrew(@Param("crew") Crew crew);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update RunningMember r set r.deleted = true where r.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
+
 }
