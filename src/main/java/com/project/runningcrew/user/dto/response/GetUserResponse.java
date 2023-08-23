@@ -33,6 +33,12 @@ public class GetUserResponse {
     //@Schema(description = "유저 휴대폰 번호 정보", example = "01012345678")
     //private String phoneNumber;
 
+    @Schema(description = "동 id", example = "1")
+    private Long dongId;
+
+    @Schema(description = "동 이름", example = "전농동")
+    private String dongName;
+
     @Schema(description = "유저 성별 정보", example = "MAN")
     private Sex sex;
 
@@ -53,6 +59,8 @@ public class GetUserResponse {
         this.imgUrl = user.getImgUrl();
         this.loginType = user.getLogin_type();
         //this.phoneNumber = user.getPhoneNumber();
+        this.dongId = user.getDongArea().getId();
+        this.dongName = user.getDongArea().getName();
         this.sex = user.getSex();
         this.birthday = user.getBirthday();
         this.height = user.getHeight();
