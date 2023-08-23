@@ -187,4 +187,13 @@ public interface RunningNoticeRepository extends JpaRepository<RunningNotice, Lo
     @Query("select r.runningNotice from RunningMember r where r.member = :member")
     Slice<RunningNotice> findRunningNoticesByApplyMember(@Param("member") Member member, Pageable pageable);
 
+    @Query("select r.id from RunningNotice r " +
+            "inner join r.member m on m.deleted = false " +
+            "where m.crew = :crew")
+    List<Long> findIdsByCrew(@Param("crew") Crew crew);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update RunningNotice r set r.deleted = true where r.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
+
 }

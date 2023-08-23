@@ -53,4 +53,14 @@ public interface RunningRecordImageRepository extends JpaRepository<RunningRecor
             "where r.user = :user)")
     void deleteAllByUser(@Param("user") User user);
 
+
+    @Query("select img.id from RunningRecordImage img " +
+            "inner join img.runningRecord r on r.deleted = false " +
+            "where r.user = :user")
+    List<Long> findIdsByUser(@Param("user") User user);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update RunningRecordImage i set i.deleted = true where i.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
+
 }

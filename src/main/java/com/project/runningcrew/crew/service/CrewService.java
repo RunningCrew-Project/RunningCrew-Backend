@@ -136,12 +136,25 @@ public class CrewService {
         reportedCommentRepository.deleteAllByCrew(crew);
         recruitAnswerRepository.deleteAllByCrew(crew);
         recruitQuestionRepository.deleteAllByCrew(crew);
-        runningNoticeImageRepository.deleteAllByCrew(crew);
-        runningMemberRepository.deleteAllByCrew(crew);
-        commentRepository.deleteAllByCrew(crew);
-        runningNoticeRepository.deleteAllByCrew(crew);
-        boardImageRepository.deleteAllByCrew(crew);
-        boardRepository.deleteAllByCrew(crew);
+
+        List<Long> runningNoticeImageIds = runningNoticeImageRepository.findIdsByCrew(crew);
+        runningNoticeImageRepository.deleteAllByIds(runningNoticeImageIds);
+
+        List<Long> runningMemberIds = runningMemberRepository.findIdsByCrew(crew);
+        runningMemberRepository.deleteAllByIds(runningMemberIds);
+
+        List<Long> runningNoticeIds = runningNoticeRepository.findIdsByCrew(crew);
+        runningNoticeRepository.deleteAllByIds(runningNoticeIds);
+
+        List<Long> commentIds = commentRepository.findIdsByCrew(crew);
+        commentRepository.deleteAllByIds(commentIds);
+
+        List<Long> boardImageIds = boardImageRepository.findIdsByCrew(crew);
+        boardImageRepository.deleteAllByIds(boardImageIds);
+
+        List<Long> boardIds = boardRepository.findIdsByCrew(crew);
+        boardRepository.deleteAllByIds(boardIds);
+
         memberRepository.deleteAllByCrew(crew);
         notificationRepository.deleteAllByCrew(crew);
         crewConditionRepository.deleteByCrew(crew);
