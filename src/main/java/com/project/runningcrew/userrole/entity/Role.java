@@ -21,7 +21,7 @@ public enum Role {
 
     public static Role getRole(String userRole) {
         return Arrays.stream(Role.values())
-                .filter(role -> role.getValue().equals(userRole))
+                .filter(role -> role.getValue().equals("ROLE_" + userRole))
                 .findAny()
                 .orElseThrow(UserRoleNotFoundException::new);
     }
