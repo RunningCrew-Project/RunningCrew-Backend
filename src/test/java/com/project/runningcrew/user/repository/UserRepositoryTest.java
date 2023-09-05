@@ -155,6 +155,33 @@ class UserRepositoryTest {
         Assertions.assertThat(findUser.get().getId()).isEqualTo(user.getId());
     }
 
+    @Test
+    public void findByEmailForAdmin_테스트() {
+        //given
+        SidoArea sidoArea = testEntityFactory.getSidoArea(0);
+        GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
+        DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
+        String email = "email@email.com";
+        User user = User.builder()
+                .email(email)
+                .name("name")
+                .nickname("nickname")
+                .imgUrl("imgUrl")
+                .login_type(LoginType.EMAIL)
+                .dongArea(dongArea)
+                .build();
+        user.updateDeleted(true);
+        userRepository.save(user);
+        em.flush();
+        em.clear();
+
+        ///when
+        Optional<User> findUser = userRepository.findByEmailForAdmin(email);
+
+        //then
+        Assertions.assertThat(findUser).isNotEmpty();
+        Assertions.assertThat(findUser.get().getEmail()).isEqualTo(email);
+    }
 
     @Test
     public void deleteForAdmin_테스트() {
