@@ -53,9 +53,11 @@ public class UserJdbcRepositoryImpl implements UserJdbcRepository {
 
     @Transactional
     @Override
-    public void deleteForAdmin(User user) {
-        String sql = "delete from users where user_id = :userId";
-        namedParameterJdbcTemplate.update(sql, Map.of("userId", user.getId()));
+    public void rollbackUser(Long id) {
+        String sql = "update users set name = null, nickname = null, dong_area_id = null, " +
+                "img_url = null, sex = null, birthday = null, height = null, weight = null, " +
+                "password = null, phone_number = null, deleted = false  where user_id = :userId";
+        namedParameterJdbcTemplate.update(sql, Map.of("userId", id));
     }
 
 }

@@ -184,7 +184,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    public void deleteForAdmin_테스트() {
+    public void rollbackUser_테스트() {
         //given
         SidoArea sidoArea = testEntityFactory.getSidoArea(0);
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
@@ -203,16 +203,17 @@ class UserRepositoryTest {
                 .height(100)
                 .weight(100)
                 .build();
+        user.updateDeleted(true);
         userRepository.save(user);
         em.flush();
         em.clear();
 
         ///when
-        userRepository.deleteForAdmin(user);
+        userRepository.rollbackUser(user.getId());
 
         //then
-        Optional<User> findUser = userRepository.findByIdForAdmin(user.getId());
-        Assertions.assertThat(findUser).isEmpty();
+        Optional<User> findUser = userRepository.findById(user.getId());
+        Assertions.assertThat(findUser).isNotEmpty();
     }
 
 
