@@ -1,6 +1,7 @@
 package com.project.runningcrew.oauth.oauth2user.parser;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.project.runningcrew.exception.notFound.UserNotFoundException;
 import com.project.runningcrew.exception.notFound.UserRoleNotFoundException;
@@ -23,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,8 +72,10 @@ public class AppleUserParser {
 
         try {
             SignedJWT signedJWT = SignedJWT.parse(oauthDto.getIdToken());
-            JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
-            Map<String, Object> attributes = jwtClaimsSet.toJSONObject();
+            ReadOnlyJWTClaimsSet getPayload = signedJWT.getJWTClaimsSet();
+
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("email", getPayload.getStringClaim("email"));
 
             if(!CollectionUtils.isEmpty(attributes)) {
                 return attributes;
