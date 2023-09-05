@@ -8,6 +8,8 @@ public interface UserJdbcRepository {
 
     Optional<User> findByIdForAdmin(Long id);
 
+    Optional<User> findByEmailForAdmin(String email);
+
     void deleteForAdmin(User user);
 
 }

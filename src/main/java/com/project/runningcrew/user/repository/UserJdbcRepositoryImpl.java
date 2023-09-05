@@ -40,6 +40,17 @@ public class UserJdbcRepositoryImpl implements UserJdbcRepository {
         }
     }
 
+    @Override
+    public Optional<User> findByEmailForAdmin(String email) {
+        try {
+            String sql = "select * from users where email = :email";
+            User user = namedParameterJdbcTemplate.queryForObject(sql, Map.of("email", email), this::mapRow);
+            return Optional.of(user);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
     @Transactional
     @Override
     public void deleteForAdmin(User user) {
