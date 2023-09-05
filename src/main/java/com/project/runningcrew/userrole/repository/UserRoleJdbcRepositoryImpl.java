@@ -1,6 +1,7 @@
 package com.project.runningcrew.userrole.repository;
 
 import com.project.runningcrew.user.entity.User;
+import com.project.runningcrew.userrole.entity.Role;
 import com.project.runningcrew.userrole.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -20,6 +21,7 @@ public class UserRoleJdbcRepositoryImpl implements UserRoleJdbcRepository {
     public UserRole mapRow(ResultSet rs, int rowNum) throws SQLException {
         UserRole userRole = UserRole.builder()
                 .id(rs.getLong("user_role_id"))
+                .role(Role.getRole(rs.getString("role")))
                 .build();
         userRole.updateDeleted(rs.getBoolean("deleted"));
 
