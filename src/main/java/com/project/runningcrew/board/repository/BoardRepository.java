@@ -55,4 +55,13 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "where b2.member.crew = :crew )")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
+    @Query("select b.id from Board b " +
+            "inner join b.member m on m.deleted = false " +
+            "where m.crew = :crew")
+    List<Long> findIdsByCrew(@Param("crew") Crew crew);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Board b set b.deleted = true where b.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
+
 }

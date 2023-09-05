@@ -68,4 +68,19 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
             "where m.crew = :crew)")
     void deleteAllByCrew(@Param("crew") Crew crew);
 
+    @Query("select img.id from BoardImage img " +
+            "inner join img.board b on b.deleted = false " +
+            "where b.member = :member")
+    List<Long> findIdsByMember(@Param("member") Member member);
+
+    @Query("select img.id from BoardImage img " +
+            "inner join img.board b on b.deleted = false " +
+            "inner join b.member m on m.deleted = false " +
+            "where m.crew = :crew")
+    List<Long> findIdsByCrew(@Param("crew") Crew crew);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update BoardImage i set i.deleted = true where i.id in :ids")
+    void deleteAllByIds(@Param("ids") List<Long> ids);
+
 }

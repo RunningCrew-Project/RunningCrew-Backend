@@ -110,10 +110,16 @@ public class MemberService {
         } else {
             reportedTotalPostRepository.deleteAllByMember(member);
             blockedInfoRepository.deleteAllByBlockerMember(member);
-            boardImageRepository.deleteAllByMember(member);
+
+            List<Long> boardImageIds = boardImageRepository.findIdsByMember(member);
+            boardImageRepository.deleteAllByIds(boardImageIds);
+
             commentRepository.deleteAllByMember(member);
             boardRepository.deleteAllByMember(member);
-            runningNoticeImageRepository.deleteAllByMember(member);
+
+            List<Long> runningNoticeImageIds = runningNoticeImageRepository.findIdsByMember(member);
+            runningNoticeImageRepository.deleteAllByIds(runningNoticeImageIds);
+
             runningMemberRepository.deleteAllByMember(member);
             runningNoticeRepository.deleteAllByMember(member);
             memberRepository.delete(member);

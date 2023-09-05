@@ -97,7 +97,7 @@ public class User extends BaseEntity {
     @Builder
     public User(Long id, String email, String password, String name, String nickname, String imgUrl,
                 LoginType login_type, String phoneNumber, DongArea dongArea, Sex sex,
-                LocalDate birthday, int height, int weight) {
+                LocalDate birthday, Integer height, Integer weight) {
 
         this.id = id;
         this.email = email;
@@ -149,11 +149,11 @@ public class User extends BaseEntity {
 
     public void updatePhoneNumber(String phoneNumber) {this.phoneNumber = phoneNumber;}
 
-    public void updateHeight(int height) {
+    public void updateHeight(Integer height) {
         this.height = height;
     }
 
-    public void updateWeight(int weight) {
+    public void updateWeight(Integer weight) {
         this.weight = weight;
     }
 
