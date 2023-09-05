@@ -43,11 +43,10 @@ public class KakaoUserParser {
             User user = optionalUser.get();
             UserRole userRole = userRoleRepository.findByUserForAdmin(user).orElseThrow(UserRoleNotFoundException::new);
             if (user.isDeleted()) {
-                userRoleRepository.deleteForAdmin(userRole);
-                userRepository.deleteForAdmin(user);
-            } else {
-                return new OAuth2User(user, userRole);
+                userRepository.rollbackUser(user.getId());
+                userRoleRepository.rollbackUserRole(userRole.getId());
             }
+            return new OAuth2User(user, userRole);
         }
 
         log.info("입력받은 Email 로 가입된 Kakao 회원이 없습니다.");

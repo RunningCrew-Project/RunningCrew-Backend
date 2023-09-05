@@ -10,6 +10,6 @@ public interface UserJdbcRepository {
 
     Optional<User> findByEmailForAdmin(String email);
 
-    void deleteForAdmin(User user);
+    void rollbackUser(Long id);
 
 }

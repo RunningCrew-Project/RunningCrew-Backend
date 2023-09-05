@@ -9,6 +9,6 @@ public interface UserRoleJdbcRepository {
 
     Optional<UserRole> findByUserForAdmin(User user);
 
-    void deleteForAdmin(UserRole userRole);
+    void rollbackUserRole(Long id);
 
 }

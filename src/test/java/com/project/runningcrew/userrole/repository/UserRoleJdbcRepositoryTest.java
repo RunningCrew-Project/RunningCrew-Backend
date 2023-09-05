@@ -53,23 +53,25 @@ class UserRoleJdbcRepositoryTest {
     }
 
     @Test
-    public void deleteForAdmin_테스트() {
+    public void rollback_테스트() {
         //given
         SidoArea sidoArea = testEntityFactory.getSidoArea(0);
         GuArea guArea = testEntityFactory.getGuArea(sidoArea, 0);
         DongArea dongArea = testEntityFactory.getDongArea(guArea, 0);
         User user = testEntityFactory.getUser(dongArea, 0);
         UserRole userRole = new UserRole(user, Role.USER);
+        userRole.updateDeleted(true);
         userRoleRepository.save(userRole);
         em.flush();
         em.clear();
 
         ///when
-        userRoleRepository.deleteForAdmin(userRole);
+        userRoleRepository.rollbackUserRole(userRole.getId());
 
         //then
-        Optional<UserRole> findUser = userRoleRepository.findByUser(user);
-        assertThat(findUser).isEmpty();
+        Optional<UserRole> findUserRole = userRoleRepository.findByUser(user);
+        assertThat(findUserRole).isNotEmpty();
+        assertThat(findUserRole.get().isDeleted()).isFalse();
     }
 
 }
