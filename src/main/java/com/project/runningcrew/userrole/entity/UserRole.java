@@ -2,6 +2,7 @@ package com.project.runningcrew.userrole.entity;
 
 import com.project.runningcrew.user.entity.User;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -35,6 +36,13 @@ public class UserRole {
     private boolean deleted = false;
 
     public UserRole(User user, Role role) {
+        this.user = user;
+        this.role = role;
+    }
+
+    @Builder
+    public UserRole(Long id, User user, Role role) {
+        this.id = id;
         this.user = user;
         this.role = role;
     }
