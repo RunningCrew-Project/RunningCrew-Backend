@@ -44,8 +44,8 @@ public class GoogleUserParser {
             User user = optionalUser.get();
             UserRole userRole = userRoleRepository.findByUserForAdmin(user).orElseThrow(UserRoleNotFoundException::new);
             if (user.isDeleted()) {
-                userRepository.deleteForAdmin(user);
                 userRoleRepository.deleteForAdmin(userRole);
+                userRepository.deleteForAdmin(user);
             } else {
                 return new OAuth2User(user, userRole);
             }
