@@ -39,11 +39,11 @@ public class UserRoleJdbcRepositoryImpl implements UserRoleJdbcRepository {
         }
     }
 
+
     @Transactional
     @Override
-    public void deleteForAdmin(UserRole userRole) {
-        String sql = "delete from user_roles where user_role_id = :userRoleId";
-        namedParameterJdbcTemplate.update(sql, Map.of("userRoleId", userRole.getId()));
+    public void rollbackUserRole(Long id) {
+        String sql = "update user_roles set deleted = false  where user_role_id = :userRoleId";
+        namedParameterJdbcTemplate.update(sql, Map.of("userRoleId", id));
     }
-
 }
